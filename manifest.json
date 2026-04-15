@@ -1,0 +1,14 @@
+{
+  "repo": "Expert-Integrado/ei-prompt",
+  "branch": "main",
+  "files": [
+    "CLAUDE.md",
+    "modelo/Orquestrador.md",
+    "modelo/Qualifier.md",
+    "modelo/Scheduler.md",
+    "modelo/Protractor.md",
+    ".claude/agents/client-project-scaffolder.md",
+    ".claude/agents/docs-editor-conciso.md",
+    ".claude/agents/docs-reviewer.md"
+  ]
+}

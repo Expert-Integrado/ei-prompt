@@ -1,0 +1,27 @@
+{
+  "name": "ei-prompt",
+  "version": "1.0.0",
+  "description": "Baixa o conjunto de agentes EiPrompt (Orquestrador, Qualifier, Scheduler, Protractor) do GitHub para o projeto atual.",
+  "bin": {
+    "ei-prompt": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "manifest.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ei-prompt",
+    "claude",
+    "agents",
+    "orquestrador",
+    "prompts"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Expert-Integrado/ei-prompt.git"
+  }
+}
