@@ -16,6 +16,14 @@
 
 **SEMPRE usar o agente `docs-editor-conciso`** para editar arquivos de agentes (Orquestrador.md, Qualifier.md, Scheduler.md, Protractor.md, etc.). Este agente garante que os princípios de otimização sejam seguidos.
 
+## Regra Inviolável: `modelo/` é Read-Only
+
+**NUNCA fazer alterações nos arquivos dentro da pasta `modelo/`.** Os templates base são imutáveis.
+
+- Todas as alterações devem ser feitas na pasta do cliente específico (ex: `malu/`, `joao/`) via `/ei-ajustes <cliente> <descrição>`.
+- Se precisar criar um novo cliente, use `/ei-cria-cliente <nome>` — ele copia `modelo/` sem alterar.
+- `/ei-review` pode auditar `modelo/*.md` em modo leitura, mas nunca editar.
+
 ## Slash Commands do Projeto
 
 | Comando | Uso |
