@@ -9,6 +9,14 @@
     "modelo/Protractor.md",
     ".claude/agents/client-project-scaffolder.md",
     ".claude/agents/docs-editor-conciso.md",
-    ".claude/agents/docs-reviewer.md"
+    ".claude/agents/docs-reviewer.md",
+    ".claude/settings.json",
+    ".claude/hooks/inject-ei-context.sh",
+    ".claude/hooks/prompt-matches-agent.sh",
+    ".claude/commands/ei-edit.md",
+    ".claude/commands/ei-review.md",
+    ".claude/commands/ei-ctx.md",
+    ".claude/commands/ei-cria-cliente.md",
+    ".claude/commands/ei-ajustes.md"
   ]
 }

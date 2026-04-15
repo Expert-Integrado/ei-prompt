@@ -74,9 +74,24 @@ Sempre apresente:
 2. **Documento editado** — Versão completa otimizada
 3. **Alerta se algo não pôde ser alterado** — Especialmente se envolvia `<response_format>`
 
-## FINALIZAÇÃO
+## FINALIZAÇÃO (Anti-Loop)
 
-Ao concluir os ajustes:
+**Verificar PRIMEIRO se o prompt recebido contém a tag `[CICLO_CORRECAO=1]`:**
 
-1. **Informar que o trabalho está concluído** e que o agente `docs-reviewer` pode ser usado para validar as alterações
-2. Aguardar instruções do usuário
+### Modo A — Edição normal (sem a tag)
+1. Aplicar as alterações no arquivo.
+2. **Invocar o `docs-reviewer`** via Agent tool para auditoria (obrigatório).
+3. Reportar o veredicto ao usuário:
+   - APROVADO → informar conclusão.
+   - REPROVADO → o `docs-reviewer` já cuidará do ciclo de correção automático. Apenas repasse o output dele.
+
+### Modo B — Correção disparada pelo reviewer (prompt contém `[CICLO_CORRECAO=1]`)
+1. Aplicar APENAS as correções listadas pelo reviewer.
+2. **NÃO invocar o `docs-reviewer` novamente** — isto evita loop infinito.
+3. Reportar o resultado diretamente ao usuário: "Correções aplicadas. Rode `/ei-review <agente>` se quiser nova auditoria."
+
+## SLASH COMMANDS RELACIONADOS
+
+- `/ei-edit <agente> <instrução>` — fluxo completo (editor + auditoria)
+- `/ei-review <agente>` — auditoria somente-leitura
+- `/ei-ctx` — recarregar contexto do projeto

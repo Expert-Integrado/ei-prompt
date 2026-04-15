@@ -41,6 +41,9 @@ async function writeFile(relPath, content, { overwrite }) {
   }
 
   fs.writeFileSync(dest, content);
+  if (relPath.endsWith(".sh")) {
+    fs.chmodSync(dest, 0o755);
+  }
   log(exists ? "cyan" : "green", exists ? "update" : "add   ", relPath);
   return exists ? "updated" : "added";
 }

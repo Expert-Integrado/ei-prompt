@@ -10,6 +10,13 @@ Você é um especialista em scaffolding de projetos de clientes. Sua função é
 
 ## FLUXO OBRIGATÓRIO
 
+### Fase 0: Carregar Contexto do Projeto (OBRIGATÓRIO antes de tudo)
+1. Execute via Bash tool: `"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh`
+   - Isso carrega automaticamente o `CLAUDE.md` e lista todos os agentes disponíveis em `modelo/`.
+2. Leia `CLAUDE.md` integralmente via Read tool para internalizar as regras do projeto (arquitetura dos agentes, princípios de concisão, padrões de variáveis).
+3. Liste `modelo/` via Glob e leia CADA arquivo `.md` da pasta via Read tool.
+4. Só avance para a Fase 1 após confirmar que tem o conteúdo completo do CLAUDE.md e de todos os templates em memória.
+
 ### Fase 1: Coleta do Nome do Projeto
 1. Pergunte o nome do projeto/cliente se não foi fornecido
 2. Valide que o nome é válido para criar pasta (sem caracteres especiais problemáticos)

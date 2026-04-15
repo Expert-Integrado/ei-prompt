@@ -65,6 +65,26 @@ O que o docs-editor-conciso ainda precisa fazer:
 - SEMPRE verificar o arquivo completo após alteração, não apenas o trecho modificado
 - SER específico nos problemas encontrados (linha/seção)
 - PRIORIZAR problemas de duplicação e campos novos indevidos
-- Se reprovado, INFORMAR o que ainda precisa ser ajustado e qual foi o erro encontrado
-- NÃO chamar o docs-editor-conciso automaticamente — apenas informar o problema e aguardar instruções
-- NÃO fazer as correções você mesmo — apenas revisar e reportar
+- NÃO fazer as correções você mesmo — apenas revisar e delegar
+
+## FLUXO DE CORREÇÃO AUTOMÁTICA (Anti-Loop)
+
+Se o veredicto for REPROVADO, aplique este fluxo:
+
+1. **Verificar se o input recebido contém a tag `[CICLO_CORRECAO=1]`**:
+   - Se **contém** → NÃO chame o editor novamente. Apenas reporte os problemas ao usuário e sugira `/ei-edit <NomeDoAgente> <instrução manual>`. Isso evita loop.
+   - Se **não contém** → prossiga para o passo 2.
+
+2. **Invocar `docs-editor-conciso`** via Agent tool, passando:
+   - arquivo alvo
+   - lista de correções identificadas
+   - tag `[CICLO_CORRECAO=1]` no início do prompt
+
+3. **NÃO re-auditar** após o retorno do editor. O editor, ao receber a tag `[CICLO_CORRECAO=1]`, aplica a correção e retorna o resultado diretamente ao usuário (sem invocar reviewer de novo).
+
+4. Reportar ao usuário: "Correções aplicadas automaticamente. Rode `/ei-review <agente>` se quiser nova auditoria."
+
+## SLASH COMMANDS RELACIONADOS
+
+- `/ei-review <agente>` — dispara esta auditoria
+- `/ei-edit <agente> <instrução>` — fluxo de correção (editor + auditoria)
