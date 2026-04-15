@@ -6,13 +6,13 @@ CLI que instala o conjunto de agentes **EiPrompt** (Orquestrador, Qualifier, Sch
 
 ```bash
 # Instala os arquivos (não sobrescreve o que já existe)
-npx ei-prompt@latest
+npx @expertzinhointegrado/ei-prompt@latest
 
 # Atualiza — sobrescreve arquivos já existentes
-npx ei-prompt@latest update
+npx @expertzinhointegrado/ei-prompt@latest update
 
 # Ajuda
-npx ei-prompt@latest --help
+npx @expertzinhointegrado/ei-prompt@latest --help
 ```
 
 ## O que é instalado

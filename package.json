@@ -1,5 +1,5 @@
 {
-  "name": "ei-prompt",
+  "name": "@expertzinhointegrado/ei-prompt",
   "version": "1.0.0",
   "description": "Baixa o conjunto de agentes EiPrompt (Orquestrador, Qualifier, Scheduler, Protractor) do GitHub para o projeto atual.",
   "bin": {

@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(chmod +x /root/EiPrompt/bin/cli.js)",
-      "Bash(gh auth *)",
-      "Bash(node /root/EiPrompt/bin/cli.js --help)"
-    ]
-  }
-}

@@ -77,9 +77,9 @@ function help() {
 ${COLORS.cyan}ei-prompt${COLORS.reset} — instala agentes EiPrompt no projeto atual
 
 ${COLORS.yellow}Uso:${COLORS.reset}
-  npx ei-prompt@latest           Instala os arquivos (não sobrescreve existentes)
-  npx ei-prompt@latest update    Atualiza os arquivos (sobrescreve tudo)
-  npx ei-prompt@latest --help    Mostra esta ajuda
+  npx @expertzinhointegrado/ei-prompt@latest           Instala os arquivos (não sobrescreve existentes)
+  npx @expertzinhointegrado/ei-prompt@latest update    Atualiza os arquivos (sobrescreve tudo)
+  npx @expertzinhointegrado/ei-prompt@latest --help    Mostra esta ajuda
 
 ${COLORS.yellow}Arquivos instalados:${COLORS.reset}
 ${manifest.files.map((f) => `  - ${f}`).join("\n")}
