@@ -16,6 +16,16 @@
 
 **SEMPRE usar o agente `docs-editor-conciso`** para editar arquivos de agentes (Orquestrador.md, Qualifier.md, Scheduler.md, Protractor.md, etc.). Este agente garante que os princípios de otimização sejam seguidos.
 
+## Slash Commands do Projeto
+
+| Comando | Uso |
+|---------|-----|
+| `/ei-cria-cliente <nome>` | Cria novo projeto de cliente (pasta + templates personalizados). Ex: `/ei-cria-cliente malu` |
+| `/ei-ajustes <cliente> <descrição>` | Aplica ajuste em agente de cliente existente. Ex: `/ei-ajustes malu a ia esta falando sobre valores` |
+| `/ei-edit <agente> <instrução>` | Edita um template em `modelo/*.md` (editor + auditoria automática) |
+| `/ei-review <agente>` | Audita um template em `modelo/*.md` (somente leitura) |
+| `/ei-ctx` | Recarrega contexto do projeto (CLAUDE.md + lista de modelos) |
+
 ## Otimização de Prompts (Orchestrators/Agentes)
 
 ### Princípios de Concisão
