@@ -77,14 +77,13 @@ async function run({ overwrite }) {
 
 function help() {
   console.log(`
-${COLORS.cyan}ei-prompt${COLORS.reset} — instala agentes EiPrompt no projeto atual
+${COLORS.cyan}ei-prompt${COLORS.reset} — baixa/atualiza agentes EiPrompt no projeto atual
 
 ${COLORS.yellow}Uso:${COLORS.reset}
-  npx @expertzinhointegrado/ei-prompt@latest           Instala os arquivos (não sobrescreve existentes)
-  npx @expertzinhointegrado/ei-prompt@latest update    Atualiza os arquivos (sobrescreve tudo)
+  npx @expertzinhointegrado/ei-prompt@latest           Baixa tudo e sobrescreve arquivos existentes
   npx @expertzinhointegrado/ei-prompt@latest --help    Mostra esta ajuda
 
-${COLORS.yellow}Arquivos instalados:${COLORS.reset}
+${COLORS.yellow}Arquivos instalados/atualizados:${COLORS.reset}
 ${manifest.files.map((f) => `  - ${f}`).join("\n")}
 `);
 }
@@ -93,13 +92,8 @@ const cmd = process.argv[2];
 
 if (cmd === "--help" || cmd === "-h" || cmd === "help") {
   help();
-} else if (cmd === "update") {
+} else if (!cmd || cmd === "install" || cmd === "update") {
   run({ overwrite: true }).catch((err) => {
-    log("red", "erro", err.message);
-    process.exit(1);
-  });
-} else if (!cmd || cmd === "install") {
-  run({ overwrite: false }).catch((err) => {
     log("red", "erro", err.message);
     process.exit(1);
   });

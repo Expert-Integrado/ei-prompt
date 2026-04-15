@@ -4,12 +4,10 @@ CLI que instala o conjunto de agentes **EiPrompt** (Orquestrador, Qualifier, Sch
 
 ## Uso
 
-```bash
-# Instala os arquivos (não sobrescreve o que já existe)
-npx @expertzinhointegrado/ei-prompt@latest
+Um único comando — baixa tudo e sempre sobrescreve arquivos existentes (funciona tanto para primeira instalação quanto para atualização):
 
-# Atualiza — sobrescreve arquivos já existentes
-npx @expertzinhointegrado/ei-prompt@latest update
+```bash
+npx @expertzinhointegrado/ei-prompt@latest
 
 # Ajuda
 npx @expertzinhointegrado/ei-prompt@latest --help
@@ -20,13 +18,11 @@ npx @expertzinhointegrado/ei-prompt@latest --help
 Os arquivos são baixados do repo [`Expert-Integrado/ei-prompt`](https://github.com/Expert-Integrado/ei-prompt) (branch `main`):
 
 - `CLAUDE.md` — preferências do projeto
-- `modelo/Orquestrador.md`
-- `modelo/Qualifier.md`
-- `modelo/Scheduler.md`
-- `modelo/Protractor.md`
-- `.claude/agents/client-project-scaffolder.md`
-- `.claude/agents/docs-editor-conciso.md`
-- `.claude/agents/docs-reviewer.md`
+- `modelo/*.md` — templates dos agentes (Orquestrador, Qualifier, Scheduler, Protractor)
+- `.claude/agents/*.md` — subagentes (scaffolder, editor, reviewer)
+- `.claude/settings.json` — configuração dos hooks
+- `.claude/hooks/*.sh` — scripts que injetam contexto automaticamente
+- `.claude/commands/ei-*.md` — slash commands (`/ei-cria-cliente`, `/ei-ajustes`, `/ei-edit`, `/ei-review`, `/ei-ctx`)
 
 ## Como funciona
 
