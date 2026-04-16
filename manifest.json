@@ -3,6 +3,7 @@
   "branch": "main",
   "files": [
     "CLAUDE.md",
+    "CHANGELOG.md",
     "modelo/Orquestrador.md",
     "modelo/Qualifier.md",
     "modelo/Scheduler.md",

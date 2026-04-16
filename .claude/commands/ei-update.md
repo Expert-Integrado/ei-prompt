@@ -8,10 +8,10 @@ description: Atualiza os agentes EiPrompt na pasta atual e mostra o que há de n
    npx @expertzinhointegrado/ei-prompt@latest
    ```
 
-2. Busque o CHANGELOG mais recente do repositório e mostre a seção do topo (versão mais nova):
+2. Leia o `./CHANGELOG.md` local (baixado pelo `npx`) e mostre só a seção da versão mais nova:
 
    ```bash
-   curl -s https://raw.githubusercontent.com/Expert-Integrado/ei-prompt/main/CHANGELOG.md | awk '/^## \[/{c++} c==2{exit} {print}'
+   awk '/^## \[/{c++} c==2{exit} {print}' ./CHANGELOG.md
    ```
 
 3. Resuma ao usuário em 1–2 linhas:
