@@ -40,6 +40,14 @@ async function writeFile(relPath, content, { overwrite }) {
     return "skipped";
   }
 
+  if (exists) {
+    const current = fs.readFileSync(dest, "utf8");
+    if (current === content) {
+      log("dim", "same  ", `${relPath} ${COLORS.dim}(sem mudanças)${COLORS.reset}`);
+      return "unchanged";
+    }
+  }
+
   fs.writeFileSync(dest, content);
   if (relPath.endsWith(".sh")) {
     fs.chmodSync(dest, 0o755);
@@ -52,7 +60,7 @@ async function run({ overwrite }) {
   log("cyan", "ei-prompt", `baixando de ${manifest.repo}@${manifest.branch}`);
   console.log();
 
-  const results = { added: 0, updated: 0, skipped: 0, failed: 0 };
+  const results = { added: 0, updated: 0, unchanged: 0, skipped: 0, failed: 0 };
 
   for (const file of manifest.files) {
     try {
@@ -69,7 +77,7 @@ async function run({ overwrite }) {
   log(
     "green",
     "pronto",
-    `${results.added} adicionados, ${results.updated} atualizados, ${results.skipped} ignorados, ${results.failed} falhas`,
+    `${results.added} adicionados, ${results.updated} atualizados, ${results.unchanged} sem mudanças, ${results.skipped} ignorados, ${results.failed} falhas`,
   );
 
   if (results.failed > 0) process.exit(1);
