@@ -94,3 +94,51 @@ Exemplo:
 - **Preferir reutilizar** texto/estruturas que já existem no arquivo
 - **Evitar adicionar muito texto** — ser conciso, ir direto ao ponto
 - **Modificar o mínimo necessário** para resolver o problema
+
+## Envio de Mídia (imagens, vídeos, PDFs)
+
+Agentes podem enviar mídias para o lead. As mídias ficam declaradas **dentro da seção `<conhecimento>`** do Orquestrador (template ou cliente).
+
+### Formato do bloco de mídia
+```
+[Nome da mídia] → quando lead [gatilho]
+mediaUrl: "[https://link-direto/arquivo.ext]"
+mediaType: "image" | "video" | "file"
+```
+
+### Tipos válidos
+| `mediaType` | Extensões aceitas |
+|-------------|-------------------|
+| `image` | .jpg, .jpeg, .png, .webp |
+| `video` | .mp4, .mov |
+| `file`  | .pdf, .docx, .xlsx |
+
+### Regras do link
+- ✅ URL **direta**, terminando na extensão do arquivo
+- ✅ Arquivo **público** (qualquer um abre sem login)
+- ❌ **Não funciona:** YouTube, Instagram, Google Drive, Dropbox (são páginas, não arquivos)
+- **Validação rápida:** colar no navegador deve abrir/baixar o arquivo, não uma página
+
+### Onde obter o link (`mediaUrl`)
+Use o **Banco de Mídia** no frontend da **ExpertIntegrado** — lá o arquivo é hospedado e o link direto é gerado automaticamente (já no formato aceito).
+
+### Onde aplicar
+- **Cliente novo/ajuste:** adicionar blocos em `<conhecimento>` do Orquestrador do cliente via `/ei-ajustes <cliente> adicionar midia <descrição>`
+- **Template base:** já contém instrução de comportamento; mídias concretas são sempre do cliente, nunca do `modelo/`
+
+### Exemplo (empilhar quantas mídias forem necessárias)
+```
+<conhecimento>
+# Base de conhecimento sobre [Cliente]
+- [produto/serviço 1]
+- [produto/serviço 2]
+
+Apresentação dos fundos → quando lead pedir detalhes dos fundos
+mediaUrl: "https://site.com/apresentacao.pdf"
+mediaType: "file"
+
+Vídeo institucional → quando lead quiser conhecer a empresa
+mediaUrl: "https://site.com/video.mp4"
+mediaType: "video"
+</conhecimento>
+```

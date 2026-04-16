@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0] - 2026-04-16
+
+- Conhecimento de **Envio de Mídia** (imagens, vídeos, PDFs): padrão de bloco em `<conhecimento>` do Orquestrador, tipos válidos (`image`/`video`/`file`), regras do link direto e orientação para gerar o `mediaUrl` no Banco de Mídia do frontend ExpertIntegrado.
+- Template `modelo/Orquestrador.md`: placeholder de mídia em `<conhecimento>` + regra de acionamento em `<regras_gerais>`.
+- `client-project-scaffolder` ganhou Fase 4.5 — pergunta obrigatória sobre mídias no fluxo de criação de cliente.
+
 ## [1.3.2] - 2026-04-16
 
 - `/ei-update` agora mostra o CHANGELOG da versão mais nova após rodar o `npx`.
