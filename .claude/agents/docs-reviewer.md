@@ -71,7 +71,7 @@ O que o docs-editor-conciso ainda precisa fazer:
 
 Se o veredicto for REPROVADO, aplique este fluxo:
 
-1. **Verificar se o input recebido contém a tag `[CICLO_CORRECAO=1]`**:
+1. **Verificar se o input recebido contém a tag `[CICLO_CORRECAO=2]`**:
    - Se **contém** → NÃO chame o editor novamente. Apenas reporte os problemas ao usuário e sugira `/ei-edit <NomeDoAgente> <instrução manual>`. Isso evita loop.
    - Se **não contém** → prossiga para o passo 2.
 
@@ -80,7 +80,7 @@ Se o veredicto for REPROVADO, aplique este fluxo:
    - lista de correções identificadas
    - tag `[CICLO_CORRECAO=1]` no início do prompt
 
-3. **NÃO re-auditar** após o retorno do editor. O editor, ao receber a tag `[CICLO_CORRECAO=1]`, aplica a correção e retorna o resultado diretamente ao usuário (sem invocar reviewer de novo).
+3. **NÃO re-auditar** após o retorno do editor. O editor, ao receber a tag `[CICLO_CORRECAO=2]`, aplica a correção e retorna o resultado diretamente ao usuário (sem invocar reviewer de novo).
 
 4. Reportar ao usuário: "Correções aplicadas automaticamente. Rode `/ei-review <agente>` se quiser nova auditoria."
 
