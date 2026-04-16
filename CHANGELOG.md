@@ -1,9 +1,5 @@
 # Changelog
 
-## [1.3.3] - 2026-04-16
-
-- `CHANGELOG.md` agora é baixado pelo `npx` junto com os agentes — `/ei-update` lê direto de `./CHANGELOG.md` local.
-
 ## [1.3.2] - 2026-04-16
 
 - `/ei-update` agora mostra o CHANGELOG da versão mais nova após rodar o `npx`.
