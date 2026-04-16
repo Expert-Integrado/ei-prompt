@@ -6,8 +6,6 @@
 - Template `modelo/Orquestrador.md`: placeholder de mídia em `<conhecimento>` + regra de acionamento em `<regras_gerais>`.
 - `client-project-scaffolder` ganhou Fase 4.5 — pergunta obrigatória sobre mídias no fluxo de criação de cliente.
 
-## [1.3.2] - 2026-04-16
-
 - `/ei-update` agora mostra o CHANGELOG da versão mais nova após rodar o `npx`.
 
 ## [1.3.1] - 2026-04-16
