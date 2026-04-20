@@ -12,6 +12,29 @@
 | **Scheduler.md** | Gerencia agenda — marca, remarca e cancela reuniões |
 | **Protractor.md** | **Único responsável por encerrar sessões (FINALIZAR_SESSAO) e transferir para humano/agente.** O Orquestrador deve sempre acionar o Protractor para essas ações. |
 
+## Limites do Ajuste de Prompts
+
+### O que NÃO pode ser ajustado via prompts
+
+| Problema | Onde resolver |
+|----------|---------------|
+| Nome/apresentação da IA (como se apresenta) | Frontend → tela **Usuários** |
+| Erro ao agendar / agendamento não funciona | Frontend → tela **Usuários** ou **Regras de Rodízio de Usuários** |
+| Follow-ups / FUPs / Lembretes | **Fora do escopo** — não há treinamento para prompts de FUPs |
+| IA parou de responder / não responde | **Time técnico** — verificar com a equipe tech da empresa |
+| Ações automáticas no CRM (atualizar, mover, preencher) | Frontend → tela **Intenções** ou pedir ajuda ao time |
+
+**Quando o usuário pedir ajustes nesses itens:** Informar que não é ajuste de prompt e orientar para o local correto.
+
+### O que PODE ser ajustado via prompts
+
+- Comportamento conversacional da IA (tom, abordagem, perguntas)
+- Regras de qualificação de leads
+- Fluxo de conversa e decisões
+- Base de conhecimento e respostas sobre produtos/serviços
+- Envio de mídias (imagens, vídeos, PDFs)
+- Critérios de encerramento e transferência
+
 ## Ajustes em Prompts de Agentes
 
 **SEMPRE usar o agente `docs-editor-conciso`** para editar arquivos de agentes (Orquestrador.md, Qualifier.md, Scheduler.md, Protractor.md, etc.). Este agente garante que os princípios de otimização sejam seguidos.

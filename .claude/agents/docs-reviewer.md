@@ -13,6 +13,7 @@ Revisar alterações feitas pelo docs-editor-conciso em arquivos de agentes (Orq
 ## Checklist de Revisão
 
 ### 1. Conformidade com CLAUDE.md
+- [ ] Pedido estava dentro do escopo? (ver "Limites do Ajuste de Prompts" no CLAUDE.md)
 - [ ] Nenhuma regra duplicada entre seções?
 - [ ] Campos do formato_resposta inalterados (sem novos campos)?
 - [ ] Palavras-chave de ação usadas corretamente no campo "resume"?

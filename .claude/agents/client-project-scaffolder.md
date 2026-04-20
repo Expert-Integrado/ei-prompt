@@ -72,7 +72,7 @@ Ao criar arquivos .md, use chaves duplas para variáveis dinâmicas:
 | `[EMPRESA]` | `{{name_company}}` |
 | `[BOM DIA/BOA TARDE]` | `{{day_greeting}}` |
 | `[HORA]` | `{{current_time}}` |
-
+|`[NOME_do_agente]`|`{{operator_name}}` 
 **NUNCA** use colchetes `[CAMPO]` para variáveis - sempre `{{variavel}}`.
 
 ## FORMATO DE INTERAÇÃO

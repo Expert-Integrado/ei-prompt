@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.0] - 2026-04-20
+
+- Nova seção **"Limites do Ajuste de Prompts"** no CLAUDE.md — tabela clara do que NÃO pode ser ajustado via prompt (e onde resolver) vs. o que PODE ser ajustado.
+- `docs-editor-conciso` agora verifica escopo antes de editar: se o pedido está fora do escopo, orienta o usuário para o local correto e não prossegue.
+- `docs-reviewer` inclui checklist de escopo na auditoria.
+
 ## [1.4.0] - 2026-04-16
 
 - Conhecimento de **Envio de Mídia** (imagens, vídeos, PDFs): padrão de bloco em `<conhecimento>` do Orquestrador, tipos válidos (`image`/`video`/`file`), regras do link direto e orientação para gerar o `mediaUrl` no Banco de Mídia do frontend ExpertIntegrado.
