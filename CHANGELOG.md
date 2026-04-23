@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.6.2] - 2026-04-23
+
+- Hook `SubagentStop` (`post-scaffolder-review.sh`) ampliado para cobrir também o `docs-editor-conciso`. Quando o editor termina, o hook injeta instrução no Claude principal para invocar o `docs-reviewer` de verdade (via Agent tool) sobre o arquivo editado — impede auto-auditoria narrada pelo editor, que vinha acontecendo e mascarava a etapa de review.
+- Detecção do subagent agora usa o mais recente no transcript (`tail -1`) em vez de `grep -q`, evitando falsos positivos quando múltiplos tipos aparecem.
+
 ## [1.6.1] - 2026-04-23
 
 - `modelo/Orquestrador.md`: correção do fluxo de transferência e falha técnica.

@@ -1,10 +1,10 @@
 #!/bin/bash
 # SubagentStop hook — dispara auditoria automática com docs-reviewer
-# depois que o client-project-scaffolder terminar.
+# quando os subagents client-project-scaffolder ou docs-editor-conciso terminam.
 #
-# Estratégia: lê o transcript_path do JSON de entrada e procura pelo
-# Agent tool mais recente com subagent_type=client-project-scaffolder.
-# Se encontrou, injeta instrução no contexto do Claude principal.
+# Estratégia: lê o transcript_path do JSON de entrada e identifica o
+# subagent_type MAIS RECENTE no transcript. Se bater com um dos casos
+# cobertos, injeta instrução no contexto do Claude principal.
 
 INPUT=$(cat)
 
@@ -15,10 +15,15 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 [ -z "$TRANSCRIPT" ] && exit 0
 [ ! -f "$TRANSCRIPT" ] && exit 0
 
-# Procura nas últimas 200 linhas do transcript por invocação do scaffolder.
-# Evita falsos positivos: só dispara se o subagent que acabou foi ele.
-if tail -n 200 "$TRANSCRIPT" | grep -q '"subagent_type"[[:space:]]*:[[:space:]]*"client-project-scaffolder"'; then
-  cat <<'JSON'
+# Último subagent_type aparecendo nas últimas 200 linhas do transcript.
+LAST_SUBAGENT=$(tail -n 200 "$TRANSCRIPT" \
+  | grep -o '"subagent_type"[[:space:]]*:[[:space:]]*"[^"]*"' \
+  | tail -1 \
+  | sed 's/.*"\([^"]*\)"$/\1/')
+
+case "$LAST_SUBAGENT" in
+  client-project-scaffolder)
+    cat <<'JSON'
 {
   "hookSpecificOutput": {
     "hookEventName": "SubagentStop",
@@ -26,6 +31,17 @@ if tail -n 200 "$TRANSCRIPT" | grep -q '"subagent_type"[[:space:]]*:[[:space:]]*
   }
 }
 JSON
-fi
+    ;;
+  docs-editor-conciso)
+    cat <<'JSON'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SubagentStop",
+    "additionalContext": "O subagent docs-editor-conciso acabou de terminar. Se ele aplicou edições em um arquivo .md de agente (Orquestrador/Qualifier/Scheduler/Protractor — seja em modelo/ ou em pasta de cliente), AGORA invoque o docs-reviewer via Agent tool sobre ESSE arquivo para auditoria real. É PROIBIDO apresentar veredicto de auditoria ao usuário sem que o docs-reviewer tenha sido invocado de fato via Agent tool — auto-auditoria narrada pelo editor não conta. Se o veredicto for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer. Se nenhum arquivo .md de agente foi editado nesta rodada, ignore esta instrução."
+  }
+}
+JSON
+    ;;
+esac
 
 exit 0
