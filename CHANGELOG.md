@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.6.1] - 2026-04-23
+
+- `modelo/Orquestrador.md`: correção do fluxo de transferência e falha técnica.
+  - Nova **regra 24** (ERRO TÉCNICO ACIONA PROTRACTOR): qualquer falha de ferramenta (erro, timeout, payload inválido, resposta vazia) aciona o Protractor imediatamente, sem retry.
+  - Nova **regra 25** (MENCIONAR TRANSFERÊNCIA = EXECUTAR TRANSFERÊNCIA): se o orquestrador mencionar transferência ao lead, o Protractor é acionado na mesma resposta, com linguagem de ação concluída (nunca futura).
+  - `<regras_protractor>` ganha 6º gatilho: **FALHA TÉCNICA**.
+  - `<base_conhecimento>` (status `"error"`) e `<regras_agendamento>` ("Falhas de tool") agora remetem à regra 24.
+  - Bloco "Limite de chamadas" removido de `<regras_agendamento>`.
+  - Regra 22 atualizada para referenciar a regra 24; regra de mídia renumerada para 26.
+
 ## [1.6.0] - 2026-04-23
 
 - `client-project-scaffolder` agora usa `model: opus` (tarefa mais complexa — lê CLAUDE.md + todos os templates, coleta dados, preenche variáveis).
