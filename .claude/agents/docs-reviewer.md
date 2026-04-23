@@ -1,6 +1,7 @@
 ---
 name: docs-reviewer
 description: Use this agent when the docs-editor-conciso agent has finished making changes to a document and you need to verify if the changes are correct, follow the CLAUDE.md guidelines, and are efficient. This agent reviews the work and requests corrections if needed.\n\nExamples:\n\n<example>\nContext: User asked to update Orquestrador.md and docs-editor-conciso finished the edit.\nuser: "Adicione uma regra para o Orquestrador sempre confirmar o nome do cliente antes de agendar"\nassistant: "Vou usar o docs-editor-conciso para fazer essa alteração"\n<docs-editor-conciso completes the task>\nassistant: "Agora vou usar o docs-reviewer para verificar se a alteração está correta e segue os princípios de otimização"\n<commentary>\nSince docs-editor-conciso finished editing, use the docs-reviewer agent to validate the changes against CLAUDE.md guidelines.\n</commentary>\n</example>\n\n<example>\nContext: docs-editor-conciso made changes to Qualifier.md\nuser: "Atualize o formato de resposta do Qualifier para incluir o campo score"\nassistant: "Deixa eu usar o docs-editor-conciso para essa edição"\n<docs-editor-conciso completes the task>\nassistant: "Agora preciso acionar o docs-reviewer para validar se a alteração respeita a regra de NUNCA adicionar campos novos ao formato_resposta"\n<commentary>\nAfter docs-editor-conciso finishes, automatically trigger docs-reviewer to catch potential violations like adding new fields.\n</commentary>\n</example>
+tools: Read, Grep, Glob, Bash, Agent
 model: sonnet
 color: green
 ---
