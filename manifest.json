@@ -14,6 +14,7 @@
     ".claude/settings.json",
     ".claude/hooks/inject-ei-context.sh",
     ".claude/hooks/prompt-matches-agent.sh",
+    ".claude/hooks/post-scaffolder-review.sh",
     ".claude/commands/ei-edit.md",
     ".claude/commands/ei-review.md",
     ".claude/commands/ei-ctx.md",

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.0] - 2026-04-23
+
+- `client-project-scaffolder` agora usa `model: opus` (tarefa mais complexa — lê CLAUDE.md + todos os templates, coleta dados, preenche variáveis).
+- Novo hook `SubagentStop` (`.claude/hooks/post-scaffolder-review.sh`) dispara auditoria automática com `docs-reviewer` em paralelo após a criação de um novo cliente. Veredicto por arquivo é apresentado no resumo final.
+- `settings.json` registra o novo hook; `manifest.json` baixa o script.
+
 ## [1.5.0] - 2026-04-20
 
 - Nova seção **"Limites do Ajuste de Prompts"** no CLAUDE.md — tabela clara do que NÃO pode ser ajustado via prompt (e onde resolver) vs. o que PODE ser ajustado.
