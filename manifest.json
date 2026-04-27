@@ -8,6 +8,7 @@
     "modelo/Qualifier.md",
     "modelo/Scheduler.md",
     "modelo/Protractor.md",
+    "modelo/Follow-Up.md",
     ".claude/agents/client-project-scaffolder.md",
     ".claude/agents/docs-editor-conciso.md",
     ".claude/agents/docs-reviewer.md",

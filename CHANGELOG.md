@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.3] - 2026-04-27
+
+- Novo template `modelo/Follow-Up.md` — agente dedicado a gerar mensagens de follow-up para reengajar leads. Contém `<objetivo>`, `<regras_followup>` e `<templates>` com scaffold guiado para o configurador coletar e inserir os exemplos reais de FUP do cliente.
+
 ## [1.6.2] - 2026-04-23
 
 - Hook `SubagentStop` (`post-scaffolder-review.sh`) ampliado para cobrir também o `docs-editor-conciso`. Quando o editor termina, o hook injeta instrução no Claude principal para invocar o `docs-reviewer` de verdade (via Agent tool) sobre o arquivo editado — impede auto-auditoria narrada pelo editor, que vinha acontecendo e mascarava a etapa de review.
