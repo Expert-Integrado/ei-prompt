@@ -38,7 +38,7 @@ Se o input estiver vazio ou incompleto, pergunte ao usuário:
 
 ### Passo 5: Delegar ao docs-editor-conciso
 Invoque o agente `docs-editor-conciso` via Agent tool passando:
-- **arquivo alvo:** `<cliente>/<Agente>.md` (NÃO `modelo/`)
+- **arquivo alvo:** caminho absoluto completo conforme localizado no Passo 2 (ex: `/root/EiPrompt/malu/Qualifier.md`). NÃO usar caminho relativo. NÃO prefixar com `modelo/`.
 - **instrução:** a descrição do ajuste fornecida pelo usuário
 - **lembrete:** preservar `<response_format>`, seguir CLAUDE.md, modificar o mínimo necessário
 
