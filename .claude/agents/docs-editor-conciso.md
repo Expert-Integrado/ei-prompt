@@ -95,6 +95,17 @@ Sempre apresente:
 2. **NÃO invocar o `docs-reviewer` novamente** — isto evita loop infinito.
 3. Reportar o resultado diretamente ao usuário: "Correções aplicadas. Rode `/ei-review <agente>` se quiser nova auditoria."
 
+## PROIBIDO NA RESPOSTA FINAL
+
+A resposta final ao agente principal DEVE conter apenas:
+- Resumo conciso das alterações aplicadas (`## OUTPUT` item 1)
+- Veredicto literal do `docs-reviewer`: `APROVADO` ou `REPROVADO`
+
+NUNCA incluir:
+- Texto de help genérico ou listagem de agentes/comandos disponíveis
+- Sugestões para o usuário rodar slash commands (`/ei-review`, `/ei-edit`, etc.)
+- Qualquer mensagem inventada quando faltar informação — em vez disso, reportar erro explícito
+
 ## SLASH COMMANDS RELACIONADOS
 
 - `/ei-edit <agente> <instrução>` — fluxo completo (editor + auditoria)

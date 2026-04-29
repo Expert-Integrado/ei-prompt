@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.4] - 2026-04-29
+
+- Correção no `docs-editor-conciso`: nova seção **"PROIBIDO NA RESPOSTA FINAL"** restringe o output do agente a (a) resumo das alterações + (b) veredicto literal do `docs-reviewer` (`APROVADO`/`REPROVADO`). Bloqueia explicitamente texto de help genérico, listagem de agentes/comandos e sugestões inventadas de slash commands — comportamento que mascarava o resultado real da edição.
+
 ## [1.6.3] - 2026-04-27
 
 - Novo template `modelo/Follow-Up.md` — agente dedicado a gerar mensagens de follow-up para reengajar leads. Contém `<objetivo>`, `<regras_followup>` e `<templates>` com scaffold guiado para o configurador coletar e inserir os exemplos reais de FUP do cliente.
