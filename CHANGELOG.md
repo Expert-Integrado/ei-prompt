@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.6.6] - 2026-05-01
+
+- `docs-editor-conciso`: corrige falha em pastas de cliente com nomes contendo espaços (ex: `ACS Advogados Associados/Orquestrador.md`). O agente extraía a primeira palavra do nome e tentava abrir `modelo/<palavra>.md`, falhando com "arquivo não existe". Reforço aplicado em dois pontos:
+  - **description**: explicita que edita tanto `modelo/*.md` quanto arquivos em pastas de cliente (inclusive com espaços) e proíbe prefixar com `modelo/`.
+  - **Passo 0 do FLUXO**: instrução triplicada para copiar o caminho literal caractere por caractere, NUNCA prefixar com `modelo/`, NUNCA extrair palavras do nome do cliente.
+
+## [1.6.5] - 2026-04-29
+
+- `docs-editor-conciso`: Passo 0 obriga `Read` no caminho exato recebido no prompt antes de qualquer edição — impede o agente de adivinhar/reescrever caminhos quando o arquivo está fora de `modelo/`.
+- `ei-ajustes`: passa caminho absoluto completo (ex: `/root/EiPrompt/malu/Qualifier.md`) ao `docs-editor-conciso`, eliminando ambiguidade que levava o editor a procurar em `modelo/`.
+
 ## [1.6.4] - 2026-04-29
 
 - Correção no `docs-editor-conciso`: nova seção **"PROIBIDO NA RESPOSTA FINAL"** restringe o output do agente a (a) resumo das alterações + (b) veredicto literal do `docs-reviewer` (`APROVADO`/`REPROVADO`). Bloqueia explicitamente texto de help genérico, listagem de agentes/comandos e sugestões inventadas de slash commands — comportamento que mascarava o resultado real da edição.
