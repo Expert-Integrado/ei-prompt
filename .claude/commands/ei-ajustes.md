@@ -37,12 +37,31 @@ Se o input estiver vazio ou incompleto, pergunte ao usuário:
 - Leia o arquivo do agente que será ajustado: `<cliente>/<Agente>.md`.
 
 ### Passo 5: Delegar ao docs-editor-conciso
-Invoque o agente `docs-editor-conciso` via Agent tool passando:
-- **arquivo alvo:** caminho absoluto completo conforme localizado no Passo 2 (ex: `/root/EiPrompt/malu/Qualifier.md`). NÃO usar caminho relativo. NÃO prefixar com `modelo/`.
-- **instrução:** a descrição do ajuste fornecida pelo usuário
-- **lembrete:** preservar `<response_format>`, seguir CLAUDE.md, modificar o mínimo necessário
 
-O `docs-editor-conciso` vai acionar o `docs-reviewer` automaticamente ao finalizar (conforme fluxo anti-loop já definido). Apenas repasse o veredicto ao usuário.
+Construa o prompt para o agente **exatamente** neste formato (substitua os placeholders, mantenha a estrutura):
+
+```
+TAREFA: Edição (NÃO auditoria).
+
+ARQUIVO ALVO (use este caminho LITERAL com Read, depois Edit/Write — caractere por caractere, incluindo espaços):
+<CAMINHO_ABSOLUTO_DO_PASSO_2>
+
+⚠️ NÃO transformar o caminho. NÃO prefixar com `modelo/`. NÃO extrair palavras do nome da pasta. Use o caminho EXATAMENTE como aparece acima.
+
+INSTRUÇÃO DO USUÁRIO:
+<DESCRIÇÃO_DO_AJUSTE>
+
+CONTEÚDO ATUAL DO ARQUIVO (já carregado via Read no Passo 4 — referência para você editar com precisão):
+<conteudo_atual>
+<COLE_AQUI_O_CONTEÚDO_INTEGRAL_LIDO_NO_PASSO_4>
+</conteudo_atual>
+
+LEMBRETE: preservar `<response_format>` (REGRA INVIOLÁVEL), seguir CLAUDE.md, modificar o mínimo necessário, NUNCA duplicar regras existentes. Aplicar a edição com Edit/Write — não responder em modo review.
+```
+
+Invoque via Agent tool com `subagent_type: docs-editor-conciso` e o prompt acima preenchido.
+
+O `docs-editor-conciso` vai acionar o `docs-reviewer` automaticamente ao finalizar (conforme fluxo anti-loop). Apenas repasse o veredicto ao usuário.
 
 ## Regras
 
