@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.6.8] - 2026-05-01
+
+- Novo fluxo de auditoria pós-edição em `/ei-ajustes`: o `docs-editor-conciso` termina com aviso ao agente principal (`Edição concluída ... ative /ei-review <CLIENTE> <AGENTE>`) e o agente principal **executa `/ei-review` automaticamente** — auditoria via `docs-reviewer` segue acontecendo, mas roteada explicitamente pelo slash command `/ei-review` em vez de auto-invocação interna do editor.
+- `/ei-review` estendido para aceitar pasta de cliente: além de `/ei-review <agente>` (template em `modelo/`), agora aceita `/ei-review <cliente> <agente>` (ex: `/ei-review malu Qualifier`, `/ei-review "ACS Advogados Associados" Orquestrador`).
+
 ## [1.6.7] - 2026-05-01
 
 - `docs-editor-conciso`: o fix de v1.6.6 (Passo 0) era ignorado pelo agente — em pastas de cliente com espaços, o agente continuava reportando "arquivo `modelo/<palavra>.md` não existe", entrava em modo auditoria sozinho e duplicava regras. Correção em duas camadas:
