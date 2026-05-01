@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.7] - 2026-05-01
+
+- `docs-editor-conciso`: o fix de v1.6.6 (Passo 0) era ignorado pelo agente — em pastas de cliente com espaços, o agente continuava reportando "arquivo `modelo/<palavra>.md` não existe", entrava em modo auditoria sozinho e duplicava regras. Correção em duas camadas:
+  - **Agente:** nova **REGRA #0 — CAMINHO LITERAL** promovida para o topo absoluto do prompt (antes da arquitetura/missão), com exemplo concreto da armadilha (`ACS Advogados Associados`), exigência explícita de chamar `Read` antes de reportar erro, e desambiguação edição vs auditoria. Passo 0 do Fluxo de Trabalho agora apenas referencia a REGRA #0 (sem duplicação).
+  - **Slash command `/ei-ajustes`:** agora pré-lê o conteúdo do arquivo no Passo 4 e o injeta inline (`<conteudo_atual>`) no prompt do agente, eliminando estruturalmente a ambiguidade. Prompt do agente passa a ter formato fixo: `TAREFA`, `ARQUIVO ALVO`, `INSTRUÇÃO`, `CONTEÚDO ATUAL`.
+
 ## [1.6.6] - 2026-05-01
 
 - `docs-editor-conciso`: corrige falha em pastas de cliente com nomes contendo espaços (ex: `ACS Advogados Associados/Orquestrador.md`). O agente extraía a primeira palavra do nome e tentava abrir `modelo/<palavra>.md`, falhando com "arquivo não existe". Reforço aplicado em dois pontos:
