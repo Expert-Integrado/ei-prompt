@@ -57,11 +57,20 @@ CONTEÚDO ATUAL DO ARQUIVO (já carregado via Read no Passo 4 — referência pa
 </conteudo_atual>
 
 LEMBRETE: preservar `<response_format>` (REGRA INVIOLÁVEL), seguir CLAUDE.md, modificar o mínimo necessário, NUNCA duplicar regras existentes. Aplicar a edição com Edit/Write — não responder em modo review.
+
+AO FINALIZAR (OVERRIDE do Modo A do FINALIZAÇÃO): NÃO invoque o `docs-reviewer` nesta chamada. Em vez disso, encerre sua resposta com EXATAMENTE este aviso ao agente principal:
+
+> Edição concluída em `<CAMINHO_ABSOLUTO_DO_PASSO_2>`. Para validar, ative `/ei-review <CLIENTE> <AGENTE>` — o `docs-reviewer` fará a auditoria.
+
+(Substitua `<CLIENTE>` e `<AGENTE>` pelos valores reais — ex: `/ei-review malu Qualifier`.)
 ```
 
 Invoque via Agent tool com `subagent_type: docs-editor-conciso` e o prompt acima preenchido.
 
-O `docs-editor-conciso` vai acionar o `docs-reviewer` automaticamente ao finalizar (conforme fluxo anti-loop). Apenas repasse o veredicto ao usuário.
+### Passo 6: Ativar `/ei-review` automaticamente
+O editor terminará com a mensagem `Edição concluída ... Para validar, ative /ei-review <CLIENTE> <AGENTE>`. **Você (agente principal) deve então executar `/ei-review <cliente> <agente>` automaticamente** — substitua `<cliente>` e `<agente>` pelos valores reais (ex: `/ei-review malu Qualifier`). O `/ei-review` delega ao `docs-reviewer` e retorna o veredicto (APROVADO/REPROVADO).
+
+Apresente ao usuário no final: resumo das alterações + veredicto da auditoria.
 
 ## Regras
 
