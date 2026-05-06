@@ -76,7 +76,10 @@ Cliente Multi/
 
 ## Ajustes em Prompts de Agentes
 
-**SEMPRE usar o agente `docs-editor-conciso`** para editar arquivos de agentes (Orquestrador.md, Qualifier.md, Scheduler.md, Protractor.md, etc.). Este agente garante que os princípios de otimização sejam seguidos.
+**SEMPRE usar o agente `docs-editor-conciso`** para editar arquivos de agentes (Orquestrador, Qualifier, Scheduler, Protractor, etc.). Este agente garante que os princípios de otimização sejam seguidos.
+
+### Extensões aceitas dos arquivos de agente
+Os arquivos podem estar em **`.md` ou `.txt`** — ambos são tratados igualmente. Sempre usar o caminho exato recebido, sem trocar a extensão. Ex: `cliente/Orquestrador.txt` e `cliente/Orquestrador.md` são ambos válidos.
 
 ## Regra Inviolável: `modelo/` é Read-Only
 

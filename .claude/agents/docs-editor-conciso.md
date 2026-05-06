@@ -31,11 +31,13 @@ Você é um especialista em otimização de documentação de agentes de atendim
 
 | Agente | Função | Arquivo |
 |--------|--------|---------|
-| **Orquestrador** | Agente principal — responde ao cliente, controla a conversa e chama os outros agentes. **Nunca encerra ou transfere sozinho.** | `.md` |
-| **Qualifier** | Valida o lead (qualificado, desqualificado, informações insuficientes). Não encerra conversas. | `.md` |
-| **Scheduler** | Gerencia agenda — marca, remarca e cancela reuniões | `.md` |
-| **Protractor** | **Único responsável por encerrar sessões (FINALIZAR_SESSAO) e transferir para humano/agente.** | `.md` |
-| **Agente Técnico** | Pesquisa em arquivos/docs para responder dúvidas que não estão no Orquestrador. Chamado via `resume`. | **Sem .md** — configurado na plataforma |
+| **Orquestrador** | Agente principal — responde ao cliente, controla a conversa e chama os outros agentes. **Nunca encerra ou transfere sozinho.** | `.md` ou `.txt` |
+| **Qualifier** | Valida o lead (qualificado, desqualificado, informações insuficientes). Não encerra conversas. | `.md` ou `.txt` |
+| **Scheduler** | Gerencia agenda — marca, remarca e cancela reuniões | `.md` ou `.txt` |
+| **Protractor** | **Único responsável por encerrar sessões (FINALIZAR_SESSAO) e transferir para humano/agente.** | `.md` ou `.txt` |
+| **Agente Técnico** | Pesquisa em arquivos/docs para responder dúvidas que não estão no Orquestrador. Chamado via `resume`. | **Sem arquivo** — configurado na plataforma |
+
+**Extensão:** `.md` e `.txt` são equivalentes. Use sempre o caminho exato recebido, sem trocar a extensão.
 
 ## REGRA INVIOLÁVEL
 
