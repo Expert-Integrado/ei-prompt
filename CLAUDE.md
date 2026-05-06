@@ -11,6 +11,45 @@
 | **Qualifier.md** | Valida o lead (qualificado, desqualificado, informações insuficientes). Não encerra conversas. |
 | **Scheduler.md** | Gerencia agenda — marca, remarca e cancela reuniões |
 | **Protractor.md** | **Único responsável por encerrar sessões (FINALIZAR_SESSAO) e transferir para humano/agente.** O Orquestrador deve sempre acionar o Protractor para essas ações. |
+| **Recepcionista.md** | _(Opcional, multi-agente)_ Router — recebe o lead, identifica intenção e transfere para o especialista correto via Protractor. **Não qualifica nem agenda.** |
+
+## Arquitetura Multi-Agente (opcional — Recepcionista)
+
+Quando um cliente atende **múltiplas frentes/áreas com fluxos distintos** (ex: Consumidor + Trabalhista + Previdenciário), use o padrão **Recepcionista** — agente router que filtra o lead antes do fluxo especializado.
+
+### Estrutura de pasta
+
+```
+Cliente Multi/
+├── Recepcionista/                  ← router (não qualifica, não agenda)
+│   ├── Orquestrador.md             ← gerado a partir de modelo/Recepcionista.md
+│   ├── Qualifier.md                ← stub neutralizado (não atua)
+│   ├── Scheduler.md                ← stub neutralizado (não atua)
+│   └── Protractor.md               ← com TRANSFERIR_PARA_AGENT ATIVO
+├── [Especialidade-1]/              ← stack completo single-agent
+│   ├── Orquestrador.md
+│   ├── Qualifier.md
+│   ├── Scheduler.md
+│   ├── Protractor.md               ← TRANSFERIR_PARA_AGENT ativo (permite re-roteamento)
+│   └── Follow-Up.md
+├── [Especialidade-2]/              ← idem
+└── ...
+```
+
+### Fluxo
+1. Lead chega → **Recepcionista** apresenta a empresa de forma neutra e identifica intenção.
+2. Mapeia a intenção contra `<agentes_disponiveis>` e aciona Protractor com `TRANSFERIR_PARA_AGENT:[especialidade]`.
+3. A especialidade assume a conversa via `mensagem_inicial_sugerida` retornada pelo Protractor.
+
+### Quando usar
+- Cliente com 2+ frentes que exigem qualificação ou fluxo distintos.
+- Sempre que o atendimento precisar de "filtragem" antes de entrar no fluxo.
+
+**Não usar** quando o cliente tem só 1 frente — single-agent (estrutura `cliente/*.md`) basta.
+
+### Comandos relacionados
+- Criar: `/ei-cria-cliente <nome>` — o scaffolder pergunta se é multi-agente.
+- Ajustar: `/ei-ajustes "<cliente> <especialidade>" <descrição>` — note as **aspas** envolvendo cliente + especialidade. Ex: `/ei-ajustes "Brunno Brandi Consumidor" a IA está falando sobre valores`.
 
 ## Limites do Ajuste de Prompts
 
@@ -103,7 +142,8 @@ Usar palavras-chave que indiquem ao Orquestrador **qual agente acionar e o que f
 |------|-------------|
 | `IR_PARA_AGENDAMENTO` | Seguir fluxo de agendamento (Scheduler) |
 | `ACIONAR_PROTRACTOR:FINALIZAR_SESSAO` | Encerrar conversa via Protractor |
-| `ACIONAR_PROTRACTOR:TRANSFERIR_PARA_HUMANO` | Transferir via Protractor |
+| `ACIONAR_PROTRACTOR:TRANSFERIR_PARA_HUMANO` | Transferir para humano via Protractor |
+| `ACIONAR_PROTRACTOR:TRANSFERIR_PARA_AGENT:[nome]` | _(Multi-agente)_ Transferir para outro agente automatizado via Protractor |
 | `COLETAR:[campo]` | Perguntar informação que falta |
 
 Exemplo:

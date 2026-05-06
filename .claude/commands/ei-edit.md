@@ -1,6 +1,6 @@
 ---
 description: Edita um agente EiPrompt (modelo/*.md) via docs-editor-conciso + auditoria automática com docs-reviewer
-argument-hint: <Orquestrador|Qualifier|Scheduler|Protractor> <instrução>
+argument-hint: <Orquestrador|Qualifier|Scheduler|Protractor|Recepcionista|Follow-Up> <instrução>
 ---
 
 Você vai coordenar a edição de um agente EiPrompt.

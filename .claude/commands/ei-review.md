@@ -1,6 +1,6 @@
 ---
-description: Audita um agente EiPrompt via docs-reviewer (sem editar). Aceita template ou pasta de cliente.
-argument-hint: <agente> | <cliente> <agente>
+description: Audita um agente EiPrompt via docs-reviewer (sem editar). Aceita template ou pasta de cliente (single ou multi-agente).
+argument-hint: <agente> | <cliente> <agente> | "<cliente> <especialidade>" <agente>
 ---
 
 Rode uma auditoria somente-leitura via `docs-reviewer`.
@@ -9,10 +9,15 @@ Rode uma auditoria somente-leitura via `docs-reviewer`.
 
 ## Passo 1: Resolver o caminho alvo
 
-- **Se 1 argumento** (ex: `Qualifier`) → alvo = `modelo/$1.md` (template).
-- **Se 2 argumentos** (ex: `malu Qualifier` ou `"ACS Advogados Associados" Orquestrador`) → alvo = `<cliente>/<agente>.md` (pasta de cliente).
-  - Use Glob para localizar a pasta do cliente (match exato → case-insensitive → substring).
-  - Suporte nomes com espaços (passe entre aspas ou trate todos os tokens menos o último como o cliente).
+- **1 argumento** (ex: `Qualifier`) → alvo = `modelo/$1.md` (template). Para auditar o recepcionista, use `Recepcionista`.
+- **2 argumentos** — a forma do **primeiro** decide o modo:
+  - **Single-agent** (ex: `malu Qualifier` ou `"ACS Advogados Associados" Orquestrador`) → alvo = `<cliente>/<agente>.md`.
+    - Use Glob para localizar a pasta do cliente (match exato → case-insensitive → substring).
+  - **Multi-agente** (ex: `"Brunno Brandi Consumidor" Qualifier`) → alvo = `<cliente>/<especialidade>/<agente>.md`.
+    - Resolva o identificador composto entre aspas dividindo progressivamente em prefix+suffix:
+      - `Brunno` + `Brandi Consumidor`, `Brunno Brandi` + `Consumidor`
+      - Para cada divisão, verifique se `<prefix>/<suffix>/` existe.
+      - Se exatamente uma resolver → use ela. Se múltiplas/nenhuma → liste e pergunte.
 
 Se o caminho resolvido não existir → reportar erro com as opções disponíveis e parar.
 
@@ -27,7 +32,8 @@ Invoque via Agent tool com `subagent_type: docs-reviewer` passando o **caminho a
 - APROVADO → informar conclusão.
 - REPROVADO → listar problemas. Sugerir correção:
   - Template: `/ei-edit <agente> <instrução>`
-  - Cliente: `/ei-ajustes <cliente> <instrução>`
+  - Cliente single: `/ei-ajustes <cliente> <instrução>`
+  - Cliente multi: `/ei-ajustes "<cliente> <especialidade>" <instrução>`
 
 ## Regras
 - NUNCA edite o arquivo aqui — apenas audite.

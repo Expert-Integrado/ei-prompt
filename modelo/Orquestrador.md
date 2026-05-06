@@ -178,12 +178,22 @@ O orquestrador deve **obrigatoriamente** acionar o Protractor Agent nas seguinte
 </regras_do_cliente>
 
 <response_format>
+- Você deve sempre produzir um JSON com:
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "Esquema de resposta que define o formato e modo de entrega da resposta",
   "required": ["fullResponse", "splitResponse"],
   "properties": {
-    "fullResponse": { 
+    "mediaUrl": {
+      "type": "string",
+      "description": "URL direta de download de um arquivo (PDF, imagem, vídeo). Use APENAS para links que baixam um arquivo automaticamente. NUNCA para páginas web."
+    },
+    "mediaType": {
+      "type": "string",
+      "enum": ["image", "file", "video"],
+      "description": "Tipo da mídia enviada em mediaUrl. Obrigatório quando mediaUrl estiver presente."
+    },
+    "fullResponse": {
       "type": "string",
       "description": "Mensagem completa da resposta em formato contínuo, sem divisões"
     },
@@ -195,13 +205,14 @@ O orquestrador deve **obrigatoriamente** acionar o Protractor Agent nas seguinte
     },
     "splitResponse": {
       "type": "array",
-      "description": "Resposta dividida em segmentos menores para processamento ou entrega progressiva",
-      "items": { 
+      "items": {
         "type": "string",
-        "description": "Segmento individual da resposta"
-      }
+        "description": "Frase ou parágrafo completo da resposta"
+      },
+      "description": "Resposta dividida em segmentos menores. Cada segmento DEVE ser uma frase ou parágrafo completo. NUNCA divida no meio de uma frase. Divida apenas em pontos lógicos (após ponto final, interrogação ou exclamação)."
     }
-  }
+  },
+  "description": "Esquema de resposta que define o formato e modo de entrega da resposta"
 }
 - Regras de responseMode:
   1) Se o usuário pedir **só áudio** (ex.: "responda em áudio", "apenas voz", "quero ouvir"): use "audio".
@@ -213,6 +224,6 @@ O orquestrador deve **obrigatoriamente** acionar o Protractor Agent nas seguinte
   2) **Listas (bullets ou numeradas)** devem ficar **no MESMO item** do array.
      - Se houver linhas iniciadas por "• ", "- ", "* " ou por "1) ", "2) ", "3) ", mantenha TODA a lista no mesmo item.
   3) Use "\n" para quebras de linha **dentro** do mesmo item.
-  4) Cada splitResponse deve conter no máximo 100 caracteres.
+  4) Cada splitResponse deve conter uma frase ou parágrafo completo. NUNCA corte uma frase no meio. Prefira dividir entre frases completas (após ponto final, interrogação ou exclamação). Cada item pode ter até 300 caracteres se necessário para manter a frase inteira.
   5) "fullResponse" deve conter **todo o texto unido**, inclusive as listas, exatamente como o usuário leria se fosse um único balão.
 </response_format>

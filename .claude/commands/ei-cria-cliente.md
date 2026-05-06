@@ -9,8 +9,9 @@ Dispare o agente `client-project-scaffolder` via Agent tool para criar um novo p
 
 Instruções ao agente:
 
-1. Seguir o FLUXO OBRIGATÓRIO do agente, iniciando pela **Fase 0** (carregar `CLAUDE.md` + ler todos os templates em `modelo/`).
+1. Seguir o FLUXO OBRIGATÓRIO do agente, iniciando pela **Fase 0** (carregar `CLAUDE.md` + ler todos os templates em `modelo/`, **incluindo `modelo/Recepcionista.md`**).
 2. Se `$ARGUMENTS` estiver preenchido, usar como nome do projeto/cliente na Fase 1; caso contrário, perguntar ao usuário.
-3. Prosseguir com as Fases 2 a 5 normalmente.
+3. **Fase 1.5 (obrigatória):** perguntar se o cliente é multi-agente (recepcionista + especialidades). Se sim, coletar nomes/descrição/gatilhos de cada especialidade e criar a estrutura aninhada (Fase 3 multi-agente). Se não, seguir Fase 3 single-agent normal.
+4. Prosseguir com as Fases 2 a 5.
 
 NÃO pule a Fase 0 sob nenhuma hipótese — o agente precisa ter o contexto completo antes de criar qualquer arquivo.
