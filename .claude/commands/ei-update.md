@@ -5,7 +5,7 @@ description: Atualiza os agentes EiPrompt na pasta atual e mostra o que há de n
 1. Execute a atualização do pacote:
 
    ```bash
-   npx @expertzinhointegrado/ei-prompt@latest
+   npx --no-install @expertzinhointegrado/ei-prompt@latest
    ```
 
 2. Leia o `./CHANGELOG.md` local (baixado pelo `npx`) e mostre só a seção da versão mais nova:
