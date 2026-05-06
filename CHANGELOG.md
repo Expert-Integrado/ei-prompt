@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.7.0] - 2026-05-06
+
+- **Novo padrão arquitetural: Recepcionista (multi-agente).** Para clientes que atendem múltiplas frentes/áreas (ex: Consumidor + Trabalhista + Previdenciário), o EiPrompt agora suporta um agente **router** que recebe o lead, identifica intenção e transfere para o agente especialista correto via Protractor (`TRANSFERIR_PARA_AGENT:[nome]`).
+  - Novo template `modelo/Recepcionista.md` — Orquestrador-router enxuto (sem Qualifier/Scheduler), com seção `<agentes_disponiveis>` listando cada especialista, `<fluxo_recepcao>` (saudação neutra → identificar intenção → mapear → transferir) e `<regras_recepcao>` (não qualifica, não agenda, não responde dúvidas técnicas).
+  - Estrutura aninhada por especialidade: `Cliente/Recepcionista/` (router + stubs de Qualifier/Scheduler) + `Cliente/<Especialidade-N>/` (stack completo single-agent) para cada frente.
+  - `client-project-scaffolder` ganha **Fase 1.5** que pergunta se o cliente é multi-agente e coleta nomes/descrição/gatilhos de cada especialidade. Cria estrutura aninhada automaticamente, com bloco `TRANSFERIR_PARA_AGENT` ATIVO em todos os Protractors da árvore.
+  - `/ei-ajustes` ganha modo multi-agente via aspas: `/ei-ajustes "Brunno Brandi Consumidor" <descrição>` resolve para `Brunno Brandi/Consumidor/<Agente>.md` por divisão progressiva do identificador composto. Modo single (legado) `/ei-ajustes <cliente> <descrição>` continua funcionando.
+  - `/ei-review` estendido para o mesmo formato: `/ei-review "Brunno Brandi Consumidor" Qualifier` resolve para a subpasta da especialidade.
+  - `/ei-edit` ganha `Recepcionista` e `Follow-Up` no argument-hint.
+  - Nova ação no campo `resume`: `ACIONAR_PROTRACTOR:TRANSFERIR_PARA_AGENT:[nome]` documentada no CLAUDE.md.
+
 ## [1.6.8] - 2026-05-01
 
 - Melhora no fluxo de auditoria pós-edição em `/ei-ajustes`: o `docs-editor-conciso` termina com aviso ao agente principal (`Edição concluída ... ative /ei-review <CLIENTE> <AGENTE>`) e o agente principal **executa `/ei-review` automaticamente** — auditoria via `docs-reviewer` segue acontecendo, mas roteada explicitamente pelo slash command `/ei-review` em vez de auto-invocação interna do editor.
