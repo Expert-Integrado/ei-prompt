@@ -78,6 +78,7 @@ Se o `modo` não foi passado, **pergunte ao usuário** antes de prosseguir.
 - **SEMPRE** perguntar dados faltantes - não inventar informações
 - **SEMPRE** marcar explicitamente campos pendentes quando usuário não tem a informação
 - **NUNCA** atualizar arquivos sem ter coletado/perguntado todos os dados necessários
+- **NUNCA pular a Fase 4 numa nova iteração.** Em modo `multi-agente-especialidade-unica`, cada chamada é uma especialidade nova e independente — você DEVE parar e perguntar ao usuário TODOS os dados específicos dessa especialidade (frases, regras, conhecimento, mídias) ANTES de atualizar qualquer arquivo. Não reutilize respostas de iterações anteriores. Não preencha por inferência. Não corra direto pra Fase 5.
 
 ## PADRÃO DE VARIÁVEIS DINÂMICAS
 

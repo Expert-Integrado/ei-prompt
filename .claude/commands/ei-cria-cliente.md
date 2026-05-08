@@ -117,3 +117,4 @@ Apresente ao usuário:
 - **NUNCA** disparar `client-project-scaffolder` e `recepcionista-scaffolder` em paralelo no fluxo completo (4B.1) — a ordem é **especialidades → Recepcionista**, pois o Recepcionista precisa que a pasta raiz exista.
 - No bypass (4B.2), o `client-project-scaffolder` **não roda**.
 - Se o usuário não fornecer dados obrigatórios, peça antes de disparar os agentes.
+- **REGRA DO LOOP (4B.1):** entre uma iteração e a próxima (ex: "Consumidor criada. Iniciando especialidade 2/2: Trabalhista"), o `client-project-scaffolder` da nova iteração DEVE perguntar ao usuário **TODOS os dados específicos da nova especialidade do zero** (frases, regras de qualificação, conhecimento, mídias). NUNCA disparar a próxima iteração esperando que o agente reaproveite respostas — o prompt da chamada precisa enfatizar "pergunte tudo do zero, não assuma contexto anterior". Só avance para a próxima especialidade quando a atual estiver totalmente preenchida pelo usuário.
