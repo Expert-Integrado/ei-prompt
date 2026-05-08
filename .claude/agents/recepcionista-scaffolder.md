@@ -43,12 +43,48 @@ Se faltar qualquer dado obrigatório (nome, lista de especialidades, empresa), *
 
 ### Fase 1: Coleta de Dados (institucionais + roteamento se necessário)
 
-**(a) Roteamento das especialidades (só se o comando não passou)**
-Se a lista de especialidades veio só com nomes (fluxo completo, sem `descricao`/`gatilhos`), pergunte ao usuário **para cada especialidade**:
-- `descricao` — do que cuida (1 frase). Ex: "problemas com bancos, cobrança indevida".
-- `gatilhos` — palavras-chave/temas. Ex: "cobrança indevida, banco, financeira, juros abusivos".
+**(a) Roteamento das especialidades — SEMPRE perguntar ou confirmar via `AskUserQuestion`**
 
-Se o comando já enviou os dados completos (bypass), pule esse passo.
+Se a lista de especialidades veio só com nomes (fluxo completo, sem `descricao`/`gatilhos`) **OU** veio com dados que precisam ser revisados, **use `AskUserQuestion` UMA chamada POR ESPECIALIDADE** (loop externo no agente — N especialidades = N chamadas de `AskUserQuestion`, em sequência).
+
+Cada chamada propõe sugestões plausíveis baseadas no nome da especialidade + opção **"Outros"** (já é adicionada automaticamente pela tool — sempre disponível pra o usuário inserir texto livre). Estrutura recomendada:
+
+```json
+{
+  "questions": [
+    {
+      "question": "Especialidade <NOME>: qual é a descrição do que ela cuida?",
+      "header": "<NOME> · Descrição",
+      "multiSelect": false,
+      "options": [
+        {"label": "<sugestão 1 baseada no nome>", "description": "Ex: para Consumidor → 'Problemas com bancos, cobrança indevida, dívida abusiva'"},
+        {"label": "<sugestão 2 alternativa>", "description": "Variação relacionada"},
+        {"label": "Deixar pendente", "description": "Marcar como [PENDENTE - informação não fornecida]"}
+      ]
+    },
+    {
+      "question": "Especialidade <NOME>: quais são os gatilhos (palavras-chave)? **Obrigatório** — o Recepcionista usa isso pra decidir pra qual agente transferir.",
+      "header": "<NOME> · Gatilhos",
+      "multiSelect": false,
+      "options": [
+        {"label": "<gatilhos sugeridos baseados no nome>", "description": "Ex: para Consumidor → 'cobrança indevida, banco, financeira, juros abusivos'"},
+        {"label": "<variação alternativa>", "description": "Outra combinação"},
+        {"label": "<terceira sugestão genérica/abrangente>", "description": "Combinação ampla cobrindo casos comuns"}
+      ]
+    }
+  ]
+}
+```
+
+> **Sempre incluir "Outros" como saída** — a tool `AskUserQuestion` adiciona essa opção automaticamente; o usuário pode digitar texto livre. NÃO recriar manualmente o item "Outros".
+
+> **GATILHOS SÃO OBRIGATÓRIOS.** O Recepcionista usa os gatilhos pra decidir pra qual agente transferir cada lead — sem eles o roteamento quebra. Por isso, na pergunta de gatilhos NÃO ofereça "Deixar pendente" como opção. Se o usuário escolher "Outros" e digitar vazio/lixo, repita a pergunta. Aceite apenas texto significativo ou uma das sugestões pré-definidas.
+
+> Descrição pode ficar pendente em casos extremos (não bloqueia roteamento); gatilhos NUNCA.
+
+> Se as opções sugeridas não couberem (especialidade muito atípica), proponha 2-3 alternativas genéricas e deixe o usuário usar "Outros" para personalizar.
+
+Se o comando enviou os dados COMPLETOS (bypass), use `AskUserQuestion` com 1 pergunta por especialidade só pra **CONFIRMAR**: opções `["Confirmar dados recebidos", "Editar"]` (+ "Outros" automático). Se "Editar" ou "Outros", colete o novo valor.
 
 **(b) Dados institucionais do Recepcionista**
 Pergunte ao usuário (em bloco único, aceitando "não tenho" para marcar PENDENTE):
