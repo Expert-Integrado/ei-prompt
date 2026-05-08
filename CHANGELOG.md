@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.1] - 2026-05-07
+
+- **`/ei-ajustes`: prompt enviado ao `docs-editor-conciso` simplificado e mais preciso.**
+  - Removido bloco `CONTEÚDO ATUAL DO ARQUIVO` — o agente lê o arquivo diretamente pelo caminho absoluto fornecido, eliminando duplicação de conteúdo no prompt.
+  - Passo 4 agora carrega apenas `CLAUDE.md` (leitura do arquivo-alvo era redundante com o bloco removido).
+  - Adicionado campo `OBJETIVO DO AJUSTE` no prompt — resumo em 1 linha derivado da descrição do usuário, dando ao editor contexto explícito do que deve mudar.
+- **`/ei-review`: prompt enviado ao `docs-reviewer` agora tem estrutura explícita.**
+  - Passo 3 passa a montar um prompt com `ARQUIVO ALVO` e `OBJETIVO DO AJUSTE` (o que foi editado, ou "auditoria geral" se chamado standalone), em vez de passar apenas o caminho.
+
 ## [1.7.0] - 2026-05-06
 
 - **Novo padrão arquitetural: Recepcionista (multi-agente).** Para clientes que atendem múltiplas frentes/áreas (ex: Consumidor + Trabalhista + Previdenciário), o EiPrompt agora suporta um agente **router** que recebe o lead, identifica intenção e transfere para o agente especialista correto via Protractor (`TRANSFERIR_PARA_AGENT:[nome]`).

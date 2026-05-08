@@ -26,7 +26,16 @@ Se o caminho resolvido não existir → reportar erro com as opções disponíve
 - O arquivo alvo resolvido no Passo 1.
 
 ## Passo 3: Delegar ao agente `docs-reviewer`
-Invoque via Agent tool com `subagent_type: docs-reviewer` passando o **caminho absoluto literal** do arquivo alvo (caractere por caractere, incluindo espaços) — NUNCA reescrever ou prefixar com `modelo/`.
+
+Construa o prompt neste formato e invoque via Agent tool com `subagent_type: docs-reviewer`:
+
+```
+ARQUIVO ALVO (caminho LITERAL — caractere por caractere, incluindo espaços):
+<CAMINHO_ABSOLUTO_DO_PASSO_1>
+
+OBJETIVO DO AJUSTE (o que foi alterado ou o motivo da auditoria):
+<OBJETIVO_DERIVADO_DO_CONTEXTO — se chamado após edição, descrever o que foi mudado; se standalone, usar "auditoria geral">
+```
 
 ## Passo 4: Apresentar veredicto
 - APROVADO → informar conclusão.

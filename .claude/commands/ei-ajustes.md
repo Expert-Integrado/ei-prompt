@@ -61,7 +61,6 @@ Se o input estiver vazio ou incompleto, pergunte:
 
 ### Passo 4: Carregar contexto
 - Leia `CLAUDE.md` via Read (se ainda não leu nesta sessão).
-- Leia o arquivo do agente que será ajustado: `<cliente>/<Agente>.md`.
 
 ### Passo 5: Delegar ao docs-editor-conciso
 
@@ -78,10 +77,8 @@ ARQUIVO ALVO (use este caminho LITERAL com Read, depois Edit/Write — caractere
 INSTRUÇÃO DO USUÁRIO:
 <DESCRIÇÃO_DO_AJUSTE>
 
-CONTEÚDO ATUAL DO ARQUIVO (já carregado via Read no Passo 4 — referência para você editar com precisão):
-<conteudo_atual>
-<COLE_AQUI_O_CONTEÚDO_INTEGRAL_LIDO_NO_PASSO_4>
-</conteudo_atual>
+OBJETIVO DO AJUSTE (resumo em 3 linha do que deve mudar):
+<OBJETIVO_DERIVADO_DA_DESCRIÇÃO>
 
 LEMBRETE: preservar `<response_format>` (REGRA INVIOLÁVEL), seguir CLAUDE.md, modificar o mínimo necessário, NUNCA duplicar regras existentes. Aplicar a edição com Edit/Write — não responder em modo review.
 
