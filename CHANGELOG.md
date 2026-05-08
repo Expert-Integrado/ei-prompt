@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.0] - 2026-05-07
+
+**Correção do fluxo de criação de clientes multi-agente.** A criação da Recepcionista foi extraída para um agente dedicado, e a ordem de execução foi invertida (especialidades primeiro, Recepcionista depois — pois o router precisa conhecer a lista das especialidades para popular `<agentes_disponiveis>`).
+
+- **Novo agente `recepcionista-scaffolder`** (`.claude/agents/recepcionista-scaffolder.md`) — especialista em montar a pasta `Recepcionista/`: cria `Orquestrador.md` (a partir de `modelo/Recepcionista.md`), stubs neutralizados de `Qualifier.md` e `Scheduler.md`, e `Protractor.md` com `TRANSFERIR_PARA_AGENT` ATIVO (remove os marcadores `////`). Preenche `<agentes_disponiveis>` com a lista das especialidades e coleta dados institucionais (frases, regras críticas, pode/não pode informar). Faz `mkdir -p` da raiz para funcionar tanto no fluxo completo quanto no bypass.
+- **`/ei-cria-cliente` virou orquestrador.** Pergunta single/multi via `AskUserQuestion` (com estrutura JSON explícita), e em multi pergunta novamente "criar tudo do zero" vs "só Recepcionista (bypass)". No fluxo completo, dispara `client-project-scaffolder` PRIMEIRO (cria todas as especialidades em loop) e depois `recepcionista-scaffolder` (cria a Recepcionista com a lista das especialidades). No bypass, só dispara o `recepcionista-scaffolder`.
+- **`client-project-scaffolder` enxugado.** Removida a Fase 1.5 interativa (modo agora vem do prompt do comando) e toda a lógica de criar Recepcionista (migrou para o novo agente). Aceita `modo: single-agent` ou `modo: multi-agente-especialidades`. Em multi, cria apenas as subpastas das especialidades.
+
 ## [1.7.1] - 2026-05-07
 
 **Melhoria de performance nos slash commands `/ei-ajustes` e `/ei-review`** — redução do tamanho dos prompts enviados aos sub-agentes, diminuindo consumo de tokens e tempo de resposta.

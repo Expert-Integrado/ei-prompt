@@ -11,6 +11,7 @@
     "modelo/Follow-Up.md",
     "modelo/Recepcionista.md",
     ".claude/agents/client-project-scaffolder.md",
+    ".claude/agents/recepcionista-scaffolder.md",
     ".claude/agents/docs-editor-conciso.md",
     ".claude/agents/docs-reviewer.md",
     ".claude/settings.json",
