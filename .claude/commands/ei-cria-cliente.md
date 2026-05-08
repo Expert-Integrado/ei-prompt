@@ -65,31 +65,31 @@ O agente segue o fluxo padrão (Fase 0 → Fase 5). Encerre. Pular Passo 4B/5.
 
 #### Passo 4B.1 — Fluxo completo (criar especialidades + Recepcionista)
 
-**(a) Coletar quantidade e dados das especialidades**
+**(a) Coletar quantidade e nomes das especialidades**
 1. Pergunte: **"Quantas especialidades?"** e **"Liste os nomes das especialidades, separados por vírgula"** (ex: `Consumidor, Previdenciário, Trabalhista`).
-2. **Para cada especialidade** (loop), colete:
-   - `nome`
-   - `descricao` — do que cuida (1 frase). Ex: "problemas com bancos, cobrança indevida, dívida abusiva".
-   - `gatilhos` — palavras-chave/temas que indicam essa especialidade. Ex: "cobrança indevida, banco, financeira, juros abusivos".
-3. Pergunte também o **nome da empresa** (usado na saudação neutra do Recepcionista).
+2. Pergunte também o **nome da empresa** (usado depois pelo Recepcionista).
 
-**(b) Criar especialidades — `client-project-scaffolder` PRIMEIRO**
-Dispare via Agent tool com:
-- `modo: multi-agente-especialidades`
+> Não colete `descricao` nem `gatilhos` agora — o `recepcionista-scaffolder` vai pedir esses dados depois, quando os agentes especialistas já existirem.
+
+**(b) LOOP — criar cada especialidade via `client-project-scaffolder`**
+Para **cada nome** da lista coletada em (a), dispare o `client-project-scaffolder` via Agent tool **uma vez**. Ou seja: N especialidades = N invocações do agente, em sequência (não em paralelo).
+
+Cada invocação recebe:
+- `modo: multi-agente-especialidade-unica`
 - `nome_cliente: <valor>`
-- `especialidades: [<lista de nomes>]`
+- `especialidade: <nome da especialidade dessa iteração>`
 
-Instrução: "Para cada especialidade, criar subpasta `<cliente>/<especialidade>/` com `Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md` (com `TRANSFERIR_PARA_AGENT` ativo) e `Follow-Up.md`. Coletar dados por especialidade na Fase 4. **NÃO** criar pasta `Recepcionista/` — será criada depois pelo `recepcionista-scaffolder`."
+Instrução do prompt: "Crie a subpasta `<nome_cliente>/<especialidade>/` com `Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md` (com `TRANSFERIR_PARA_AGENT` ativo) e `Follow-Up.md`. Pergunte ao usuário TODOS os dados específicos dessa especialidade do zero (frases características, regras de qualificação, conhecimento, mídias, etc.) — não assuma contexto de chamadas anteriores. **NÃO** criar pasta `Recepcionista/`. **NÃO** criar outras especialidades."
 
-> Aguarde o agente terminar antes do próximo passo — a pasta raiz precisa existir antes do Recepcionista.
+> Aguarde cada iteração terminar antes de iniciar a próxima — escolha sequencial preserva o foco do usuário em uma especialidade por vez.
 
-**(c) Criar Recepcionista — `recepcionista-scaffolder` DEPOIS**
-Dispare via Agent tool com:
+**(c) Criar Recepcionista — `recepcionista-scaffolder` DEPOIS DO LOOP**
+Quando TODAS as especialidades estiverem criadas, dispare o `recepcionista-scaffolder` via Agent tool com:
 - `nome_cliente: <valor>`
 - `empresa: <valor>`
-- `especialidades:` lista completa com `nome`, `descricao`, `gatilhos` de cada uma.
+- `especialidades:` lista de nomes (sem descrição/gatilhos — o agente vai pedir ao usuário).
 
-Instrução: "As pastas das especialidades já existem. Criar `<cliente>/Recepcionista/` seguindo seu FLUXO OBRIGATÓRIO. Preencher `<agentes_disponiveis>` com a lista recebida. Perguntar dados institucionais ao usuário (frases, regras críticas, pode/não pode informar)."
+Instrução: "As pastas das especialidades já existem em `<nome_cliente>/<cada_especialidade>/`. Criar `<nome_cliente>/Recepcionista/` seguindo seu FLUXO OBRIGATÓRIO. **Pergunte ao usuário a `descricao` (do que cuida) e os `gatilhos` (palavras-chave) de cada especialidade** para preencher `<agentes_disponiveis>`. Pergunte também os dados institucionais (frases, regras críticas, pode/não pode informar)."
 
 #### Passo 4B.2 — Bypass (criar só Recepcionista; especialidades já existem)
 

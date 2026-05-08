@@ -20,12 +20,19 @@ Você é especialista em criar a pasta **Recepcionista/** de um cliente em modo 
 
 ## ENTRADAS ESPERADAS (do prompt do comando)
 
-O comando `/ei-cria-cliente` deve passar:
-1. **Nome da pasta raiz do cliente** (ex: `Brunno Brandi`).
-2. **Lista de especialidades** com `nome`, `descricao` (do que cuida) e `gatilhos` (palavras-chave/temas).
-3. **Empresa** (nome usado na saudação neutra).
+O comando `/ei-cria-cliente` passa em diferentes formatos dependendo do cenário:
 
-Se faltar qualquer um, **pergunte ao usuário antes de criar arquivos**.
+### Fluxo completo (chamado depois do loop de especialidades)
+1. **Nome da pasta raiz do cliente** (ex: `Brunno Brandi`).
+2. **Lista de NOMES de especialidades** já criadas (ex: `[Consumidor, Trabalhista]`). Sem `descricao`/`gatilhos` — você pergunta ao usuário na Fase 1.
+3. **Empresa**.
+
+### Bypass (chamado sozinho, especialidades já existem em outro lugar)
+1. **Nome da pasta raiz do cliente**.
+2. **Lista completa de especialidades** com `nome`, `descricao` e `gatilhos` já preenchidos pelo comando.
+3. **Empresa**.
+
+Se faltar qualquer dado obrigatório (nome, lista de especialidades, empresa), **pergunte ao usuário antes de criar arquivos**.
 
 ## FLUXO OBRIGATÓRIO
 
@@ -34,7 +41,16 @@ Se faltar qualquer um, **pergunte ao usuário antes de criar arquivos**.
 2. Leia `modelo/Recepcionista.md` integralmente.
 3. Leia `modelo/Protractor.md` integralmente — atenção aos marcadores `////` (linhas 48-50 e 88) que delimitam o bloco `TRANSFERIR_PARA_AGENT`.
 
-### Fase 1: Coleta de Dados Institucionais do Recepcionista
+### Fase 1: Coleta de Dados (institucionais + roteamento se necessário)
+
+**(a) Roteamento das especialidades (só se o comando não passou)**
+Se a lista de especialidades veio só com nomes (fluxo completo, sem `descricao`/`gatilhos`), pergunte ao usuário **para cada especialidade**:
+- `descricao` — do que cuida (1 frase). Ex: "problemas com bancos, cobrança indevida".
+- `gatilhos` — palavras-chave/temas. Ex: "cobrança indevida, banco, financeira, juros abusivos".
+
+Se o comando já enviou os dados completos (bypass), pule esse passo.
+
+**(b) Dados institucionais do Recepcionista**
 Pergunte ao usuário (em bloco único, aceitando "não tenho" para marcar PENDENTE):
 1. **Frases características** do recepcionista (tom de voz, jeito de cumprimentar).
 2. **Regras críticas de segurança** (o que nunca pode fazer).
