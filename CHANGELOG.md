@@ -2,12 +2,10 @@
 
 ## [1.7.1] - 2026-05-07
 
-- **`/ei-ajustes`: prompt enviado ao `docs-editor-conciso` simplificado e mais preciso.**
-  - Removido bloco `CONTEÚDO ATUAL DO ARQUIVO` — o agente lê o arquivo diretamente pelo caminho absoluto fornecido, eliminando duplicação de conteúdo no prompt.
-  - Passo 4 agora carrega apenas `CLAUDE.md` (leitura do arquivo-alvo era redundante com o bloco removido).
-  - Adicionado campo `OBJETIVO DO AJUSTE` no prompt — resumo em 1 linha derivado da descrição do usuário, dando ao editor contexto explícito do que deve mudar.
-- **`/ei-review`: prompt enviado ao `docs-reviewer` agora tem estrutura explícita.**
-  - Passo 3 passa a montar um prompt com `ARQUIVO ALVO` e `OBJETIVO DO AJUSTE` (o que foi editado, ou "auditoria geral" se chamado standalone), em vez de passar apenas o caminho.
+**Melhoria de performance nos slash commands `/ei-ajustes` e `/ei-review`** — redução do tamanho dos prompts enviados aos sub-agentes, diminuindo consumo de tokens e tempo de resposta.
+
+- **`/ei-ajustes`:** removido bloco `CONTEÚDO ATUAL DO ARQUIVO` do prompt — o `docs-editor-conciso` lê o arquivo diretamente pelo caminho absoluto, eliminando duplicação de conteúdo. Passo 4 simplificado (carrega apenas `CLAUDE.md`). Adicionado campo `OBJETIVO DO AJUSTE` — resumo em 1 linha do que deve mudar, dando contexto direto ao editor.
+- **`/ei-review`:** Passo 3 agora monta prompt explícito com `ARQUIVO ALVO` e `OBJETIVO DO AJUSTE` (o que foi editado, ou "auditoria geral" se chamado standalone).
 
 ## [1.7.0] - 2026-05-06
 
