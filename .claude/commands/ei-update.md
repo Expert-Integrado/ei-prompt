@@ -8,6 +8,13 @@ description: Atualiza os agentes EiPrompt na pasta atual e mostra o que há de n
    npx --no-install @expertzinhointegrado/ei-prompt@latest
    ```
 
+   **Se der erro** (sandbox bloqueou, permissão negada, etc.):
+   - Tente rodar fora do sandbox: use `dangerouslyDisableSandbox: true` na chamada Bash, ou
+   - Oriente o usuário a rodar manualmente no terminal:
+     ```
+     npx @expertzinhointegrado/ei-prompt@latest
+     ```
+
 2. Leia o `./CHANGELOG.md` local (baixado pelo `npx`) e mostre só a seção da versão mais nova:
 
    ```bash
