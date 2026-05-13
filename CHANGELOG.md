@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.5] - 2026-05-13
+
+**Ajuste no `modelo/Recepcionista.md`: coleta opcional de contexto ANTES de identificar o agente.** O template agora suporta uma lista linear de perguntas configuráveis em `<fluxo_conversa>` — quando preenchida, a Recepcionista faz as perguntas em ordem antes de mapear contra `<agentes_disponiveis>`; quando vazia, mantém o comportamento original (pergunta aberta para identificar intenção).
+
+- **Nova seção `<fluxo_conversa>`** entre `<agentes_disponiveis>` e `<fluxo_recepcao>` — opcional, lista numerada de perguntas. Comentário de cabeçalho referencia `<regras_gerais>` item 4 (uma pergunta por vez) sem duplicar.
+- **`<fluxo_recepcao>` Passo 2 reescrito com bifurcação:** caminho A (perguntas configuradas) faz coleta sequencial pulando perguntas já respondidas implicitamente na 1ª mensagem; caminho B (vazio) usa a pergunta aberta padrão. Se o lead pressionar por conteúdo (preço, prazo, condições) no meio da coleta, aplica `<regras_recepcao>` e vai direto à transferência (curto-circuito intencional).
+- **Mapeamento (Passo 3) usa o histórico das respostas** para escolher o agente — funciona nos dois caminhos sem mudança.
+- `<response_format>` e demais regras preservados intactos.
+
 ## [1.8.0] - 2026-05-07
 
 **Correção do fluxo de criação de clientes multi-agente.** A criação da Recepcionista foi extraída para um agente dedicado, e a ordem de execução foi invertida (especialidades primeiro, Recepcionista depois — pois o router precisa conhecer a lista das especialidades para popular `<agentes_disponiveis>`).
