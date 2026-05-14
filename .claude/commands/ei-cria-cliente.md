@@ -89,7 +89,7 @@ Quando TODAS as especialidades estiverem criadas, dispare o `recepcionista-scaff
 - `empresa: <valor>`
 - `especialidades:` lista de nomes (sem descrição/gatilhos — o agente vai pedir ao usuário).
 
-Instrução: "As pastas das especialidades já existem em `<nome_cliente>/<cada_especialidade>/`. Criar `<nome_cliente>/Recepcionista/` seguindo seu FLUXO OBRIGATÓRIO. **Pergunte ao usuário a `descricao` (do que cuida) e os `gatilhos` (palavras-chave) de cada especialidade** para preencher `<agentes_disponiveis>`. Pergunte também os dados institucionais (frases, regras críticas, pode/não pode informar)."
+Instrução: "As pastas das especialidades já existem em `<nome_cliente>/<cada_especialidade>/`. Criar `<nome_cliente>/Recepcionista/` seguindo seu FLUXO OBRIGATÓRIO. **Pergunte ao usuário a `descricao` (do que cuida) e os `gatilhos` (palavras-chave) de cada especialidade** para preencher `<agentes_disponiveis>`. Pergunte também os dados institucionais (frases, regras críticas, pode/não pode informar) e o **fluxo de conversa** (via `AskUserQuestion`: se quer perguntas específicas antes de identificar o agente ou pergunta aberta padrão; se sim, quais perguntas) — Fase 1 (c) do scaffolder."
 
 #### Passo 4B.2 — Bypass (criar só Recepcionista; especialidades já existem)
 
