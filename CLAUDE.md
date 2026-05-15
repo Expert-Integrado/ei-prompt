@@ -161,6 +161,29 @@ Exemplo:
 - **Evitar adicionar muito texto** — ser conciso, ir direto ao ponto
 - **Modificar o mínimo necessário** para resolver o problema
 
+## Base de Conhecimento (`<conhecimento>` do Orquestrador)
+
+A seção `<conhecimento>` do Orquestrador **NÃO é o repositório completo da base de conhecimento** — é apenas um **índice/resumo** do que existe no Banco de Conhecimento real.
+
+### Onde mora cada coisa
+| Conteúdo | Lugar correto |
+|----------|---------------|
+| Base de conhecimento **completa** (documentos, textos longos, FAQs detalhados) | **Frontend → tela `/base_conhecimento`** |
+| **Resumo/índice** do que existe na base | `<conhecimento>` do Orquestrador (do cliente) |
+
+### O que PODE entrar em `<conhecimento>`
+- **Resumo curto** de cada documento disponível, com o **nome do documento**.
+  Ex: `Documento "Sobre a Empresa" — histórico, missão e portfólio.`
+- **Lista de produtos/serviços** (bullets curtos).
+- **Blocos de mídia** (ver seção "Envio de Mídia" abaixo).
+
+### O que NÃO pode entrar em `<conhecimento>`
+- ❌ Conteúdo integral de documentos (transcrição completa de PDFs, manuais, FAQs).
+- ❌ Textos longos que duplicam o que já está em `/base_conhecimento`.
+
+### Quando o usuário pedir para "colocar a base inteira no prompt"
+Orientar: o lugar correto é a tela **`/base_conhecimento`** no frontend. No prompt do Orquestrador entra apenas um resumo + nome dos documentos disponíveis. Cada agente pode/deve dar essa recomendação ao usuário.
+
 ## Envio de Mídia (imagens, vídeos, PDFs)
 
 Agentes podem enviar mídias para o lead. As mídias ficam declaradas **dentro da seção `<conhecimento>`** do Orquestrador (template ou cliente).

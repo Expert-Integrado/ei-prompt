@@ -21,8 +21,16 @@ Rode uma auditoria somente-leitura via `docs-reviewer`.
 
 Se o caminho resolvido não existir → reportar erro com as opções disponíveis e parar.
 
-## Passo 2: Ler contexto obrigatório (se ainda não leu nesta sessão)
-- `CLAUDE.md`
+## Passo 2: Recarregar contexto obrigatório
+
+**SEMPRE** rodar o hook de contexto antes da auditoria (garante que CLAUDE.md está atualizado, pegando regras novas):
+
+```bash
+"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh
+```
+
+Depois leia (se ainda não leu nesta sessão):
+- `CLAUDE.md` (regras vigentes — fonte da verdade para o reviewer)
 - O arquivo alvo resolvido no Passo 1.
 
 ## Passo 3: Delegar ao agente `docs-reviewer`
@@ -33,8 +41,13 @@ Construa o prompt neste formato e invoque via Agent tool com `subagent_type: doc
 ARQUIVO ALVO (caminho LITERAL — caractere por caractere, incluindo espaços):
 <CAMINHO_ABSOLUTO_DO_PASSO_1>
 
-OBJETIVO DO AJUSTE (o que foi alterado ou o motivo da auditoria):
-<OBJETIVO_DERIVADO_DO_CONTEXTO — se chamado após edição, descrever o que foi mudado; se standalone, usar "auditoria geral">
+O QUE FOI ALTERADO (foco principal da auditoria):
+<DESCREVA AS MUDANÇAS RECÉM-FEITAS — seções tocadas, regras adicionadas/removidas. Se standalone (sem edição prévia), usar "auditoria geral — sem alteração específica">
+
+OBJETIVO DO AJUSTE (motivo do pedido original):
+<OBJETIVO_DERIVADO_DO_CONTEXTO>
+
+LEMBRETE AO REVIEWER: leia CLAUDE.md antes de auditar — ele é a fonte da verdade das regras (inclui regras adicionadas recentemente como Base de Conhecimento, Envio de Mídia, modelo/ read-only).
 ```
 
 ## Passo 4: Apresentar veredicto

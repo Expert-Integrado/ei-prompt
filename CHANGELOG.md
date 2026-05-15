@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.6] - 2026-05-15
+
+**Melhoria de performance na pipeline de revisão/ajuste de agentes.** O `docs-reviewer` agora sempre recarrega o contexto antes de auditar (regras novas do `CLAUDE.md` são aplicadas imediatamente), `/ei-review` passa o foco da auditoria explicitamente e `/ei-ajustes` injeta contexto antes de delegar ao editor — eliminando auditorias com regras defasadas.
+
+- **`docs-reviewer`:** novo Passo 0 obrigatório — roda `inject-ei-context.sh` (via `/ei-ctx`) antes de qualquer auditoria, garantindo regras vigentes do `CLAUDE.md`. Abordagem **diff-first**: prioriza o trecho alterado, depois valida coerência com o resto. Checklist expandido com regras de Base de Conhecimento, Envio de Mídia, `modelo/` read-only e multi-agente (Recepcionista/especialidades).
+- **`/ei-review`:** Passo 2 reescrito — executa o hook de contexto explicitamente (antes lia só `CLAUDE.md` da memória). Prompt do reviewer ganha campo separado `O QUE FOI ALTERADO` (foco da auditoria) distinto de `OBJETIVO DO AJUSTE` (motivo do pedido).
+- **`/ei-ajustes`:** Passo 4 agora roda o hook `inject-ei-context.sh` antes de delegar ao `docs-editor-conciso` — simetria com `/ei-review`, garante regras frescas no fluxo de edição.
+- **`CLAUDE.md`:** nova seção **Base de Conhecimento (`<conhecimento>` do Orquestrador)** — esclarece que `<conhecimento>` é índice/resumo, não a base completa (que mora no frontend `/base_conhecimento`). Define o que pode/não pode entrar e como orientar o usuário quando pedir "colocar a base inteira no prompt".
+
 ## [1.8.5] - 2026-05-13
 
 **Ajuste no `modelo/Recepcionista.md`: coleta opcional de contexto ANTES de identificar o agente.** O template agora suporta uma lista linear de perguntas configuráveis em `<fluxo_conversa>` — quando preenchida, a Recepcionista faz as perguntas em ordem antes de mapear contra `<agentes_disponiveis>`; quando vazia, mantém o comportamento original (pergunta aberta para identificar intenção).

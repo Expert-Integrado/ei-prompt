@@ -60,7 +60,14 @@ Se o input estiver vazio ou incompleto, pergunte:
 3. Se ambíguo ou múltiplos, pergunte ao usuário qual agente.
 
 ### Passo 4: Carregar contexto
-- Leia `CLAUDE.md` via Read (se ainda não leu nesta sessão).
+
+**SEMPRE** rodar o hook de contexto antes de delegar ao editor (garante que CLAUDE.md está atualizado, pegando regras novas):
+
+```bash
+"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh
+```
+
+Depois leia `CLAUDE.md` via Read (se ainda não leu nesta sessão).
 
 ### Passo 5: Delegar ao docs-editor-conciso
 
