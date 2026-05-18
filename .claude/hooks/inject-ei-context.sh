@@ -5,6 +5,7 @@
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 CLAUDE_MD="$PROJECT_DIR/CLAUDE.md"
+DOCS_DIR="$PROJECT_DIR/docs"
 MODELO_DIR="$PROJECT_DIR/modelo"
 
 echo "=== Contexto EiPrompt (injetado por hook) ==="
@@ -17,6 +18,19 @@ if [ -f "$CLAUDE_MD" ]; then
   echo
 else
   echo "[aviso] CLAUDE.md não encontrado em $CLAUDE_MD" >&2
+fi
+
+# Injeta os arquivos de regras fracionadas em docs/
+if [ -d "$DOCS_DIR" ]; then
+  for doc in regras-edicao.md regras-validacao.md proibido-fazer.md; do
+    doc_path="$DOCS_DIR/$doc"
+    if [ -f "$doc_path" ]; then
+      echo "## docs/$doc (regras do projeto — SEMPRE seguir)"
+      echo
+      cat "$doc_path"
+      echo
+    fi
+  done
 fi
 
 if [ -d "$MODELO_DIR" ]; then

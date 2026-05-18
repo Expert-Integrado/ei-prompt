@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.8.7] - 2026-05-18
+
+**Fracionamento do `CLAUDE.md` em `docs/`.** O índice agora mora no `CLAUDE.md` (enxuto: arquitetura, comandos, regras básicas) e as regras detalhadas foram movidas para 3 arquivos especializados em `docs/`. O hook `inject-ei-context.sh` injeta os 3 arquivos automaticamente, garantindo que agentes (editor, reviewer) sempre vejam o conjunto completo.
+
+- **`CLAUDE.md` reduzido a índice** — mantém Commits, Arquitetura de Agentes (single + multi), Slash Commands, Regras Básicas e mapa de regras.
+- **`docs/regras-edicao.md`** — princípios de concisão, estrutura padrão de prompts, padrões de economia, formato de resposta, ações no campo `resume`, Base de Conhecimento e Envio de Mídia.
+- **`docs/regras-validacao.md`** — checklists pós-edição (pré-commit, ações no `resume`, base de conhecimento, arquitetura) e auditoria automática.
+- **`docs/proibido-fazer.md`** — limites duros: `modelo/` read-only, o que NÃO pode ser ajustado via prompts, o que NÃO entra em `<conhecimento>`, o que NÃO pode em edições/commits.
+- **`.claude/hooks/inject-ei-context.sh`** atualizado para injetar os 3 arquivos de `docs/` após o `CLAUDE.md`.
+- **`manifest.json`** inclui os novos arquivos de `docs/` — `/ei-update` baixa o conjunto completo para clientes existentes.
+
 ## [1.8.6] - 2026-05-15
 
 **Melhoria de performance na pipeline de revisão/ajuste de agentes.** O `docs-reviewer` agora sempre recarrega o contexto antes de auditar (regras novas do `CLAUDE.md` são aplicadas imediatamente), `/ei-review` passa o foco da auditoria explicitamente e `/ei-ajustes` injeta contexto antes de delegar ao editor — eliminando auditorias com regras defasadas.
