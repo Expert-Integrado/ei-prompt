@@ -21,7 +21,8 @@ fi
 
 if [ -d "$MODELO_DIR" ]; then
   echo "## Arquivos modelo disponíveis em modelo/"
-  echo "Leia ANTES de editar/referenciar qualquer agente:"
+  echo "Estes arquivos servem como BASE/referência ao editar ou criar agentes."
+  echo "Não duplicar regras já contidas neles. Leia o conteúdo quando precisar consultar."
   echo
   for f in "$MODELO_DIR"/*.md; do
     [ -f "$f" ] || continue
