@@ -1,14 +1,34 @@
 #!/bin/bash
-# inject-ei-context.sh
-# Injeta contexto EiPrompt: CLAUDE.md + lista dos arquivos modelo.
-# Usado por SessionStart, UserPromptSubmit e PreToolUse (Edit|Write em modelo/*.md).
+# inject-ei-context.sh [mode]
+# Injeta contexto EiPrompt seletivo conforme o modo:
+#   editor    → CLAUDE.md + docs/regras-edicao.md   + docs/proibido-fazer.md
+#   reviewer  → CLAUDE.md + docs/regras-validacao.md + docs/proibido-fazer.md
+#   full|""   → CLAUDE.md + todos os docs/ + lista de modelo/*.md (padrão)
+#
+# Usado por SessionStart, UserPromptSubmit, PreToolUse (Edit|Write em modelo/*.md)
+# e pelos agentes docs-editor-conciso / docs-reviewer.
 
+MODE="${1:-full}"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 CLAUDE_MD="$PROJECT_DIR/CLAUDE.md"
 DOCS_DIR="$PROJECT_DIR/docs"
 MODELO_DIR="$PROJECT_DIR/modelo"
 
-echo "=== Contexto EiPrompt (injetado por hook) ==="
+# proibido-fazer.md é SEMPRE injetado (limites duros valem para todos os modos)
+case "$MODE" in
+  editor)
+    DOCS_TO_LOAD=(regras-edicao.md proibido-fazer.md)
+    ;;
+  reviewer)
+    DOCS_TO_LOAD=(regras-validacao.md proibido-fazer.md)
+    ;;
+  full|*)
+    MODE="full"
+    DOCS_TO_LOAD=(regras-edicao.md regras-validacao.md proibido-fazer.md)
+    ;;
+esac
+
+echo "=== Contexto EiPrompt (injetado por hook, modo: $MODE) ==="
 echo
 
 if [ -f "$CLAUDE_MD" ]; then
@@ -20,9 +40,8 @@ else
   echo "[aviso] CLAUDE.md não encontrado em $CLAUDE_MD" >&2
 fi
 
-# Injeta os arquivos de regras fracionadas em docs/
 if [ -d "$DOCS_DIR" ]; then
-  for doc in regras-edicao.md regras-validacao.md proibido-fazer.md; do
+  for doc in "${DOCS_TO_LOAD[@]}"; do
     doc_path="$DOCS_DIR/$doc"
     if [ -f "$doc_path" ]; then
       echo "## docs/$doc (regras do projeto — SEMPRE seguir)"
@@ -33,7 +52,8 @@ if [ -d "$DOCS_DIR" ]; then
   done
 fi
 
-if [ -d "$MODELO_DIR" ]; then
+# Lista de modelo/*.md só no modo full (editor/reviewer recebem caminho literal e não precisam descobrir).
+if [ "$MODE" = "full" ] && [ -d "$MODELO_DIR" ]; then
   echo "## Arquivos modelo disponíveis em modelo/"
   echo "Estes arquivos servem como BASE/referência ao editar ou criar agentes."
   echo "Não duplicar regras já contidas neles. Leia o conteúdo quando precisar consultar."

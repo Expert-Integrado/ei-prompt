@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.8] - 2026-05-18
+
+**Injeção seletiva de contexto por agente.** O hook `inject-ei-context.sh` agora aceita um modo (`editor`, `reviewer` ou padrão) e injeta apenas os `docs/` relevantes para o consumidor — reduzindo ruído no contexto dos subagents e mantendo `docs/proibido-fazer.md` sempre presente como guarda-corpo universal.
+
+- **`.claude/hooks/inject-ei-context.sh`:** novo argumento de modo. `editor` → `CLAUDE.md` + `docs/regras-edicao.md` + `docs/proibido-fazer.md`; `reviewer` → `CLAUDE.md` + `docs/regras-validacao.md` + `docs/proibido-fazer.md`; sem argumento (`full`) → todos os docs + lista de `modelo/*.md` (comportamento atual preservado para `SessionStart`/`UserPromptSubmit`/`PreToolUse`).
+- **`/ei-ctx`** aceita argumento opcional (`editor` | `reviewer`) e repassa ao hook via `$ARGUMENTS`.
+- **`docs-editor-conciso`** ganha Passo 0 obrigatório: roda o hook em modo `editor` antes de qualquer edição.
+- **`docs-reviewer`** atualizado: Passo 0 agora roda o hook em modo `reviewer` (antes carregava o conjunto completo).
+
 ## [1.8.7] - 2026-05-18
 
 **Fracionamento do `CLAUDE.md` em `docs/`.** O índice agora mora no `CLAUDE.md` (enxuto: arquitetura, comandos, regras básicas) e as regras detalhadas foram movidas para 3 arquivos especializados em `docs/`. O hook `inject-ei-context.sh` injeta os 3 arquivos automaticamente, garantindo que agentes (editor, reviewer) sempre vejam o conjunto completo.

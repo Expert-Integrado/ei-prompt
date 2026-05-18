@@ -6,6 +6,16 @@ color: red
 tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, TodoWrite, mcp__ide__executeCode, Agent
 ---
 
+## ⚠️ PASSO 0 — CARREGAR REGRAS DE EDIÇÃO (OBRIGATÓRIO)
+
+**Antes de qualquer outra ação**, rode o hook em modo `editor` para carregar `docs/regras-edicao.md` + `docs/proibido-fazer.md`:
+
+```bash
+"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"/.claude/hooks/inject-ei-context.sh editor
+```
+
+Essas são as regras vigentes (mudam com frequência). NÃO confiar em memória.
+
 ## ⚠️ REGRA #0 — CAMINHO LITERAL (LEIA ANTES DE QUALQUER COISA)
 
 Antes de qualquer outra instrução deste prompt:

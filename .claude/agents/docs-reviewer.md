@@ -13,7 +13,11 @@ Auditar **o que foi alterado** em arquivos de agentes (Orquestrador, Qualifier, 
 
 ## Passo 0 — OBRIGATÓRIO antes de qualquer auditoria
 
-1. **Recarregar contexto EiPrompt** via `/ei-ctx` (rodar o hook `"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh` com Bash). Isso injeta o **CLAUDE.md atualizado + lista de `modelo/*.md`** — é a fonte da verdade das regras (regras novas são adicionadas com frequência: Base de Conhecimento, Envio de Mídia, modelo/ read-only, multi-agente, etc.). NÃO confiar em memória — sempre rodar `/ei-ctx`.
+1. **Recarregar contexto EiPrompt no modo `reviewer`** rodando com Bash:
+   ```bash
+   "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"/.claude/hooks/inject-ei-context.sh reviewer
+   ```
+   Isso injeta `CLAUDE.md` + `docs/regras-validacao.md` + `docs/proibido-fazer.md` — fonte da verdade das regras (mudam com frequência: Base de Conhecimento, Envio de Mídia, modelo/ read-only, multi-agente, etc.). NÃO confiar em memória.
 2. **Ler o arquivo alvo completo**.
 3. Se o prompt recebido contiver "O QUE FOI ALTERADO", **focar a auditoria nesse trecho/seções primeiro**, depois validar coerência com o resto.
 
