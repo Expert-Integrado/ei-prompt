@@ -198,6 +198,27 @@ Após o usuário escolher uma opção 1-3 no [B], abra um SEGUNDO AskUserQuestio
 - Resposta = `"Outro"` (texto livre) → tratar como Cancelar (no [B.2] não há re-rodada — para reformular, o usuário precisa Voltar e escolher "Outro" no [B]).
 - Resposta vazia / não-mapeável → tratar como Cancelar (fail-closed).
 
+#### Caminho **[C]** — re-rodada do analyzer (cap em 2 reformulações)
+
+Acionado por:
+- Caminho [B] resposta = `"Outro"` (D-07 — usuário reformulou a descrição).
+- Roteamento do Passo 3 detectou `decisao=edit` + `confianca` != `alta` (D-09 — bug de contrato do analyzer; ANTES de re-invocar, exiba ao usuário a mensagem `"⚠️ Confiança insuficiente para edição direta — reformule a descrição."` em texto solto — UMA linha curta — e PEÇA a reformulação via uma chamada explícita à tool `AskUserQuestion` com question="Reformule a descrição do ajuste:", header="Reformular", options=[{"label":"Reformular","description":"Vou digitar nova descrição via Outro."},{"label":"Cancelar","description":"Encerra sem editar."}] — o usuário escolhe "Reformular" e usa "Outro" (adicionado automaticamente pela UI) para digitar o texto livre da nova descrição; se escolher "Reformular" sem usar "Outro", capture a próxima mensagem livre do usuário como nova `<descricao_ajuste>`; se escolher "Cancelar" ou responder vazio, encerre com a mensagem de cancelamento — REGRA INVIOLÁVEL).
+
+**Contador de re-rodadas (D-08, D-16):**
+
+Mantenha mentalmente um contador inteiro `reformulacoes` durante esta execução de `/ei-ajustes`. Inicialize em 0 na primeira invocação do analyzer (Passo 3). A cada vez que entrar no caminho [C], INCREMENTE o contador (`reformulacoes += 1`) ANTES de re-invocar o analyzer.
+
+Regra dura:
+- Se `reformulacoes > 2` (i.e. já fez 2 reformulações = 3 análises totais somando a original) → **NÃO re-invoque o analyzer**. Encerre o `/ei-ajustes` com a mensagem LITERAL:
+
+```
+Análise não conseguiu identificar o ajuste após 3 tentativas. Reformule a descrição e re-rode `/ei-ajustes`.
+```
+
+- Se `reformulacoes <= 2` → re-invoque o `docs-analyzer` via Agent tool com `subagent_type: docs-analyzer` reutilizando o MESMO prompt do Passo 3 item 2, mas substituindo o conteúdo de `<descricao_ajuste>` pelo texto da reformulação capturada (no caso [B]→Outro) ou pela descrição original (no caso D-09). Após receber a resposta XML, **volte ao Passo 3 item 4** (parsing) e em seguida ao roteamento do Passo 3 item 5 (que pode resultar em [A], [B], [C] ou ERRO novamente).
+
+**Importante:** O contador NÃO incrementa em "Voltar" do [B.2] (D-17 — Voltar reabre [B] localmente sem re-invocar analyzer). O contador INCREMENTA APENAS quando o `docs-analyzer` é re-invocado via Agent tool.
+
 ### Passo 4: Carregar contexto
 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
