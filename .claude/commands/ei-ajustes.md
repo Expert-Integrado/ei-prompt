@@ -219,6 +219,42 @@ Análise não conseguiu identificar o ajuste após 3 tentativas. Reformule a des
 
 **Importante:** O contador NÃO incrementa em "Voltar" do [B.2] (D-17 — Voltar reabre [B] localmente sem re-invocar analyzer). O contador INCREMENTA APENAS quando o `docs-analyzer` é re-invocado via Agent tool.
 
+#### Caminho ERRO — falha-fechado do analyzer (D-13)
+
+Acionado quando:
+- O Agent tool retornou exceção ao invocar `docs-analyzer`.
+- A resposta do analyzer NÃO contém `<decisao>` (XML malformado ou vazio).
+- `decisao=edit` mas `<arquivos>` está vazia.
+- `decisao=clarify` mas `<opcoes_correcao>` tem menos de 3 opções (schema inválido).
+
+**Ação:** NÃO renderize nenhum AskUserQuestion. NÃO tente recuperação automática. Encerre o `/ei-ajustes` IMEDIATAMENTE com a mensagem literal:
+
+```
+docs-analyzer falhou: <motivo extraído do erro ou descrição curta do problema>. Re-rode `/ei-ajustes <cliente> <descrição>` quando quiser tentar novamente.
+```
+
+Substitua `<motivo extraído>` por uma frase curta (ex: "XML malformado", "Resposta vazia", "Exceção no Agent tool", "Arquivos vazios em decisao=edit"). NÃO há retry automático — o mantenedor decide se calibra o analyzer ou se o usuário re-roda.
+
+#### Mensagem de cancelamento (D-11)
+
+Quando qualquer caminho ([A], [B], [B.2] ou [C]) resolver em Cancelamento (resposta = "Cancelar", resposta vazia no fail-closed, ou "Outro" no caminho [A] ou [B.2]), encerre o `/ei-ajustes` com EXATAMENTE esta mensagem (uma única linha, sem AskUserQuestion de feedback, sem sugestão de comandos relacionados):
+
+```
+Ajuste cancelado pelo usuário. Re-rode `/ei-ajustes <cliente> <descrição>` quando quiser tentar novamente.
+```
+
+Zero efeitos colaterais: NÃO leia CLAUDE.md, NÃO leia docs/, NÃO invoque docs-editor-conciso, NÃO invoque docs-reviewer. Encerre limpo.
+
+#### ⚠️ REGRA INVIOLÁVEL DO PASSO 3.5 (APPR-04)
+
+NUNCA invocar o `docs-editor-conciso` (Passo 5) sem aprovação EXPLÍCITA via `AskUserQuestion` no Passo 3.5.
+
+- Sem caminho alternativo. Sem heurística. Sem rota de exceção em erro.
+- Se o `AskUserQuestion` retornar resposta vazia, `answers={}`, `"Outro"` em caminho que não suporta reformulação, ou qualquer coisa diferente de `"Aprovar e editar"` (caminho [A]) ou `"Confirmar"` (caminho [B.2]), VOCÊ DEVE ENCERRAR o slash command com a mensagem de cancelamento — NUNCA prosseguir para Passo 4.
+- Erro de invocação do analyzer (XML malformado, resposta vazia, exceção, `<arquivos>` vazia em edit) → encerre IMEDIATAMENTE com a mensagem do caminho ERRO. NÃO renderize gate. NÃO invoque editor.
+- Não há "modo silencioso". Toda execução de `/ei-ajustes` que termine com Edit/Write em arquivo de cliente PRECISA ter passado por uma resposta humana explícita de `"Aprovar e editar"` (caminho [A]) ou `"Confirmar"` (caminho [B.2]) — sem exceção.
+- Em runtime sem TTY (SDK headless, CI, `--text` mode sem interatividade) o `AskUserQuestion` auto-resolve com `answers={}` — pela regra acima, isso = Cancelar. Comportamento esperado: `/ei-ajustes` encerra sem editar. Isso é fail-closed correto, não bug.
+
 ### Passo 4: Carregar contexto
 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
