@@ -1,6 +1,8 @@
 # Preferências do Projeto
 
-> CLAUDE.md é o **índice geral**. Regras detalhadas estão fracionadas em `docs/`. Os 3 arquivos são injetados automaticamente pelo hook `inject-ei-context.sh`.
+> CLAUDE.md é o **índice geral**. Regras detalhadas estão fracionadas em `docs/`.
+>
+> ⚠️ **v1.8.9:** Sistema de injeção automática de contexto (hook `inject-ei-context.sh` + slash command `/ei-ctx`) **desativado para manutenção**. Carregue manualmente via `Read` os arquivos da tabela abaixo + `CLAUDE.md`.
 
 ## Mapa de Regras
 
@@ -65,7 +67,7 @@ Cliente Multi/
 | `/ei-ajustes "<cliente> <especialidade>" <descrição>` | _(Multi-agente)_ Aspas em volta de cliente+especialidade. Ex: `/ei-ajustes "Brunno Brandi Consumidor" a IA está falando sobre valores` |
 | `/ei-edit <agente> <instrução>` | Edita template em `modelo/*.md` (editor + auditoria automática) |
 | `/ei-review <agente>` | Audita um agente (template ou cliente) — somente leitura |
-| `/ei-ctx` | Recarrega contexto do projeto (CLAUDE.md + docs/ + lista de modelos) |
+| ~~`/ei-ctx`~~ | **Desativado em v1.8.9 (manutenção).** Carregue contexto manualmente via `Read`. |
 
 ## Regras Básicas
 

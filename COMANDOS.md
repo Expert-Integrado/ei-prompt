@@ -98,25 +98,24 @@ Auditoria **somente-leitura** de um template em `modelo/`. Não edita nada.
 
 ---
 
-## `/ei-ctx`
+## ~~`/ei-ctx`~~ — DESATIVADO em v1.8.9
 
-Recarrega manualmente o contexto EiPrompt: re-injeta `CLAUDE.md` + lista de agentes em `modelo/`.
+> Sistema de injeção automática de contexto está em **manutenção** desde v1.8.9. O slash command `/ei-ctx` e os hooks que chamavam `inject-ei-context.sh` foram temporariamente desligados.
 
-**Uso:**
-```
-/ei-ctx
-```
-
-**Quando usar:**
-- Depois de compactação da janela de contexto
-- Quando suspeitar que o Claude "esqueceu" as regras
-- Início de sessão (redundante, pois o hook `SessionStart` já faz isso automaticamente)
+**Substituição manual:** carregue via `Read` os arquivos:
+- `CLAUDE.md`
+- `docs/regras-edicao.md`
+- `docs/regras-validacao.md`
+- `docs/proibido-fazer.md`
+- Liste `modelo/*.md` via Glob para ver os templates.
 
 ---
 
 ## Hooks automáticos (rodam sem comando)
 
-Além dos slash commands, existem hooks configurados em `.claude/settings.json` que injetam contexto automaticamente:
+> ⚠️ **v1.8.9:** Os hooks de injeção de contexto (`SessionStart`, `UserPromptSubmit`, `PreToolUse` em `modelo/*.md`) estão **desativados** em `.claude/settings.json` durante a manutenção. Apenas `SubagentStop` (auditoria pós-scaffolder) continua ativo.
+
+Após a manutenção, voltarão a operar:
 
 | Evento | Quando dispara | Ação |
 |--------|----------------|------|
@@ -124,7 +123,7 @@ Além dos slash commands, existem hooks configurados em `.claude/settings.json` 
 | `UserPromptSubmit` | Cada prompt enviado | Injeta contexto SE prompt mencionar agentes/modelo/CLAUDE.md |
 | `PreToolUse` (Edit/Write em `modelo/*.md`) | Antes de editar template | Injeta contexto |
 
-Scripts dos hooks ficam em `.claude/hooks/`:
+Scripts dos hooks (mantidos no disco, mas não invocados):
 - `inject-ei-context.sh` — lê e imprime contexto
 - `prompt-matches-agent.sh` — filtra prompts relevantes
 

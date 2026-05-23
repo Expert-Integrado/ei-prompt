@@ -21,16 +21,13 @@ Rode uma auditoria somente-leitura via `docs-reviewer`.
 
 Se o caminho resolvido não existir → reportar erro com as opções disponíveis e parar.
 
-## Passo 2: Recarregar contexto obrigatório
+## Passo 2: Carregar contexto obrigatório
 
-**SEMPRE** rodar o hook de contexto antes da auditoria (garante que CLAUDE.md está atualizado, pegando regras novas):
+> Sistema de injeção automática de contexto desativado em v1.8.9 (manutenção). Carregue os arquivos manualmente.
 
-```bash
-"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh
-```
-
-Depois leia (se ainda não leu nesta sessão):
+Leia (se ainda não leu nesta sessão):
 - `CLAUDE.md` (regras vigentes — fonte da verdade para o reviewer)
+- `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`
 - O arquivo alvo resolvido no Passo 1.
 
 ## Passo 3: Delegar ao agente `docs-reviewer`

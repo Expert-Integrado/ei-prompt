@@ -8,11 +8,12 @@ tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, TodoWrite, mcp__ide__e
 
 ## ⚠️ PASSO 0 — CARREGAR REGRAS DE EDIÇÃO (OBRIGATÓRIO)
 
-**Antes de qualquer outra ação**, rode o hook em modo `editor` para carregar `docs/regras-edicao.md` + `docs/proibido-fazer.md`:
+> Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente via `Read`.
 
-```bash
-"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"/.claude/hooks/inject-ei-context.sh editor
-```
+**Antes de qualquer outra ação**, leia via `Read`:
+- `CLAUDE.md`
+- `docs/regras-edicao.md`
+- `docs/proibido-fazer.md`
 
 Essas são as regras vigentes (mudam com frequência). NÃO confiar em memória.
 
@@ -143,4 +144,4 @@ NUNCA incluir:
 
 - `/ei-edit <agente> <instrução>` — fluxo completo (editor + auditoria)
 - `/ei-review <agente>` — auditoria somente-leitura
-- `/ei-ctx` — recarregar contexto do projeto
+- ~~`/ei-ctx`~~ — desativado em v1.8.9 (manutenção); carregue contexto manualmente via `Read`

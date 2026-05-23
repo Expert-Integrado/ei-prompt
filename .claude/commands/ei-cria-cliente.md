@@ -10,8 +10,12 @@ Crie um novo projeto de cliente. **Você (Claude principal) é o orquestrador** 
 ## Fluxo
 
 ### Passo 1 — Carregar contexto
-1. Execute via Bash: `"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh` (carrega `CLAUDE.md` + lista `modelo/*`).
-2. Leia `CLAUDE.md` integralmente — atenção à seção "Arquitetura Multi-Agente (opcional — Recepcionista)".
+
+> Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
+
+1. Leia `CLAUDE.md` integralmente — atenção à seção "Arquitetura Multi-Agente (opcional — Recepcionista)".
+2. Leia `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`.
+3. Liste `modelo/*.md` para saber quais templates estão disponíveis.
 
 ### Passo 2 — Nome do cliente
 Se `$ARGUMENTS` estiver preenchido, use como nome da pasta raiz. Caso contrário, pergunte ao usuário.

@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.8.9] - 2026-05-23
+
+**Sistema de injeção automática de contexto desativado para manutenção.** O hook `inject-ei-context.sh`, o slash command `/ei-ctx` e todas as chamadas explícitas em commands/agents foram neutralizadas. Carregamento de contexto agora é manual via `Read` até a manutenção ser concluída.
+
+- **`.claude/settings.json`:** removidos os blocos `SessionStart`, `UserPromptSubmit` e `PreToolUse` (Edit/Write em `modelo/*.md`) que chamavam `inject-ei-context.sh` / `prompt-matches-agent.sh`. Apenas `SubagentStop` (auditoria pós-scaffolder) permanece ativo. Histórico preservado em git para fácil restauração.
+- **`/ei-ctx`:** marcado como DESATIVADO no frontmatter e no corpo do arquivo — agora apenas orienta o usuário a carregar `CLAUDE.md` + `docs/*` manualmente via `Read`.
+- **`/ei-cria-cliente`, `/ei-ajustes`, `/ei-review`:** Passo de carregamento de contexto reescrito — em vez de invocar o hook via Bash, instrui leitura manual de `CLAUDE.md` + `docs/regras-edicao.md` + `docs/regras-validacao.md` + `docs/proibido-fazer.md`.
+- **`docs-editor-conciso`, `docs-reviewer`, `client-project-scaffolder`:** Passo 0 / Fase 0 não chama mais o hook — instrui Read manual dos mesmos arquivos.
+- **`CLAUDE.md`, `README.md`, `COMANDOS.md`:** banners de aviso indicando o status `[DESATIVADO em v1.8.9 — em manutenção]` em todas as referências ao sistema de injeção automática.
+- **Arquivos `inject-ei-context.sh` e `prompt-matches-agent.sh` preservados no disco** — não invocados, mas prontos para reativação restaurando os blocos de hooks no `settings.json`.
+
 ## [1.8.8] - 2026-05-18
 
 **Injeção seletiva de contexto por agente.** O hook `inject-ei-context.sh` agora aceita um modo (`editor`, `reviewer` ou padrão) e injeta apenas os `docs/` relevantes para o consumidor — reduzindo ruído no contexto dos subagents e mantendo `docs/proibido-fazer.md` sempre presente como guarda-corpo universal.

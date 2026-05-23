@@ -1,43 +1,6 @@
 {
   "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume|clear|compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-ei-context.sh"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/prompt-matches-agent.sh"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "if": "Edit(modelo/*.md)",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-ei-context.sh"
-          },
-          {
-            "type": "command",
-            "if": "Write(modelo/*.md)",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-ei-context.sh"
-          }
-        ]
-      }
-    ],
+    "_disabled_note": "Sistema de injeção de contexto desativado em v1.8.9 para manutenção. Hooks SessionStart/UserPromptSubmit/PreToolUse que chamavam inject-ei-context.sh foram removidos. Para reativar, restaurar os blocos a partir do histórico git (settings.json antes de v1.8.9).",
     "SubagentStop": [
       {
         "hooks": [

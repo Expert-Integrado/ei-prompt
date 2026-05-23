@@ -61,13 +61,11 @@ Se o input estiver vazio ou incompleto, pergunte:
 
 ### Passo 4: Carregar contexto
 
-**SEMPRE** rodar o hook de contexto antes de delegar ao editor (garante que CLAUDE.md está atualizado, pegando regras novas):
+> Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
 
-```bash
-"$CLAUDE_PROJECT_DIR"/.claude/hooks/inject-ei-context.sh
-```
-
-Depois leia `CLAUDE.md` via Read (se ainda não leu nesta sessão).
+Leia via Read (se ainda não leu nesta sessão):
+- `CLAUDE.md`
+- `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`
 
 ### Passo 5: Delegar ao docs-editor-conciso
 
