@@ -72,6 +72,7 @@ Cliente Multi/
 ## Regras Básicas
 
 - **Edição de agentes:** sempre via `docs-editor-conciso`. Caminho exato recebido, sem trocar extensão (`.md` e `.txt` são iguais).
+- **Análise pré-edição:** `/ei-ajustes` invoca o subagente `docs-analyzer` (modelo opus, read-only) para identificar arquivo+seção a partir da descrição livre. Substitui a heurística por keywords. Detalhe em `.claude/agents/docs-analyzer.md`.
 - **Auditoria:** sempre via `docs-reviewer` após edição.
 - **`modelo/` é read-only.** Detalhes em [`docs/proibido-fazer.md`](docs/proibido-fazer.md).
 - **Princípios de edição:** ver [`docs/regras-edicao.md`](docs/regras-edicao.md).
