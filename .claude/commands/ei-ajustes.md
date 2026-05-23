@@ -92,6 +92,53 @@ Aplique seu fluxo de análise e devolva APENAS o XML conforme seu <formato_respo
 
 NÃO prosseguir direto para Passo 4. NÃO imprimir markdown da recomendação. Toda apresentação ao usuário acontece DENTRO do AskUserQuestion no Passo 3.5 (D-01).
 
+### Passo 3.5: Aprovação humana via AskUserQuestion (gate-duro)
+
+Bifurcação obrigatória entre o Passo 3 (analyzer) e o Passo 4 (carregar contexto). Sem aprovação explícita aqui, NENHUM `docs-editor-conciso` é spawnado (APPR-04).
+
+A escolha do caminho vem do roteamento do Passo 3 item 5:
+
+- Caminho **[A]** — `decisao=edit` + `confianca=alta` (este bloco abaixo)
+- Caminho **[B]** — `decisao=clarify` (ver bloco mais adiante neste Passo 3.5)
+- Caminho **[B.2]** — gate duplo após escolha de opção 1-3 do clarify
+- Caminho **[C]** — re-rodada do analyzer com cap de 2 reformulações
+- Caminho **ERRO** — falha-fechado em erro do analyzer
+
+> **Runtime / no-TTY:** A tool `AskUserQuestion` é built-in do Claude Code >= v2.0.21. Em ambiente headless/no-TTY (SDK Python, CI, Docker sem TTY) ela auto-resolve com `answers={}` em ~37ms — a REGRA INVIOLÁVEL desta seção trata resposta vazia / não-"Aprovar" como Cancelar (fail-closed automático). Se você executar via SDK ou `--text` mode sem TTY interativo, o `/ei-ajustes` SEMPRE encerra com mensagem de cancelamento — comportamento correto, não bug. Em VSCode `vscode_askquestions` a UI renderiza normalmente; nenhuma adaptação necessária.
+
+#### Caminho **[A]** — edit + confianca=alta
+
+**Use OBRIGATORIAMENTE a tool `AskUserQuestion`** (não pergunte em texto solto, não imprima markdown antes — D-01).
+
+Construa o campo `question` como uma lista numerada com UM bullet por `<arquivo>` extraído no Passo 3 (D-02 — formato: ``N. `<path>` → `<secao_tag>` — <justificativa>``). Use UMA única chamada à tool, com UMA única question — mesmo se N>=2 arquivos (D-04 tudo-ou-nada, APPR-03).
+
+Estrutura literal (substitua os placeholders `<path_N>`, `<secao_tag_N>`, `<justificativa_N>` pelos valores reais; gere quantas linhas numeradas quantos forem os arquivos):
+
+```json
+{
+  "questions": [{
+    "question": "O `docs-analyzer` recomenda editar:\n\n1. `<path_1>` → `<secao_tag_1>` — <justificativa_1>\n2. `<path_2>` → `<secao_tag_2>` — <justificativa_2>\n\nAplicar essas alterações?",
+    "header": "Aprovação",
+    "multiSelect": false,
+    "options": [
+      {"label": "Aprovar e editar", "description": "Despacha o docs-editor-conciso para todos os arquivos listados acima."},
+      {"label": "Cancelar", "description": "Encerra sem editar. Você pode re-rodar /ei-ajustes com descrição refinada."}
+    ]
+  }]
+}
+```
+
+Notas críticas:
+- NÃO listar `"Outro"` nas `options` — a UI da `AskUserQuestion` adiciona automaticamente.
+- Se a `<justificativa>` original do analyzer for muito longa para uma linha confortável, ENXUGUE para <=120 caracteres preservando o sentido (D-15). NÃO faça wrap dentro do bullet.
+- `header` deve ter <=12 caracteres; cada `label` deve ter 1-5 palavras; `options` deve ter 2-4 itens (schema da tool).
+
+**Interpretação da resposta do [A]:**
+- Resposta = `"Aprovar e editar"` → segue para Passo 4 com a lista COMPLETA de arquivos parseados no Passo 3.
+- Resposta = `"Cancelar"` → encerra com a mensagem de cancelamento (ver subseção "Mensagem de cancelamento" mais adiante neste Passo 3.5).
+- Resposta = `"Outro"` (texto livre via UI) → **NO CAMINHO [A], tratar como Cancelar** (encerra com mensagem de cancelamento). Reformulação só é suportada no caminho [B] (clarify). Para reformular após edit+alta, o usuário re-roda `/ei-ajustes` manualmente.
+- Resposta vazia / answers={} / qualquer coisa diferente das acima → **tratar como Cancelar** (REGRA INVIOLÁVEL — fail-closed).
+
 ### Passo 4: Carregar contexto
 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
