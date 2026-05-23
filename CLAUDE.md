@@ -73,6 +73,7 @@ Cliente Multi/
 
 - **Edição de agentes:** sempre via `docs-editor-conciso`. Caminho exato recebido, sem trocar extensão (`.md` e `.txt` são iguais).
 - **Análise pré-edição:** `/ei-ajustes` invoca o subagente `docs-analyzer` (modelo opus, read-only) para identificar arquivo+seção a partir da descrição livre. Substitui a heurística por keywords. Detalhe em `.claude/agents/docs-analyzer.md`.
+- **Aprovação humana (gate-duro):** entre análise e edição, `/ei-ajustes` apresenta um `AskUserQuestion` (Passo 3.5) com a recomendação do analyzer; sem resposta explícita de "Aprovar e editar" (caminho edit) ou "Confirmar" (caminho clarify/gate duplo), nenhum `docs-editor-conciso` é acionado. Detalhe em `.claude/commands/ei-ajustes.md` (Passo 3.5).
 - **Auditoria:** sempre via `docs-reviewer` após edição.
 - **`modelo/` é read-only.** Detalhes em [`docs/proibido-fazer.md`](docs/proibido-fazer.md).
 - **Princípios de edição:** ver [`docs/regras-edicao.md`](docs/regras-edicao.md).
