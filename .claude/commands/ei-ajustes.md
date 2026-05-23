@@ -80,30 +80,17 @@ Aplique seu fluxo de análise e devolva APENAS o XML conforme seu <formato_respo
 4. **Parsear a resposta XML** do analyzer:
    - Extrair `<decisao>` (`edit` ou `clarify`).
    - Extrair `<confianca>` (`alta`, `media`, `baixa`).
-   - Se `<decisao>edit</decisao>`: extrair o primeiro `<arquivo>` (path, secao_tag, secao_descricao, justificativa). Em Phase 3 isso vira fan-out paralelo para N arquivos; nesta Phase 1 basta o primeiro.
-   - Se `<decisao>clarify</decisao>`: extrair `<opcoes_correcao>`.
-5. **Exibir o output ao usuário** (Phase 1 — gate de aprovação formal entra em Phase 2). Use este formato:
+   - Se `<decisao>edit</decisao>`: extrair **TODOS** os elementos `<arquivo>` em ordem (não apenas o primeiro). Para cada um, capturar `<path>`, `<secao_tag>`, `<secao_descricao>`, `<justificativa>`. Esta lista completa vai inteira para o Passo 3.5 e é apresentada ao usuário em UMA única tela (APPR-03 — D-04 tudo-ou-nada).
+   - Se `<decisao>clarify</decisao>`: extrair TODAS as `<opcao>` dentro de `<opcoes_correcao>` (id, titulo, arquivo, secao_tag). Ignore a opção `id="outro"` ao construir as options do AskUserQuestion — a UI adiciona "Outro" automaticamente (D-05).
+   - Se a resposta NÃO for XML parseável, estiver vazia, ou não contiver `<decisao>` → **PARAR aqui** e seguir para o caminho ERRO do Passo 3.5 (falha-fechado D-13).
 
-```
-## Análise do docs-analyzer
+5. **Roteamento para o Passo 3.5 (gate de aprovação):**
+   - `<decisao>edit</decisao>` + `<confianca>alta</confianca>` → Passo 3.5 caminho **[A]** (edit aprovação).
+   - `<decisao>edit</decisao>` + `<confianca>` ≠ `alta` → Passo 3.5 caminho **[C]** (re-rodada; D-09 — trata como bug de contrato do analyzer; mostra mensagem "Confiança insuficiente para edição direta — reformule a descrição" antes de re-invocar).
+   - `<decisao>clarify</decisao>` → Passo 3.5 caminho **[B]** (clarify com opções).
+   - Erro / XML inválido / resposta vazia / `<arquivos>` vazia em decisao=edit → Passo 3.5 caminho **ERRO** (falha-fechado D-13).
 
-**Decisão:** <edit|clarify>
-**Confiança:** <alta|media|baixa>
-
-### Arquivos identificados (quando decisao=edit)
-- `<path>` → `<secao_tag>` (<secao_descricao>)
-  Justificativa: <justificativa>
-
-### Opções de correção (quando decisao=clarify)
-1. <titulo> — `<arquivo>` → `<secao_tag>`
-2. <titulo> — `<arquivo>` → `<secao_tag>`
-3. <titulo> — `<arquivo>` → `<secao_tag>`
-4. Outro — descrever o ajuste direto
-```
-
-6. **Decisão de fluxo:**
-   - `<decisao>edit</decisao>` → seguir para o Passo 4 (carregar contexto) e Passo 5 (delegar ao docs-editor-conciso) usando o `<path>` e `<secao_tag>` extraídos. Não inferir mais nada por keywords.
-   - `<decisao>clarify</decisao>` → PARAR aqui. Informe ao usuário: "Análise não conseguiu identificar com confiança o ajuste. Escolha uma das opções acima e re-rode `/ei-ajustes <cliente> <descrição refinada>`." (O gate formal via AskUserQuestion entra em Phase 2 — por ora o usuário re-roda manualmente.)
+NÃO prosseguir direto para Passo 4. NÃO imprimir markdown da recomendação. Toda apresentação ao usuário acontece DENTRO do AskUserQuestion no Passo 3.5 (D-01).
 
 ### Passo 4: Carregar contexto
 
