@@ -139,6 +139,65 @@ Notas críticas:
 - Resposta = `"Outro"` (texto livre via UI) → **NO CAMINHO [A], tratar como Cancelar** (encerra com mensagem de cancelamento). Reformulação só é suportada no caminho [B] (clarify). Para reformular após edit+alta, o usuário re-roda `/ei-ajustes` manualmente.
 - Resposta vazia / answers={} / qualquer coisa diferente das acima → **tratar como Cancelar** (REGRA INVIOLÁVEL — fail-closed).
 
+#### Caminho **[B]** — clarify (analyzer retornou opções de correção)
+
+Quando `<decisao>clarify</decisao>` (confiança media ou baixa), o analyzer já devolveu 3 `<opcao>` concretas em `<opcoes_correcao>`. Mapeie cada uma para uma `option` do AskUserQuestion (D-05):
+
+- `label` = `<titulo>` da opção (ENXUGUE para <=5 palavras se necessário, preservando o verbo de ação — ex: "Remover menção a valores")
+- `description` = `<arquivo> → <secao_tag>` (formato literal: ``Orquestrador.md` → `<perguntas_iniciais>``)
+
+Adicione UMA opção fixa `"Cancelar"` no final. NÃO liste `"Outro"` — a UI adiciona automaticamente.
+
+```json
+{
+  "questions": [{
+    "question": "O `docs-analyzer` não tem certeza do ajuste. Escolha a ação:",
+    "header": "Esclarecer",
+    "multiSelect": false,
+    "options": [
+      {"label": "<titulo opção 1>", "description": "`<arquivo1>` → `<secao_tag1>`"},
+      {"label": "<titulo opção 2>", "description": "`<arquivo2>` → `<secao_tag2>`"},
+      {"label": "<titulo opção 3>", "description": "`<arquivo3>` → `<secao_tag3>`"},
+      {"label": "Cancelar", "description": "Encerra sem editar."}
+    ]
+  }]
+}
+```
+
+**Interpretação da resposta do [B]:**
+- Resposta = label de uma das opções 1-3 → segue para caminho **[B.2]** (gate duplo) usando `<arquivo>` + `<secao_tag>` + `<titulo>` da opção escolhida.
+- Resposta = `"Cancelar"` → encerra com a mensagem de cancelamento.
+- Resposta = `"Outro"` (texto livre via UI) → captura o texto digitado pelo usuário, segue para caminho **[C]** (re-rodada — D-07) usando o texto como nova `<descricao_ajuste>`.
+- Resposta vazia / não-mapeável → tratar como Cancelar (REGRA INVIOLÁVEL — fail-closed).
+
+**ANTES de abrir o AskUserQuestion do [B], armazene MENTALMENTE no contexto desta execução** as 3 opções originais (id, titulo, arquivo, secao_tag) — você precisa delas se o usuário escolher "Voltar" no [B.2] (D-17 — reabrir o [B] sem re-invocar o analyzer).
+
+#### Caminho **[B.2]** — gate duplo (defesa em profundidade)
+
+Após o usuário escolher uma opção 1-3 no [B], abra um SEGUNDO AskUserQuestion confirmando o alvo técnico (D-06). Use os valores literais da opção escolhida:
+
+```json
+{
+  "questions": [{
+    "question": "Confirmar edição:\n\n- Arquivo: `<arquivo>`\n- Seção: `<secao_tag>`\n- Ação: <titulo>",
+    "header": "Confirmar",
+    "multiSelect": false,
+    "options": [
+      {"label": "Confirmar", "description": "Despacha o docs-editor-conciso para a edição acima."},
+      {"label": "Voltar", "description": "Volta para a lista de opções anterior."},
+      {"label": "Cancelar", "description": "Encerra sem editar."}
+    ]
+  }]
+}
+```
+
+**Interpretação da resposta do [B.2]:**
+- Resposta = `"Confirmar"` → segue para Passo 4 com 1 arquivo: `{ path: <arquivo>, secao_tag: <secao_tag>, justificativa: <titulo da opção escolhida> }`. Note que no caminho [B] sempre N=1 (gate duplo escolhe UMA ação por vez).
+- Resposta = `"Voltar"` → reabra o AskUserQuestion do caminho [B] usando as `<opcoes_correcao>` originais armazenadas no contexto. **NÃO re-invocar o `docs-analyzer`** (D-17 — Voltar é navegação local, não reformulação; contador de re-rodadas NÃO incrementa).
+- Resposta = `"Cancelar"` → encerra com mensagem de cancelamento.
+- Resposta = `"Outro"` (texto livre) → tratar como Cancelar (no [B.2] não há re-rodada — para reformular, o usuário precisa Voltar e escolher "Outro" no [B]).
+- Resposta vazia / não-mapeável → tratar como Cancelar (fail-closed).
+
 ### Passo 4: Carregar contexto
 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
