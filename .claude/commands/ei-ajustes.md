@@ -3,6 +3,8 @@ description: Aplica ajuste em um agente de cliente já existente (procura a past
 argument-hint: <cliente> <descrição> | "<cliente> <especialidade>" <descrição>
 ---
 
+> ⚠️ **v2 (Phase 1):** Passo 3 agora invoca o subagente `docs-analyzer` (modelo opus, read-only) em vez de heurística por keywords. O analyzer lê todos os `.md` do cliente e devolve XML estruturado (`<decisao>edit|clarify</decisao>`). Gate de aprovação formal via `AskUserQuestion` entra em Phase 2.
+
 Você vai aplicar um ajuste em um projeto de cliente já existente.
 
 **Input bruto:** $ARGUMENTS
@@ -49,15 +51,59 @@ Se o input estiver vazio ou incompleto, pergunte:
    - Se nenhuma → liste todas as combinações `cliente/especialidade` disponíveis e pergunte.
 2. O path resolvido (ex: `Brunno Brandi/Consumidor/`) é a pasta-alvo.
 
-### Passo 3: Identificar qual agente ajustar
-1. Liste os `.md` da pasta-alvo (ex: `Brunno Brandi/Consumidor/Orquestrador.md`, `.../Qualifier.md`, etc).
-2. Analise a descrição do ajuste e inferir qual agente precisa de mudança:
-   - menções a "qualificar/lead/desqualificar/valores/dívida/faturamento" → **Qualifier**
-   - menções a "agendar/marcar/remarcar/horário/reunião" → **Scheduler**
-   - menções a "encerrar/finalizar/transferir para humano/despedida" → **Protractor**
-   - menções a "recepcionista/roteamento/transferir entre agentes/agentes disponíveis/multi-agente" → **Orquestrador** (dentro da subpasta `Recepcionista/`)
-   - menções a "resposta inicial/cumprimento/fluxo geral/chamar agente/conhecimento" → **Orquestrador**
-3. Se ambíguo ou múltiplos, pergunte ao usuário qual agente.
+### Passo 3: Invocar `docs-analyzer` para identificar arquivo + seção
+
+A heurística antiga por keywords foi substituída pelo subagente `docs-analyzer` (modelo opus, read-only). Ele lê TODOS os `.md` da pasta-alvo e devolve decisão estruturada em XML.
+
+1. **Determinar `<modo>`:** `single` (Modo A do Passo 1) ou `multi` (Modo B do Passo 1).
+2. **Construir o prompt do analyzer** EXATAMENTE neste formato (substituir placeholders, manter estrutura):
+
+```
+TAREFA: Análise (NÃO edição). Você é o docs-analyzer.
+
+<descricao_ajuste>
+<DESCRIÇÃO_DO_USUÁRIO_DO_PASSO_1>
+</descricao_ajuste>
+
+<cliente_path>
+<PATH_ABSOLUTO_RESOLVIDO_NO_PASSO_2>
+</cliente_path>
+
+<modo>
+<single OU multi>
+</modo>
+
+Aplique seu fluxo de análise e devolva APENAS o XML conforme seu <formato_resposta>. Sem texto livre fora do XML.
+```
+
+3. **Invocar via Agent tool** com `subagent_type: docs-analyzer` e o prompt acima preenchido.
+4. **Parsear a resposta XML** do analyzer:
+   - Extrair `<decisao>` (`edit` ou `clarify`).
+   - Extrair `<confianca>` (`alta`, `media`, `baixa`).
+   - Se `<decisao>edit</decisao>`: extrair o primeiro `<arquivo>` (path, secao_tag, secao_descricao, justificativa). Em Phase 3 isso vira fan-out paralelo para N arquivos; nesta Phase 1 basta o primeiro.
+   - Se `<decisao>clarify</decisao>`: extrair `<opcoes_correcao>`.
+5. **Exibir o output ao usuário** (Phase 1 — gate de aprovação formal entra em Phase 2). Use este formato:
+
+```
+## Análise do docs-analyzer
+
+**Decisão:** <edit|clarify>
+**Confiança:** <alta|media|baixa>
+
+### Arquivos identificados (quando decisao=edit)
+- `<path>` → `<secao_tag>` (<secao_descricao>)
+  Justificativa: <justificativa>
+
+### Opções de correção (quando decisao=clarify)
+1. <titulo> — `<arquivo>` → `<secao_tag>`
+2. <titulo> — `<arquivo>` → `<secao_tag>`
+3. <titulo> — `<arquivo>` → `<secao_tag>`
+4. Outro — descrever o ajuste direto
+```
+
+6. **Decisão de fluxo:**
+   - `<decisao>edit</decisao>` → seguir para o Passo 4 (carregar contexto) e Passo 5 (delegar ao docs-editor-conciso) usando o `<path>` e `<secao_tag>` extraídos. Não inferir mais nada por keywords.
+   - `<decisao>clarify</decisao>` → PARAR aqui. Informe ao usuário: "Análise não conseguiu identificar com confiança o ajuste. Escolha uma das opções acima e re-rode `/ei-ajustes <cliente> <descrição refinada>`." (O gate formal via AskUserQuestion entra em Phase 2 — por ora o usuário re-roda manualmente.)
 
 ### Passo 4: Carregar contexto
 
@@ -74,8 +120,14 @@ Construa o prompt para o agente **exatamente** neste formato (substitua os place
 ```
 TAREFA: Edição (NÃO auditoria).
 
-ARQUIVO ALVO (use este caminho LITERAL com Read, depois Edit/Write — caractere por caractere, incluindo espaços):
-<CAMINHO_ABSOLUTO_DO_PASSO_2>
+ARQUIVO ALVO (vindo do docs-analyzer no Passo 3, use este caminho LITERAL com Read, depois Edit/Write):
+<PATH_DO_ANALYZER>
+
+SEÇÃO ALVO (tag XML literal identificada pelo docs-analyzer):
+<SECAO_TAG_DO_ANALYZER>
+
+JUSTIFICATIVA DO ANALYZER (contexto da escolha):
+<JUSTIFICATIVA_DO_ANALYZER>
 
 ⚠️ NÃO transformar o caminho. NÃO prefixar com `modelo/`. NÃO extrair palavras do nome da pasta. Use o caminho EXATAMENTE como aparece acima.
 
