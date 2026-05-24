@@ -334,6 +334,44 @@ Emita as N chamadas via tool `Agent` na MESMA resposta. Cada chamada usa `subage
 
 > **N=1 e N>=2 usam EXATAMENTE este mesmo bloco.** Não há rota separada para "fluxo single-file legado" — o template ganhou ESCOPO + marcador `<resultado>`, mas para N=1 o comportamento observável (arquivo editado dentro da seção declarada, mensagem de finalização ao usuário) permanece idêntico ao pré-Phase 3 (PARL-01 — zero regressão).
 
+#### Bloco pós-Tasks — parsing dos N marcadores `<resultado>` (D-09)
+
+Quando as N Tasks paralelas retornarem (todas no mesmo turn, paralelismo nativo do harness), o Claude principal consolida os resultados antes de prosseguir:
+
+1. **Para cada uma das N respostas de Task** (uma por arquivo da lista aprovada), classifique o status do arquivo como `OK` ou `FALHO` aplicando, EM ORDEM:
+   - **(a) Exceção do Agent tool ao spawnar/executar a Task** → `FALHO` com `motivo = "Exceção do Agent: <texto curto do erro>"`. NÃO requer marcador parseável.
+   - **(b) Resposta retornou sem marcador `<resultado>...</resultado>` parseável** (regex: `<resultado>(OK|ERRO:[^<]+)</resultado>`) → `FALHO` com `motivo = "Marcador <resultado> ausente ou malformado na resposta do editor"`.
+   - **(c) Resposta contém `<resultado>OK</resultado>`** → `OK` (motivo vazio).
+   - **(d) Resposta contém `<resultado>ERRO: <motivo></resultado>`** → `FALHO` com `motivo = <texto após "ERRO: " até "</resultado>">` (preservar literal, UMA linha).
+
+Detecção de falha (D-09): NÃO use comandos do sistema de controle de versão (status, diff) nem leitura do arquivo editado para inferir se a edição foi aplicada. A fonte da verdade é APENAS o marcador `<resultado>OK</resultado>` no fim da resposta do editor. Ausência de marcador OU formato ERRO = falha. Validação de qualidade da edição é responsabilidade dos reviewers (Phase 4).
+
+2. **Construa a lista consolidada** `[{path, status, motivo}]` (uma entrada por arquivo da lista aprovada, na MESMA ordem em que as Tasks foram disparadas). Exemplos:
+   - `{path: "malu/Orquestrador.md", status: "OK", motivo: ""}`
+   - `{path: "malu/Qualifier.md", status: "FALHO", motivo: "Seção <perguntas_iniciais> não encontrada"}`
+
+3. **Contagem:** `K = quantidade de entradas com status=FALHO`; `N = tamanho da lista aprovada`.
+
+4. **Rotear pelo valor de K:**
+   - **K = 0** (todos OK) → siga para o **Passo 6** (Phase 4 ainda vai mexer no Passo 6; nesta phase, basta apresentar o resumo final ao usuário e prosseguir como hoje).
+   - **K >= 1** (pelo menos 1 falho) → passe controle para a **subseção "Gate de retry parcial"** mais adiante neste Passo 5 (preenchida pelo Plan 02 da Phase 3). Mantenha em memória a lista consolidada (para o gate consumir) e o contador `retries_por_arquivo` (inicializado em 0 para todos os arquivos da rodada — Plan 02 incrementa).
+
+5. **Apresentação do estado consolidado ao usuário** (antes do retry gate, se K>=1): UMA linha curta listando cada arquivo da rodada com seu status. Formato sugerido (D-16 — wording é discricionário; este formato é o default):
+
+```
+Resultado do fan-out (N={N} arquivos):
+- ✓ `<path1>`
+- ✓ `<path2>`
+- ✗ `<path3>` — <motivo>
+- ✗ `<path4>` — <motivo>
+```
+
+Os ✓ apareceram com status=OK; os ✗ com status=FALHO. Esta apresentação é puramente informativa — o gate de retry parcial (Plan 02) é quem decide o que fazer com os falhos.
+
+#### Subseção "Gate de retry parcial" (preenchida pelo Plan 02 da Phase 3)
+
+> **Plan 02 stub:** Quando K>=1 arquivos falharam, esta subseção apresenta o gate de retry com 3 opções ("Tentar de novo apenas os falhos" / "Pular falhos e seguir" / "Cancelar tudo") e gerencia o contador `retries_por_arquivo` com cap dura de 2 retries (D-10, D-11, D-12). Bloco materializado pelo Plan 02 desta phase — atualmente é um stub para preservar o fluxo enquanto Plan 02 não foi executado.
+
 ### Passo 6: Ativar `/ei-review` automaticamente
 O editor terminará com a mensagem `Edição concluída ... Para validar, ative /ei-review <ALVO> <AGENTE>`. **Você (agente principal) deve então executar `/ei-review <alvo> <agente>` automaticamente** — substitua pelos valores reais. Para multi-agente, use aspas envolvendo cliente+especialidade. Exemplos: `/ei-review malu Qualifier` (single) ou `/ei-review "Brunno Brandi Consumidor" Qualifier` (multi). O `/ei-review` delega ao `docs-reviewer` e retorna o veredicto (APROVADO/REPROVADO).
 
