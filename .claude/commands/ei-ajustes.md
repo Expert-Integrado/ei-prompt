@@ -340,7 +340,7 @@ Quando as N Tasks paralelas retornarem (todas no mesmo turn, paralelismo nativo 
 
 1. **Para cada uma das N respostas de Task** (uma por arquivo da lista aprovada), classifique o status do arquivo como `OK` ou `FALHO` aplicando, EM ORDEM:
    - **(a) Exceção do Agent tool ao spawnar/executar a Task** → `FALHO` com `motivo = "Exceção do Agent: <texto curto do erro>"`. NÃO requer marcador parseável.
-   - **(b) Resposta retornou sem marcador `<resultado>...</resultado>` parseável** (regex: `<resultado>(OK|ERRO:[^<]+)</resultado>`) → `FALHO` com `motivo = "Marcador <resultado> ausente ou malformado na resposta do editor"`.
+   - **(b) Resposta retornou sem marcador `<resultado>...</resultado>` parseável** (regex: `<resultado>(OK|ERRO:.+?)</resultado>`) → `FALHO` com `motivo = "Marcador <resultado> ausente ou malformado na resposta do editor"`.
    - **(c) Resposta contém `<resultado>OK</resultado>`** → `OK` (motivo vazio).
    - **(d) Resposta contém `<resultado>ERRO: <motivo></resultado>`** → `FALHO` com `motivo = <texto após "ERRO: " até "</resultado>">` (preservar literal, UMA linha).
 
