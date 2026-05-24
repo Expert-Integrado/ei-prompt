@@ -633,7 +633,7 @@ Enquanto K_correcao >= 1 com algum `correcoes_por_arquivo[path] < 2`:
 7. **Template do prompt de cada Task de re-edit** = MESMO template do Passo 5 (path, secao_tag, justificativa, descricao, objetivo, ESCOPO) + **campo extra `FEEDBACK DO REVIEWER`** contendo o `<feedback>` do veredito CORRECAO da rodada que pediu a correção. Bloco literal a injetar logo após `OBJETIVO DO AJUSTE` e antes de `LEMBRETE:` do template do Passo 5:
 
 ```
-TAREFA: Edição corretiva (foi pedida correção pelo reviewer cross-context).
+CORREÇÃO PEDIDA PELO REVIEWER CROSS-CONTEXT (nova informação — esta é uma segunda passagem desta edição, baseada em feedback de auditoria; NÃO substitui a `TAREFA:` original do topo do prompt, complementa-a):
 
 FEEDBACK DO REVIEWER (motivo da correção — aplique exatamente o que está aqui):
 <FEEDBACK_DO_VEREDITO_CORRECAO_DA_RODADA_ANTERIOR>
