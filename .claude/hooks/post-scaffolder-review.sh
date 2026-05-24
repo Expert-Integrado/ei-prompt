@@ -6,6 +6,11 @@
 # subagent_type MAIS RECENTE no transcript. Se bater com um dos casos
 # cobertos, injeta instrução no contexto do Claude principal.
 
+# WR-03: set -uo pipefail para flagar uso de variáveis não-set e erros em pipes.
+# NÃO usar set -e: o pipeline grep|tail|sed retorna 1 quando grep não casa nada,
+# e isso é caso esperado (tratado pelos checks `[ -z "$LAST_SUBAGENT" ]` abaixo).
+set -uo pipefail
+
 INPUT=$(cat)
 
 # Extrai transcript_path do JSON de entrada (sem depender de jq)
@@ -14,6 +19,8 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 # Se não conseguiu extrair o transcript, sai silencioso
 [ -z "$TRANSCRIPT" ] && exit 0
 [ ! -f "$TRANSCRIPT" ] && exit 0
+# WR-03: também checar legibilidade (não-regular files: pipes, sockets, dirs com perm estranha).
+[ ! -r "$TRANSCRIPT" ] && exit 0
 
 # Último subagent_type aparecendo nas últimas 200 linhas do transcript.
 LAST_SUBAGENT=$(tail -n 200 "$TRANSCRIPT" \

@@ -13,6 +13,11 @@
 # Referência: .planning/phases/05-hook-driven-pipeline/05-RESEARCH.md §Code Examples Exemplo 1
 # Espelha o padrão de .claude/hooks/post-scaffolder-review.sh (extração de transcript_path).
 
+# WR-03: set -uo pipefail para flagar uso de variáveis não-set e erros em pipes.
+# NÃO usar set -e: o pipeline grep|tail|sed retorna 1 quando grep não casa nada,
+# e isso é caso esperado (tratado pelos checks `[ -z "$ROUND_ID" ]` abaixo).
+set -uo pipefail
+
 INPUT=$(cat)
 
 # 1) Anti-loop guard: respeitar stop_hook_active (cap=8 do Claude Code).
@@ -25,6 +30,8 @@ fi
 TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"\([^"]*\)"$/\1/')
 [ -z "$TRANSCRIPT" ] && exit 0
 [ ! -f "$TRANSCRIPT" ] && exit 0
+# WR-03: também checar legibilidade (não-regular files: pipes, sockets, dirs com perm estranha).
+[ ! -r "$TRANSCRIPT" ] && exit 0
 
 # 3) Janela do turno atual: últimas 400 linhas do transcript JSONL (tail aproximado;
 #    abordagem mais robusta de filtrar por requestId está documentada em RESEARCH Pitfall 6
