@@ -215,7 +215,7 @@ Regra dura:
 Análise não conseguiu identificar o ajuste após 3 tentativas. Reformule a descrição e re-rode `/ei-ajustes`.
 ```
 
-- Se `reformulacoes <= 2` → re-invoque o `docs-analyzer` via Agent tool com `subagent_type: docs-analyzer` reutilizando o MESMO prompt do Passo 3 item 2, mas substituindo o conteúdo de `<descricao_ajuste>` pelo texto da reformulação capturada (no caso [B]→Outro) ou pela descrição original (no caso D-09). Após receber a resposta XML, **volte ao Passo 3 item 4** (parsing) e em seguida ao roteamento do Passo 3 item 5 (que pode resultar em [A], [B], [C] ou ERRO novamente).
+- Se `reformulacoes <= 2` → re-invoque o `docs-analyzer` via Agent tool com `subagent_type: docs-analyzer` reutilizando o MESMO prompt do Passo 3 item 2, substituindo `<descricao_ajuste>` pelo texto da reformulação capturada (sempre via "Outro" do [B] ou via o gate de reformulação do D-09 — NUNCA pela descrição original, sob pena de loop imediato até estourar o cap). Após receber a resposta XML, **volte ao Passo 3 item 4** (parsing) e em seguida ao roteamento do Passo 3 item 5 (que pode resultar em [A], [B], [C] ou ERRO novamente).
 
 **Importante:** O contador NÃO incrementa em "Voltar" do [B.2] (D-17 — Voltar reabre [B] localmente sem re-invocar analyzer). O contador INCREMENTA APENAS quando o `docs-analyzer` é re-invocado via Agent tool.
 
