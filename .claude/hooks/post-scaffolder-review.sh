@@ -33,6 +33,22 @@ case "$LAST_SUBAGENT" in
 JSON
     ;;
   docs-editor-conciso)
+    # Guarda silenciosa D-11 (Phase 5): durante /ei-ajustes fan-out, deixar o
+    # novo Stop hook post-ajustes-fanout.sh cuidar — evita regressão de Phase 4
+    # (cross-context obrigatório) e conflito com o reason injetado pelo Stop hook.
+    # Detecção: sentinela <ei-ajustes-round id="..."/> ATIVO sem <ei-ajustes-round-consumed
+    # id="..."/> posterior no transcript do turno corrente.
+    # Mesmo regex/janela que post-ajustes-fanout.sh (Plan 01) para coerência.
+    # IMPORTANTE: guarda DENTRO do branch docs-editor-conciso) APENAS — o branch
+    # client-project-scaffolder) acima NÃO recebe esta guarda (per VALIDATION.md L45).
+    TAIL_AJUSTES=$(tail -n 400 "$TRANSCRIPT")
+    ROUND_ID_AJUSTES=$(printf '%s' "$TAIL_AJUSTES" \
+      | grep -o '<ei-ajustes-round id="[^"]*"' \
+      | tail -1 \
+      | sed 's/.*id="\([^"]*\)"/\1/')
+    if [ -n "$ROUND_ID_AJUSTES" ] && ! printf '%s' "$TAIL_AJUSTES" | grep -qF "<ei-ajustes-round-consumed id=\"$ROUND_ID_AJUSTES\""; then
+      exit 0  # silencioso — fan-out de /ei-ajustes em andamento; Stop hook (Plan 01) cuida
+    fi
     cat <<'JSON'
 {
   "hookSpecificOutput": {
