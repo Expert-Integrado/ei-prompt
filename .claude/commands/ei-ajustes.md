@@ -495,6 +495,8 @@ INSTRUÇÃO ORIGINAL DO USUÁRIO (motivou a edição):
 <DESCRIÇÃO_DO_AJUSTE>
 
 <contexto_cruzado>
+⚠️ ATENÇÃO ORQUESTRADOR: substitua TODO o conteúdo entre `<contexto_cruzado>` e `</contexto_cruzado>` por UM dos dois ramos abaixo (NUNCA passe ambos verbatim — ramos `[SE M=1]` e `[SE M>=2]` são MUTUAMENTE EXCLUSIVOS, e os marcadores literais `[SE M=...]` NUNCA podem chegar ao reviewer). Ver seção "Como construir as M Tasks" abaixo para a resolução exata.
+
 [SE M=1]: Nenhum outro arquivo editado nesta rodada. Audite apenas o arquivo alvo contra CLAUDE.md e regras vigentes — não há cross-context a verificar.
 
 [SE M>=2]: Outros arquivos editados nesta MESMA rodada (cheque inconsistências cruzadas com o seu):
