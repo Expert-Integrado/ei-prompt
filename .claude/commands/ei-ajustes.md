@@ -263,9 +263,22 @@ Leia via Read (se ainda não leu nesta sessão):
 - `CLAUDE.md`
 - `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`
 
-### Passo 5: Delegar ao docs-editor-conciso
+### Passo 5: Despachar `docs-editor-conciso` em paralelo (fan-out)
 
-Construa o prompt para o agente **exatamente** neste formato (substitua os placeholders, mantenha a estrutura):
+Consome a **lista aprovada** que saiu do Passo 3.5 (caminho [A] "Aprovar e editar" ou caminho [B.2] "Confirmar"). Cada elemento da lista tem `path + secao_tag + justificativa`. N>=1 sempre (caminho [B.2] resulta em N=1; caminho [A] em N>=1).
+
+#### ⚠️ REGRA INVIOLÁVEL DO PASSO 5 (PARL-02 — paralelismo nativo)
+
+Quando a lista aprovada no Passo 3.5 tiver N arquivos, emita **EXATAMENTE N chamadas paralelas à tool `Agent`** (uma por arquivo, com `subagent_type: docs-editor-conciso`) na **MESMA resposta** do Claude principal.
+
+- **NUNCA serialize.** Não chamar uma Task, esperar resposta, chamar a próxima. O harness paraleliza tool calls do MESMO turn — emita TODAS as N chamadas em UMA única resposta.
+- **NUNCA agregue.** Não combine dois arquivos em uma única Task. Uma Task por arquivo, sempre.
+- **N=1 é caso degenerado da MESMA rota** (1 tool call em 1 turn) — não há código alternativo para single-file. Mesma instrução, mesmo template. Comportamento observável para o usuário em N=1 é idêntico ao fluxo pré-Phase 3 (PARL-01 — zero regressão).
+- **Editor cego pros irmãos:** cada Task recebe APENAS o prompt do seu arquivo. NÃO inclua no prompt da Task A a lista de outros arquivos sendo editados, suas justificativas ou seus paths (D-07 — cruzamento é responsabilidade dos reviewers da Phase 4).
+
+#### Template do prompt de CADA Task
+
+Construa o prompt para cada `docs-editor-conciso` **exatamente** neste formato (substitua os placeholders pelos valores do `<arquivo>` correspondente; mantenha a estrutura — uma Task por arquivo da lista aprovada):
 
 ```
 TAREFA: Edição (NÃO auditoria).
@@ -281,22 +294,45 @@ JUSTIFICATIVA DO ANALYZER (contexto da escolha):
 
 ⚠️ NÃO transformar o caminho. NÃO prefixar com `modelo/`. NÃO extrair palavras do nome da pasta. Use o caminho EXATAMENTE como aparece acima.
 
+ESCOPO (REGRA INVIOLÁVEL — D-06):
+Este ajuste DEVE incidir APENAS dentro de `<SECAO_TAG_DO_ANALYZER>`. NUNCA editar fora dessa seção. Se identificar que o ajuste exige mexer fora da seção (ex: a regra correta vive em outro arquivo, ou em outra tag XML do mesmo arquivo), NÃO edite — termine sua resposta com o marcador `<resultado>ERRO: ajuste fora de escopo declarado (secao_tag=<SECAO_TAG_DO_ANALYZER>)</resultado>` ANTES da mensagem de finalização.
+
 INSTRUÇÃO DO USUÁRIO:
 <DESCRIÇÃO_DO_AJUSTE>
 
-OBJETIVO DO AJUSTE (resumo em 3 linha do que deve mudar):
+OBJETIVO DO AJUSTE (resumo em 3 linhas do que deve mudar):
 <OBJETIVO_DERIVADO_DA_DESCRIÇÃO>
 
 LEMBRETE: preservar `<response_format>` (REGRA INVIOLÁVEL), seguir CLAUDE.md, modificar o mínimo necessário, NUNCA duplicar regras existentes. Aplicar a edição com Edit/Write — não responder em modo review.
 
-AO FINALIZAR (OVERRIDE do Modo A do FINALIZAÇÃO): NÃO invoque o `docs-reviewer` nesta chamada. Em vez disso, encerre sua resposta com EXATAMENTE este aviso ao agente principal:
+AO FINALIZAR (OVERRIDE do Modo A do FINALIZAÇÃO — D-08): NÃO invoque o `docs-reviewer` nesta chamada. Em vez disso, encerre sua resposta com EXATAMENTE duas linhas, NESTA ORDEM:
 
-> Edição concluída em `<CAMINHO_ABSOLUTO_DO_PASSO_2>`. Para validar, ative `/ei-review <ALVO> <AGENTE>` — o `docs-reviewer` fará a auditoria.
+1. PRIMEIRA linha (marcador obrigatório de status — REGRA INVIOLÁVEL):
+   - Se a edição foi aplicada com sucesso (Edit/Write retornou sem erro e dentro do `<SECAO_TAG_DO_ANALYZER>` declarado), emita LITERALMENTE: `<resultado>OK</resultado>`
+   - Se NÃO conseguiu aplicar (arquivo não encontrado pelo Read, seção não encontrada no arquivo, ajuste fora do escopo declarado em ESCOPO, exceção em Edit/Write, qualquer outro impedimento), emita LITERALMENTE: `<resultado>ERRO: <motivo curto, UMA linha, sem quebras de linha></resultado>` (ex: `<resultado>ERRO: Seção <perguntas_iniciais> não encontrada em Orquestrador.md</resultado>`)
+
+2. SEGUNDA linha (aviso ao agente principal — mantido do fluxo atual):
+   > Edição concluída em `<CAMINHO_ABSOLUTO_DO_PASSO_2>`. Para validar, ative `/ei-review <ALVO> <AGENTE>` — o `docs-reviewer` fará a auditoria.
 
 (Substitua `<ALVO>` pelo cliente — ou `"<cliente> <especialidade>"` (com aspas) se multi-agente — e `<AGENTE>` pelo nome do agente. Ex single: `/ei-review malu Qualifier`. Ex multi: `/ei-review "Brunno Brandi Consumidor" Qualifier`.)
+
+⚠️ NUNCA omita o marcador `<resultado>...</resultado>`. NUNCA inverta a ordem (marcador SEMPRE antes do aviso). NUNCA emita `<resultado>OK</resultado>` se Edit/Write falhou ou se o ajuste teve que sair da seção declarada — nesses casos use a forma `<resultado>ERRO: ...</resultado>` com motivo curto.
 ```
 
-Invoque via Agent tool com `subagent_type: docs-editor-conciso` e o prompt acima preenchido.
+#### Como construir as N Tasks na mesma resposta
+
+Para cada `<arquivo>` da lista aprovada, substitua nos placeholders do template acima:
+
+- `<PATH_DO_ANALYZER>` → `arquivo.path` (literal, sem transformação)
+- `<SECAO_TAG_DO_ANALYZER>` → `arquivo.secao_tag` (ex: `<perguntas_iniciais>`)
+- `<JUSTIFICATIVA_DO_ANALYZER>` → `arquivo.justificativa` (1-2 linhas vindas do analyzer)
+- `<DESCRIÇÃO_DO_AJUSTE>` → descrição original que o usuário digitou ao invocar o `/ei-ajustes` (NÃO a justificativa do analyzer — a descrição do humano)
+- `<OBJETIVO_DERIVADO_DA_DESCRIÇÃO>` → resumo curto (até 3 linhas) do que muda, gerado pelo Claude principal a partir da descrição do usuário; pode ser idêntico em todas as N Tasks da rodada (descrição é única) — não personalize por arquivo (editor é cego pros irmãos, D-07)
+- `<CAMINHO_ABSOLUTO_DO_PASSO_2>` → idem `<PATH_DO_ANALYZER>` (mesmo valor; é assim que o aviso de fim mostra o arquivo editado)
+
+Emita as N chamadas via tool `Agent` na MESMA resposta. Cada chamada usa `subagent_type: docs-editor-conciso` e o prompt preenchido acima.
+
+> **N=1 e N>=2 usam EXATAMENTE este mesmo bloco.** Não há rota separada para "fluxo single-file legado" — o template ganhou ESCOPO + marcador `<resultado>`, mas para N=1 o comportamento observável (arquivo editado dentro da seção declarada, mensagem de finalização ao usuário) permanece idêntico ao pré-Phase 3 (PARL-01 — zero regressão).
 
 ### Passo 6: Ativar `/ei-review` automaticamente
 O editor terminará com a mensagem `Edição concluída ... Para validar, ative /ei-review <ALVO> <AGENTE>`. **Você (agente principal) deve então executar `/ei-review <alvo> <agente>` automaticamente** — substitua pelos valores reais. Para multi-agente, use aspas envolvendo cliente+especialidade. Exemplos: `/ei-review malu Qualifier` (single) ou `/ei-review "Brunno Brandi Consumidor" Qualifier` (multi). O `/ei-review` delega ao `docs-reviewer` e retorna o veredicto (APROVADO/REPROVADO).
