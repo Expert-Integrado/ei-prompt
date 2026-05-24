@@ -41,7 +41,10 @@ JSON
     # Mesmo regex/janela que post-ajustes-fanout.sh (Plan 01) para coerência.
     # IMPORTANTE: guarda DENTRO do branch docs-editor-conciso) APENAS — o branch
     # client-project-scaffolder) acima NÃO recebe esta guarda (per VALIDATION.md L45).
-    TAIL_AJUSTES=$(tail -n 400 "$TRANSCRIPT")
+    # NORMALIZAÇÃO JSONL (CR-01 fix): conteúdo de mensagens assistant é JSON-escapado
+    # (`"` vira `\"`). Normalizamos antes dos greps para que `<ei-ajustes-round id="..."/>`
+    # case. Idempotente (sed no-op se já não-escapado). Espelha fix de post-ajustes-fanout.sh.
+    TAIL_AJUSTES=$(tail -n 400 "$TRANSCRIPT" | sed 's/\\"/"/g')
     ROUND_ID_AJUSTES=$(printf '%s' "$TAIL_AJUSTES" \
       | grep -o '<ei-ajustes-round id="[^"]*"' \
       | tail -1 \

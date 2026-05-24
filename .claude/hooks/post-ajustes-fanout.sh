@@ -29,7 +29,11 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 # 3) Janela do turno atual: últimas 400 linhas do transcript JSONL (tail aproximado;
 #    abordagem mais robusta de filtrar por requestId está documentada em RESEARCH Pitfall 6
 #    como melhoria futura — tail -n 400 + idempotência por id é suficiente na prática).
-TAIL=$(tail -n 400 "$TRANSCRIPT")
+#    NORMALIZAÇÃO JSONL (CR-01 fix): o conteúdo de mensagens assistant é armazenado como
+#    string JSON-escapada — `"` dentro do conteúdo vira `\"`. Normalizamos `\"` → `"` no
+#    tail para que os greps abaixo (que procuram `<ei-ajustes-round id="..."/>`) casem.
+#    Idempotente: sed é no-op se o conteúdo já estiver não-escapado.
+TAIL=$(tail -n 400 "$TRANSCRIPT" | sed 's/\\"/"/g')
 
 # 4) Extrair o ÚLTIMO sentinela emitido no tail (regex captura id="..." entre aspas duplas).
 #    Se não houver sentinela, este turno NÃO é fan-out de editores — sair silencioso.
@@ -41,6 +45,7 @@ ROUND_ID=$(printf '%s' "$TAIL" \
 
 # 5) Idempotência (protocolo sentinela ↔ consumed — D-06 do CONTEXT.md):
 #    se já existe <ei-ajustes-round-consumed id="$ROUND_ID"/> no tail, este round já foi tratado.
+#    (TAIL já foi normalizado no passo 3 — busca por aspas literais funciona.)
 if printf '%s' "$TAIL" | grep -qF "<ei-ajustes-round-consumed id=\"$ROUND_ID\""; then
   exit 0
 fi
