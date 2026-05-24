@@ -647,10 +647,11 @@ Carryover do Passo 5: arquivos com `status_final` em {FALHO, PULADO, CANCELADO} 
 
 #### ⚠️ REGRA INVIOLÁVEL DO PASSO 6 (REVW-04 — RE-FAN-OUT COMPLETO após CORRECAO)
 
-Quando algum arquivo for re-editado após receber `<veredito>CORRECAO</veredito>`, **TODOS os M reviewers** são re-fan-out na rodada seguinte (re-fan-out COMPLETO).
+Quando algum arquivo for re-editado após receber `<veredito>CORRECAO</veredito>`, **TODOS os M reviewers** da rodada inicial são considerados para o re-fan-out — porém **APENAS os arquivos NÃO-TERMINAIS** efetivamente re-entram (i.e., aqueles cujo `status_final_reviewer` NÃO está em `{BLOQUEADO, CAP_CORRECAO, FALHO_EDITOR_NA_CORRECAO}` — incluindo arquivos previamente OK, que TAMBÉM re-entram porque o cross-context mudou). O conjunto re-disparado é `M' <= M`, onde `M'` é o tamanho do conjunto não-terminal. Re-fan-out COMPLETO refere-se a "todos os não-terminais", NÃO ao subconjunto que pediu CORRECAO.
 
 - **NUNCA re-revise APENAS o K que pediu CORRECAO.** O cross-context dos outros M-1 reviewers mudou porque o arquivo K foi re-editado — re-review parcial NÃO detectaria nova inconsistência introduzida pela correção. Re-review parcial reintroduz literalmente o bug-âncora.
-- **Custo aceito:** M-1 reviews adicionais por rodada de correção. Cap dura de 2 correções por arquivo limita: pior caso = 3 fan-outs totais de reviewers (inicial + correção rodada 1 + correção rodada 2).
+- **Arquivos terminais (BLOQUEADO / CAP_CORRECAO / FALHO_EDITOR_NA_CORRECAO) NÃO re-entram** no fan-out — seus vereditos finais já estão congelados e seguem direto para a Apresentação final estendida com seus marcadores (`⊗` para BLOQUEADO, `△` para CAP_CORRECAO, `✗` para FALHO_EDITOR_NA_CORRECAO). Isso é a única exceção ao "todos os M" — e está alinhada à seção "Após o parsing dos K_reedit" mais abaixo.
+- **Custo aceito:** `M' - 1` reviews adicionais por rodada de correção (onde `M'` é o tamanho do conjunto não-terminal; degenera para `M-1` se nenhum arquivo virou terminal ainda). Cap dura de 2 correções por arquivo limita: pior caso = 3 fan-outs totais de reviewers (inicial + correção rodada 1 + correção rodada 2).
 - **Re-fan-out usa EXATAMENTE o template do Plan 01** (mesma REGRA INVIOLÁVEL REVW-01, mesmo `<contexto_cruzado>`, mesmos marcadores). O `<contexto_cruzado>` é RECONSTRUÍDO na rodada seguinte (porque arquivos K foram re-editados — conteúdo dos M-1 irmãos do K, e do K visto pelos M-1, MUDOU).
 
 **Contador `correcoes_por_arquivo` (espelha `retries_por_arquivo` da Phase 3 D-11/D-15):**
