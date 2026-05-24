@@ -462,6 +462,12 @@ Após o resumo:
 - Se TODOS os arquivos terminaram com FALHO/PULADO/CANCELADO → encerre o `/ei-ajustes` sem ir para o Passo 6 (não há nada para auditar).
 
 ### Passo 6: Ativar `/ei-review` automaticamente
+
+> ⚠️ Phase 4 vai refatorar este passo para fan-out de reviewers. Até lá, dispare
+> `/ei-review` UMA vez por arquivo com `status_final=OK` (na ordem da lista
+> consolidada do Passo 5). Arquivos com `status_final` FALHO/PULADO/CANCELADO
+> NÃO entram na auditoria.
+
 O editor terminará com a mensagem `Edição concluída ... Para validar, ative /ei-review <ALVO> <AGENTE>`. **Você (agente principal) deve então executar `/ei-review <alvo> <agente>` automaticamente** — substitua pelos valores reais. Para multi-agente, use aspas envolvendo cliente+especialidade. Exemplos: `/ei-review malu Qualifier` (single) ou `/ei-review "Brunno Brandi Consumidor" Qualifier` (multi). O `/ei-review` delega ao `docs-reviewer` e retorna o veredicto (APROVADO/REPROVADO).
 
 Apresente ao usuário no final: resumo das alterações + veredicto da auditoria.
