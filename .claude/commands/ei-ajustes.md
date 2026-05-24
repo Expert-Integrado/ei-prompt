@@ -461,16 +461,144 @@ Após o resumo:
 - Se houver pelo menos 1 arquivo com `status_final=OK` E o usuário NÃO escolheu "Cancelar tudo" → **siga para o Passo 6** (auditoria via `/ei-review` — Phase 4 ainda vai refatorar isso para fan-out de reviewers).
 - Se TODOS os arquivos terminaram com FALHO/PULADO/CANCELADO → encerre o `/ei-ajustes` sem ir para o Passo 6 (não há nada para auditar).
 
-### Passo 6: Ativar `/ei-review` automaticamente
+### Passo 6: Despachar `docs-reviewer` em paralelo (fan-out cross-context)
 
-> ⚠️ Phase 4 vai refatorar este passo para fan-out de reviewers. Até lá, dispare
-> `/ei-review` UMA vez por arquivo com `status_final=OK` (na ordem da lista
-> consolidada do Passo 5). Arquivos com `status_final` FALHO/PULADO/CANCELADO
-> NÃO entram na auditoria.
+Consome a **lista consolidada** que saiu do Passo 5 (após o Gate de retry parcial). Filtre os arquivos com `status_final=OK` — chame essa quantidade de **M**. Arquivos com `status_final` em {FALHO, PULADO, CANCELADO} NÃO entram no Passo 6 e aparecem no resumo final apenas como linhas herdadas do Passo 5 (✗ / ⊘).
 
-O editor terminará com a mensagem `Edição concluída ... Para validar, ative /ei-review <ALVO> <AGENTE>`. **Você (agente principal) deve então executar `/ei-review <alvo> <agente>` automaticamente** — substitua pelos valores reais. Para multi-agente, use aspas envolvendo cliente+especialidade. Exemplos: `/ei-review malu Qualifier` (single) ou `/ei-review "Brunno Brandi Consumidor" Qualifier` (multi). O `/ei-review` delega ao `docs-reviewer` e retorna o veredicto (APROVADO/REPROVADO).
+**Pré-condição:** este passo SÓ é acionado quando M >= 1 arquivos OK saídos do Passo 5. Se M = 0 (nenhum OK), o Passo 5 já encerrou /ei-ajustes — não chegue aqui.
 
-Apresente ao usuário no final: resumo das alterações + veredicto da auditoria.
+#### ⚠️ REGRA INVIOLÁVEL DO PASSO 6 (REVW-01 — paralelismo nativo)
+
+Quando a lista de OKs do Passo 5 tiver M arquivos, emita **EXATAMENTE M chamadas paralelas à tool `Agent`** (uma por arquivo, com `subagent_type: docs-reviewer`) na **MESMA resposta** do Claude principal.
+
+- **NUNCA serialize.** Não chamar uma Task, esperar resposta, chamar a próxima. O harness paraleliza tool calls do MESMO turn — emita TODAS as M chamadas em UMA única resposta.
+- **NUNCA agregue.** Não combine dois arquivos em uma única Task. Uma Task por arquivo, sempre.
+- **M=1 é caso degenerado da MESMA rota** (1 tool call em 1 turn) — não há rota alternativa para single-file. Mesma instrução, mesmo template, `<contexto_cruzado>` vira o ramo vazio explícito (ver template). Comportamento observável para o usuário em M=1 é idêntico ao Passo 6 single-file pré-Phase 4 (REVW-01 SC#1 — zero regressão).
+- **Cada reviewer enxerga os irmãos** via `<contexto_cruzado>` no prompt (REVW-02 — cross-context). Sem cross-context, o bug-âncora (regra moveu de Qualifier→Orquestrador mas referência cruzada ficou stale) NÃO é detectado.
+- **Reviewer NÃO edita.** Emite apenas `<veredito>` + `<feedback>` opcional. Correções acontecem via re-spawn do `docs-editor-conciso` pelo orquestrador (Plan 02 — subseção "Correção iterativa"), NÃO pelo reviewer.
+- **Reviewer NÃO invoca outro Agent.** Mesmo que `docs-reviewer.md` tenha `Agent` em tools, o template abaixo sobrescreve o FLUXO DE CORREÇÃO AUTOMÁTICA do agente — presença do bloco `<contexto_cruzado>` é o sinal de "fan-out mode".
+
+#### Template do prompt de CADA Task
+
+Construa o prompt para cada `docs-reviewer` **exatamente** neste formato (substitua os placeholders pelos valores do arquivo OK correspondente; mantenha a estrutura — uma Task por arquivo OK da rodada):
+
+```
+TAREFA: Auditoria (NÃO edição).
+
+ARQUIVO ALVO (use este caminho LITERAL com Read antes de auditar):
+<PATH_DO_ARQUIVO_EDITADO>
+
+SEÇÃO RECÉM-ALTERADA (foco primário da auditoria — diff-first):
+<SECAO_TAG_DO_ANALYZER>
+
+INSTRUÇÃO ORIGINAL DO USUÁRIO (motivou a edição):
+<DESCRIÇÃO_DO_AJUSTE>
+
+<contexto_cruzado>
+[SE M=1]: Nenhum outro arquivo editado nesta rodada. Audite apenas o arquivo alvo contra CLAUDE.md e regras vigentes — não há cross-context a verificar.
+
+[SE M>=2]: Outros arquivos editados nesta MESMA rodada (cheque inconsistências cruzadas com o seu):
+
+— Arquivo: <PATH_IRMAO_1>
+  Seção alterada: <SECAO_TAG_IRMAO_1>
+  Justificativa: <JUSTIFICATIVA_IRMAO_1>
+  Conteúdo completo:
+  ```
+  <CONTEUDO_INTEGRAL_OU_TRUNCADO_DO_IRMAO_1>
+  ```
+
+— Arquivo: <PATH_IRMAO_2>
+  ... (mesma estrutura para cada um dos M-1 irmãos)
+
+REGRA DE CROSS-CONTEXT:
+Antes de emitir veredito, cheque:
+1. Mesma regra não duplicada em 2 arquivos (ex: a mesma instrução vivia em Qualifier e foi adicionada também em Orquestrador).
+2. Referências cruzadas atualizadas (ex: outro arquivo cita `<perguntas_iniciais>` — ainda existe e ainda tem o conteúdo certo?).
+3. Arquitetura padrão preservada (Orquestrador não encerra; Qualifier não encerra; Protractor é o único que transfere — verificar contra TODOS os irmãos).
+4. `<formato_resposta>` consistente entre irmãos do mesmo cliente (sem campos novos em nenhum).
+</contexto_cruzado>
+
+FALLBACK DE TRUNCAMENTO: Se algum irmão exceder 30 KB, é apresentada apenas a SECAO_TAG alterada + lista de seções restantes; reviewer deve emitir `<veredito>CORRECAO</veredito>` se precisar do conteúdo completo para decidir.
+
+REGRAS A AUDITAR (mesma checklist do `docs-reviewer.md` original — Passo 0 do agente já carrega via Read):
+- CLAUDE.md + docs/regras-validacao.md + docs/proibido-fazer.md (re-ler se ainda não leu nesta sessão)
+- `modelo/*.md` é read-only — flagar `<veredito>BLOQUEAR</veredito>` se o arquivo alvo estiver em `modelo/`
+- Campos novos no `<formato_resposta>` → `<veredito>BLOQUEAR</veredito>`
+- Duplicação de regras (entre o arquivo alvo e qualquer irmão de `<contexto_cruzado>`) → `<veredito>CORRECAO</veredito>` (proponha em `<feedback>` qual versão remover)
+- Base de conhecimento inteira dentro do `<conhecimento>` → `<veredito>CORRECAO</veredito>` ou `<veredito>BLOQUEAR</veredito>` (depende da severidade)
+
+AO FINALIZAR (OVERRIDE do `docs-reviewer.md` para modo fan-out):
+
+NÃO edite o arquivo. NÃO invoque outro Agent. NÃO aplique FLUXO DE CORREÇÃO AUTOMÁTICA (essa seção do seu prompt original NÃO se aplica quando você é invocado via fan-out — presença do bloco `<contexto_cruzado>` é o sinal). Correção é orquestrada externamente.
+
+Encerre sua resposta com EXATAMENTE estas 2 linhas (formato literal):
+
+1. PRIMEIRA linha — marcador de veredito (REGRA INVIOLÁVEL REVW-03):
+   - `<veredito>OK</veredito>` se aprovou (sem inconsistência cruzada nem problema interno)
+   - `<veredito>CORRECAO</veredito>` se identificou problema corrigível pelo editor (com `<feedback>` obrigatório descrevendo o que mudar)
+   - `<veredito>BLOQUEAR</veredito>` se identificou regra violada que NÃO deveria ter passado pelo gate (modelo/, campo novo em `<formato_resposta>`, base inteira em `<conhecimento>`, etc) — com `<feedback>` descrevendo a regra violada
+
+2. SEGUNDA linha — feedback (OBRIGATÓRIO em CORRECAO e BLOQUEAR, opcional em OK):
+   `<feedback>texto curto e acionável; em CORRECAO descreva exatamente o que o editor deve mudar; em BLOQUEAR cite a regra violada do CLAUDE.md / docs/</feedback>`
+
+⚠️ NUNCA omita `<veredito>`. NUNCA emita `<veredito>CORRECAO</veredito>` ou `<veredito>BLOQUEAR</veredito>` sem `<feedback>` — orquestrador trata como malformado (fail-closed → BLOQUEADO no resumo).
+```
+
+#### Como construir as M Tasks na mesma resposta
+
+Para cada arquivo da lista de OKs do Passo 5, substitua nos placeholders do template acima:
+
+- `<PATH_DO_ARQUIVO_EDITADO>` → path literal (mesmo que foi passado ao editor no Passo 5)
+- `<SECAO_TAG_DO_ANALYZER>` → secao_tag do analyzer (ex: `<perguntas_iniciais>`)
+- `<DESCRIÇÃO_DO_AJUSTE>` → descrição original do `/ei-ajustes`
+- `<contexto_cruzado>`:
+  - **SE M=1:** use literalmente a frase `"Nenhum outro arquivo editado nesta rodada. Audite apenas o arquivo alvo contra CLAUDE.md e regras vigentes — não há cross-context a verificar."`. NÃO omita a tag — emita o bloco com a frase explícita.
+  - **SE M>=2:** preencha uma entrada por irmão (M-1 entradas) com path + secao_tag + justificativa + conteúdo completo do irmão (faça Read do irmão ANTES de despachar a Task, para embedar inline).
+- **Fallback de truncamento:** se algum irmão exceder 30 KB no Read, substitua o `<CONTEUDO_INTEGRAL_OU_TRUNCADO_DO_IRMAO>` pela SECAO_TAG alterada (extraída via grep da tag XML) + lista das outras seções (por linha de cabeçalho `^##`); mantenha a frase fallback literal acima.
+
+Emita as M chamadas via tool `Agent` na MESMA resposta. Cada chamada usa `subagent_type: docs-reviewer` e o prompt preenchido acima.
+
+> **M=1 e M>=2 usam EXATAMENTE este mesmo bloco.** Não há rota separada para "fluxo single-file legado" — o template ganhou `<contexto_cruzado>` em ramo vazio explícito + marcadores `<veredito>` e `<feedback>`, mas para M=1 o comportamento observável (1 reviewer audita 1 arquivo) permanece compatível com Passo 6 pré-Phase 4 (REVW-01 SC#1 — zero regressão).
+
+#### Bloco pós-Tasks — parsing dos M veredictos `<veredito>` (REVW-03)
+
+Quando as M Tasks paralelas retornarem (todas no mesmo turn, paralelismo nativo do harness), o Claude principal consolida ANTES de prosseguir:
+
+1. **Para cada uma das M respostas de Task** (uma por arquivo OK da rodada), classifique aplicando EM ORDEM (7 rotas — fail-closed):
+   - **(a) Exceção do Agent tool ao spawnar/executar a Task** → `veredito=BLOQUEADO` com `feedback="Exceção do Agent: <texto curto do erro>"`. NÃO requer marcador parseável.
+   - **(b) Resposta sem marcador `<veredito>(OK|CORRECAO|BLOQUEAR)</veredito>` parseável** → `veredito=BLOQUEADO` com `feedback="Marcador <veredito> ausente ou malformado"` (fail-closed).
+   - **(c) Resposta contém `<veredito>OK</veredito>`** → `veredito=OK` (feedback opcional, pode ser vazio).
+   - **(d) Resposta contém `<veredito>CORRECAO</veredito>` + `<feedback>...</feedback>` não-vazio** → `veredito=CORRECAO` com feedback capturado.
+   - **(e) Resposta contém `<veredito>CORRECAO</veredito>` SEM `<feedback>` ou com `<feedback>` vazio** → `veredito=BLOQUEADO` com `feedback="CORRECAO sem feedback acionável"` (fail-closed — não vira retry sem informação).
+   - **(f) Resposta contém `<veredito>BLOQUEAR</veredito>` + `<feedback>`** → `veredito=BLOQUEADO` com feedback capturado.
+   - **(g) Resposta contém `<veredito>BLOQUEAR</veredito>` SEM `<feedback>`** → `veredito=BLOQUEADO` com `feedback="BLOQUEAR sem motivo (regra não identificada)"`.
+
+   Detecção de veredito: NÃO use comandos do sistema de controle de versão (status, diff) nem leitura do arquivo editado para inferir consistência. A fonte da verdade é APENAS o marcador `<veredito>` no fim da resposta do reviewer.
+
+2. **Construa a lista consolidada** `[{path, veredito, feedback}]` (uma entrada por arquivo OK da rodada, na MESMA ordem em que as Tasks foram disparadas).
+
+3. **Contagem:** `K_correcao = entradas com veredito=CORRECAO`; `K_bloqueado = entradas com veredito=BLOQUEADO`; `K_ok = entradas com veredito=OK`.
+
+4. **Rotear pelos valores:**
+   - **K_correcao = 0 E K_bloqueado = 0** → todos OK → **Apresentação final** ao usuário (formato D-16 estendido) → encerra `/ei-ajustes`.
+   - **K_correcao >= 1** → passe controle para a **subseção "Correção iterativa"** mais adiante neste Passo 6 (preenchida pelo Plan 02 da Phase 4). Mantenha em memória a lista consolidada (para a subseção consumir) e o contador `correcoes_por_arquivo` (inicializado em 0 para todos os M arquivos da rodada inicial — Plan 02 incrementa).
+   - **K_correcao = 0 E K_bloqueado >= 1** → não há retry possível (BLOQUEAR é terminal) → **Apresentação final** ao usuário com `⊗` para cada bloqueado → encerra `/ei-ajustes`.
+
+5. **Apresentação final ao usuário** (estendida no Plan 02 com estados `OK_APOS_CORRECAO` / `CAP_CORRECAO` / `FALHO_EDITOR_NA_CORRECAO`). Versão deste Plan 01 (sem rodadas de correção ainda — todos os arquivos saíram da rodada 1):
+
+```
+Resumo final do /ei-ajustes (M={M} arquivos auditados, rodadas=1):
+- ✓ `<path1>` — APROVADO pelo reviewer (1ª rodada)
+- ⊗ `<path2>` — BLOQUEADO (motivo: <feedback>). Edit no disco; reverter manualmente se necessário.
+- ⊘ `<path3>` — PULADO no Passo 5 (não auditado)
+- ✗ `<path4>` — FALHO no Passo 5 (não auditado)
+```
+
+Carryover do Passo 5: arquivos com `status_final` em {FALHO, PULADO, CANCELADO} aparecem como linhas herdadas (✗, ⊘, ⊘ respectivamente) — NÃO são auditados nesta phase.
+
+#### Subseção "Correção iterativa" (preenchida pelo Plan 02 da Phase 4)
+
+> **Plan 02 da Phase 4 (stub):** Quando K_correcao >= 1 arquivos pediram correção, esta subseção materializa o loop de re-edit + re-fan-out completo com cap dura de 2 correções por arquivo (REVW-04). Bloco materializado pelo Plan 02 desta phase — atualmente é um placeholder para preservar o fluxo enquanto Plan 02 não foi executado.
 
 ## Regras
 
