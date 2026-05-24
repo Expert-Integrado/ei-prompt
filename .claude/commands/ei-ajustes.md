@@ -586,6 +586,8 @@ Quando as M Tasks paralelas retornarem (todas no mesmo turn, paralelismo nativo 
    - **K_correcao >= 1** → passe controle para a **subseção "Correção iterativa"** mais adiante neste Passo 6 (loop de re-edit + re-fan-out COMPLETO dos M reviewers — REVW-04). Mantenha em memória a lista consolidada (para a subseção consumir) e o contador `correcoes_por_arquivo` (inicializado em 0 para todos os M arquivos da rodada inicial — a subseção incrementa).
    - **K_correcao = 0 E K_bloqueado >= 1** → não há retry possível (BLOQUEAR é terminal) → **Apresentação final** ao usuário com `⊗` para cada bloqueado → encerra `/ei-ajustes`.
 
+> **Visibilidade intermediária (fail-soft):** se `K_bloqueado >= 1` E `K_correcao >= 1` (rota da "Correção iterativa"), apresente IMEDIATAMENTE ao usuário a lista dos `K_bloqueado` arquivos com seus feedbacks (linha por arquivo: `⊗ <path> — <feedback>`) ANTES de entrar na subseção "Correção iterativa". Estes arquivos NÃO voltarão até a Apresentação final estendida — o usuário precisa do sinal cedo (o loop de correção pode durar 2 rodadas adicionais com cap=3 invocações de editor por rodada). Os mesmos `⊗` reaparecem na Apresentação final estendida (não é duplicação — é antecipação visual; espelha o "Resultado do fan-out" intermediário do Passo 5).
+
 5. **Apresentação final ao usuário** → ver **Apresentação final estendida (D-16 estilo, 6 estados)** abaixo, dentro da subseção "Correção iterativa". Ela cobre o caso simples (sem rodadas de correção) E os casos com rodadas de correção em um único template unificado.
 
 Carryover do Passo 5: arquivos com `status_final` em {FALHO, PULADO, CANCELADO} aparecem como linhas herdadas (✗, ⊘, ⊘ respectivamente) na Apresentação final estendida — NÃO são auditados nesta phase.
