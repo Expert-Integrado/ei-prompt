@@ -489,6 +489,31 @@ Consome a **lista consolidada** que saiu do Passo 5 (após o Gate de retry parci
 
 **Pré-condição:** este passo SÓ é acionado quando M >= 1 arquivos OK saídos do Passo 5. Se M = 0 (nenhum OK), o Passo 5 já encerrou /ei-ajustes — não chegue aqui.
 
+#### Instrução de trigger do hook (HOOK-02 — fallback é o ESTADO PADRÃO)
+
+O hook `.claude/hooks/post-ajustes-fanout.sh` (Stop event, registrado em `.claude/settings.json`) detecta o fim do turno de fan-out de editores (Passo 5 ou re-edit por correção) e injeta um `reason` em texto livre no próximo turno do main Claude, com formato literal aproximado:
+
+> `"Os editores da rodada round-<UNIX>-<3_ALFANUM> terminaram (trigger do hook post-ajustes-fanout). Antes de qualquer outra coisa, emita LITERALMENTE em UMA linha de texto livre: <ei-ajustes-round-consumed id=\"round-<UNIX>-<3_ALFANUM>\"/>. Em seguida, aplique o bloco pós-Tasks do Passo 5 (parsing dos <resultado>, gate PARL-04 se K>=1) seguido do Passo 6 (fan-out de M reviewers cross-context)..."`
+
+**CRÍTICO — fallback é o ESTADO PADRÃO, não caminho de exceção:** SEMPRE prossiga ao bloco pós-Tasks do Passo 5 (se ainda não tiver feito) e em seguida ao Passo 6 abaixo, ESTEJA ou NÃO recebendo `reason` injetado pelo hook.
+
+- **Se você recebeu reason do hook** (texto começa com "Os editores da rodada round-..."): trate como confirmação/instrução adicional. Antes de qualquer outra coisa, aplique a **REGRA INVIOLÁVEL HOOK-02 do Passo 6** logo abaixo (emita consumed primeiro), e em seguida prossiga ao Passo 6 normalmente.
+- **Se você NÃO recebeu reason do hook** (turno anterior terminou silenciosamente; hook desabilitado em `settings.json`; hook com bug; ou turno atípico fora do fluxo `/ei-ajustes`): prossiga ao Passo 6 normalmente como Phase 4 vigente. O hook é REINFORCEMENT da automação, não GATE — sem ele, o pipeline continua manual igual Phase 4. NÃO trave aguardando trigger.
+
+Se a rodada inteira do `/ei-ajustes` rodou em modo fallback (nenhum reason recebido em nenhum round de Passo 5 / retry / correção), inclua a nota literal na Apresentação final estendida (D-17): `"Nota: rodada em modo fallback — hook post-ajustes-fanout não acionou (D-09). Verifique \`.claude/settings.json\` se transição automática editor→reviewer for esperada."`
+
+#### ⚠️ REGRA INVIOLÁVEL DO PASSO 6 (HOOK-02 — consumed pós-trigger)
+
+Quando você receber um `reason` injetado pelo hook (formato descrito acima) contendo um `ROUND_ID` da forma `round-<UNIX>-<3_ALFANUM>`, ANTES de fazer QUALQUER outra coisa (parsing dos `<resultado>` do Passo 5, gate PARL-04, REGRA INVIOLÁVEL REVW-01, dispatch dos M reviewers), emita em UMA linha de texto livre, no MESMO turno em que vai começar o Passo 6:
+
+`<ei-ajustes-round-consumed id="<ROUND_ID>"/>`
+
+Onde `<ROUND_ID>` é EXATAMENTE o mesmo id que apareceu no `reason` do hook (e que você emitiu como sentinela no turno anterior — você manteve em memória per REGRA INVIOLÁVEL HOOK-02 do Passo 5).
+
+- **NUNCA pule esta emissão.** Sem `consumed`, o hook re-dispara no próximo turno final (visto no transcript que sentinela está ATIVO sem `consumed`), o que pode causar loop até o cap=8 do Claude Code (defesa em profundidade existe no anti-loop guard `stop_hook_active`, mas evite chegar perto).
+- **Emita `consumed` ANTES do parsing dos `<resultado>`, ANTES do gate PARL-04, ANTES do REGRA REVW-01, ANTES do dispatch dos reviewers.** Primeira ação do turno (D-18).
+- **NUNCA emita `consumed` em turno separado das ações subsequentes.** Emita `consumed` E o resto (parsing/gate/dispatch) NA MESMA RESPOSTA.
+
 #### ⚠️ REGRA INVIOLÁVEL DO PASSO 6 (REVW-01 — paralelismo nativo)
 
 Quando a lista de OKs do Passo 5 tiver M arquivos, emita **EXATAMENTE M chamadas paralelas à tool `Agent`** (uma por arquivo, com `subagent_type: docs-reviewer`) na **MESMA resposta** do Claude principal.
@@ -653,7 +678,11 @@ Enquanto K_correcao >= 1 com algum `correcoes_por_arquivo[path] < 2`:
 3. **Arquivos com veredito=BLOQUEADO**: marcar como `status_final_reviewer=BLOQUEADO` com feedback capturado; NÃO entram no loop (BLOQUEAR é terminal — A6 do RESEARCH).
 4. **Arquivos com veredito=OK** (incluindo OK_APOS_CORRECAO de rodadas anteriores): marcar como `status_final_reviewer=OK` (1ª rodada) ou `OK_APOS_CORRECAO` (após pelo menos 1 correção); NÃO entram no loop.
 5. **Para cada um dos K_reedit arquivos:** `correcoes_por_arquivo[path] += 1` ANTES do dispatch.
-6. **Emita EXATAMENTE K_reedit chamadas paralelas à tool `Agent`** (uma por arquivo K_reedit, com `subagent_type: docs-editor-conciso`) na MESMA resposta — a REGRA INVIOLÁVEL do Passo 5 (paralelismo nativo) ainda se aplica.
+6. **ANTES de emitir o re-dispatch dos K_reedit editores, emita NOVO sentinela** (HOOK-02 D-03) em UMA linha de texto livre, no MESMO turno das Tasks de re-edit, com NOVO `id` (NUNCA reuse id de rodada anterior) e `phase="correcao-revw04-r<n>"` (onde `<n>` é o número da rodada de correção: `r1` na primeira correção desta execução, `r2` na segunda):
+
+   `<ei-ajustes-round id="round-<NOVO_UNIX_TIMESTAMP>-<NOVOS_3_ALFANUM>" expected_editors="<K_reedit>" phase="correcao-revw04-r<n>"/>`
+
+   Em seguida, **emita EXATAMENTE K_reedit chamadas paralelas à tool `Agent`** (uma por arquivo K_reedit, com `subagent_type: docs-editor-conciso`) na MESMA resposta — a REGRA INVIOLÁVEL DO PASSO 5 (PARL-02 — paralelismo nativo) ainda se aplica, E a REGRA INVIOLÁVEL DO PASSO 5 (HOOK-02 — sentinela pré-dispatch) também (sentinela com phase diferente, mas mesmo protocolo).
 7. **Template do prompt de cada Task de re-edit** = MESMO template do Passo 5 (path, secao_tag, justificativa, descricao, objetivo, ESCOPO) + **campo extra `FEEDBACK DO REVIEWER`** contendo o `<feedback>` do veredito CORRECAO da rodada que pediu a correção. Bloco literal a injetar logo após `OBJETIVO DO AJUSTE` e antes de `LEMBRETE:` do template do Passo 5:
 
 ```
@@ -708,6 +737,12 @@ Resumo final do /ei-ajustes (M={M} arquivos auditados, rodadas={N'}):
 - ✗ `<path7>` — FALHO no Passo 5 (não auditado)
 - ⊘ `<path8>` — CANCELADO no Passo 5 (não auditado)
 ```
+
+**Nota opcional (D-17 — fallback):** se TODAS as rodadas desta execução (inicial, retry PARL-04, correção REVW-04) rodaram em modo fallback (nenhum `reason` do hook recebido em nenhum turno), adicione ao final do resumo a linha literal:
+
+> `"Nota: rodada em modo fallback — hook post-ajustes-fanout não acionou (D-09). Verifique \`.claude/settings.json\` se transição automática editor→reviewer for esperada."`
+
+Se pelo menos uma rodada recebeu trigger do hook (qualquer round), NÃO inclua esta nota (rodada normal).
 
 Mapeamento dos ícones:
 - `✓` = `status_final_reviewer` em {OK, OK_APOS_CORRECAO}
