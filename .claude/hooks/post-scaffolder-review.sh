@@ -5,6 +5,15 @@
 # Estratégia: lê o transcript_path do JSON de entrada e identifica o
 # subagent_type MAIS RECENTE no transcript. Se bater com um dos casos
 # cobertos, injeta instrução no contexto do Claude principal.
+#
+# WR-04: este hook usa hookSpecificOutput.additionalContext (NÃO confundir com
+# post-ajustes-fanout.sh, que é Stop event e usa decision/block + reason). O campo
+# additionalContext É válido em SubagentStop nas versões em uso desde abr/2026
+# (commit 530314f, em produção continuamente — confirmado pela ausência de
+# regressão observada). RESEARCH §Pitfall 1 vetou additionalContext APENAS para
+# o evento Stop (que tem schema mais restrito). Se uma versão futura do Claude
+# Code endurecer o schema do SubagentStop, mover para o padrão decision/reason
+# (idêntico ao post-ajustes-fanout.sh) é a migração indicada.
 
 # WR-03: set -uo pipefail para flagar uso de variáveis não-set e erros em pipes.
 # NÃO usar set -e: o pipeline grep|tail|sed retorna 1 quando grep não casa nada,
