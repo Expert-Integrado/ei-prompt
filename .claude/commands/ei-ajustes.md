@@ -527,7 +527,10 @@ Quando a lista de OKs do Passo 5 tiver M arquivos, emita **EXATAMENTE M chamadas
 
 #### Template do prompt de CADA Task
 
-Construa o prompt para cada `docs-reviewer` **exatamente** neste formato (substitua os placeholders pelos valores do arquivo OK correspondente; mantenha a estrutura — uma Task por arquivo OK da rodada):
+Construa o prompt para cada `docs-reviewer` **exatamente** neste formato (substitua os placeholders pelos valores do arquivo OK correspondente; mantenha a estrutura — uma Task por arquivo OK da rodada).
+
+⚠️ **ATENÇÃO ORQUESTRADOR (pré-construção — NÃO copiar para o prompt da Task):**
+Antes de despachar cada Task, substitua o placeholder `<CONTEUDO_CONTEXTO_CRUZADO_RESOLVIDO>` (dentro da tag `<contexto_cruzado>` do template abaixo) pelo conteúdo resolvido conforme a seção "Como construir as M Tasks" mais abaixo. Use o **ramo M=1** se houver apenas 1 arquivo na rodada; use o **ramo M>=2** se houver 2 ou mais (com 1 entrada por irmão). NUNCA passe ambos os ramos verbatim, NUNCA deixe o placeholder `<CONTEUDO_CONTEXTO_CRUZADO_RESOLVIDO>` chegar ao reviewer, NUNCA copie este aviso para o prompt da Task — ele é meta-instrução de construção, não conteúdo do prompt.
 
 ```
 TAREFA: Auditoria (NÃO edição).
@@ -542,29 +545,7 @@ INSTRUÇÃO ORIGINAL DO USUÁRIO (motivou a edição):
 <DESCRIÇÃO_DO_AJUSTE>
 
 <contexto_cruzado>
-⚠️ ATENÇÃO ORQUESTRADOR: substitua TODO o conteúdo entre `<contexto_cruzado>` e `</contexto_cruzado>` por UM dos dois ramos abaixo (NUNCA passe ambos verbatim — ramos `[SE M=1]` e `[SE M>=2]` são MUTUAMENTE EXCLUSIVOS, e os marcadores literais `[SE M=...]` NUNCA podem chegar ao reviewer). Ver seção "Como construir as M Tasks" abaixo para a resolução exata.
-
-[SE M=1]: Nenhum outro arquivo editado nesta rodada. Audite apenas o arquivo alvo contra CLAUDE.md e regras vigentes — não há cross-context a verificar.
-
-[SE M>=2]: Outros arquivos editados nesta MESMA rodada (cheque inconsistências cruzadas com o seu):
-
-— Arquivo: <PATH_IRMAO_1>
-  Seção alterada: <SECAO_TAG_IRMAO_1>
-  Justificativa: <JUSTIFICATIVA_IRMAO_1>
-  Conteúdo completo:
-  ```
-  <CONTEUDO_INTEGRAL_OU_TRUNCADO_DO_IRMAO_1>
-  ```
-
-— Arquivo: <PATH_IRMAO_2>
-  ... (mesma estrutura para cada um dos M-1 irmãos)
-
-REGRA DE CROSS-CONTEXT:
-Antes de emitir veredito, cheque:
-1. Mesma regra não duplicada em 2 arquivos (ex: a mesma instrução vivia em Qualifier e foi adicionada também em Orquestrador).
-2. Referências cruzadas atualizadas (ex: outro arquivo cita `<perguntas_iniciais>` — ainda existe e ainda tem o conteúdo certo?).
-3. Arquitetura padrão preservada (Orquestrador não encerra; Qualifier não encerra; Protractor é o único que transfere — verificar contra TODOS os irmãos).
-4. `<formato_resposta>` consistente entre irmãos do mesmo cliente (sem campos novos em nenhum).
+<CONTEUDO_CONTEXTO_CRUZADO_RESOLVIDO>
 </contexto_cruzado>
 
 FALLBACK DE TRUNCAMENTO: Se algum irmão exceder 30 KB, é apresentada apenas a SECAO_TAG alterada + lista de seções restantes; reviewer deve emitir `<veredito>CORRECAO</veredito>` se precisar do conteúdo completo para decidir.
@@ -600,9 +581,30 @@ Para cada arquivo da lista de OKs do Passo 5, substitua nos placeholders do temp
 - `<PATH_DO_ARQUIVO_EDITADO>` → path literal (mesmo que foi passado ao editor no Passo 5)
 - `<SECAO_TAG_DO_ANALYZER>` → secao_tag do analyzer (ex: `<perguntas_iniciais>`)
 - `<DESCRIÇÃO_DO_AJUSTE>` → descrição original do `/ei-ajustes`
-- `<contexto_cruzado>`:
-  - **SE M=1:** use literalmente a frase `"Nenhum outro arquivo editado nesta rodada. Audite apenas o arquivo alvo contra CLAUDE.md e regras vigentes — não há cross-context a verificar."`. NÃO omita a tag — emita o bloco com a frase explícita.
-  - **SE M>=2:** preencha uma entrada por irmão (M-1 entradas) com path + secao_tag + justificativa + conteúdo completo do irmão (faça Read do irmão ANTES de despachar a Task, para embedar inline).
+- `<CONTEUDO_CONTEXTO_CRUZADO_RESOLVIDO>` (dentro da tag `<contexto_cruzado>` do template) — escolha UM dos dois ramos abaixo conforme M; o conteúdo resolvido SUBSTITUI o placeholder (a tag `<contexto_cruzado>` permanece envolvendo o conteúdo):
+  - **SE M=1:** substitua o placeholder pela frase literal: `Nenhum outro arquivo editado nesta rodada. Audite apenas o arquivo alvo contra CLAUDE.md e regras vigentes — não há cross-context a verificar.`. NÃO omita a tag `<contexto_cruzado>` — emita o bloco com a frase explícita dentro.
+  - **SE M>=2:** substitua o placeholder pelo seguinte bloco (preencha uma entrada por irmão — M-1 entradas — com path + secao_tag + justificativa + conteúdo completo; faça Read do irmão ANTES de despachar a Task para embedar inline):
+    ```
+    Outros arquivos editados nesta MESMA rodada (cheque inconsistências cruzadas com o seu):
+
+    — Arquivo: <PATH_IRMAO_1>
+      Seção alterada: <SECAO_TAG_IRMAO_1>
+      Justificativa: <JUSTIFICATIVA_IRMAO_1>
+      Conteúdo completo:
+      ```
+      <CONTEUDO_INTEGRAL_OU_TRUNCADO_DO_IRMAO_1>
+      ```
+
+    — Arquivo: <PATH_IRMAO_2>
+      ... (mesma estrutura para cada um dos M-1 irmãos)
+
+    REGRA DE CROSS-CONTEXT:
+    Antes de emitir veredito, cheque:
+    1. Mesma regra não duplicada em 2 arquivos (ex: a mesma instrução vivia em Qualifier e foi adicionada também em Orquestrador).
+    2. Referências cruzadas atualizadas (ex: outro arquivo cita `<perguntas_iniciais>` — ainda existe e ainda tem o conteúdo certo?).
+    3. Arquitetura padrão preservada (Orquestrador não encerra; Qualifier não encerra; Protractor é o único que transfere — verificar contra TODOS os irmãos).
+    4. `<formato_resposta>` consistente entre irmãos do mesmo cliente (sem campos novos em nenhum).
+    ```
 - **Fallback de truncamento:** se algum irmão exceder 30 KB no Read, substitua o `<CONTEUDO_INTEGRAL_OU_TRUNCADO_DO_IRMAO>` pela SECAO_TAG alterada (extraída via grep da tag XML) + lista das outras seções (por linha de cabeçalho `^##`); mantenha a frase fallback literal acima.
 
 Emita as M chamadas via tool `Agent` na MESMA resposta. Cada chamada usa `subagent_type: docs-reviewer` e o prompt preenchido acima.
