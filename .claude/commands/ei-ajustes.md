@@ -581,24 +581,117 @@ Quando as M Tasks paralelas retornarem (todas no mesmo turn, paralelismo nativo 
 
 4. **Rotear pelos valores:**
    - **K_correcao = 0 E K_bloqueado = 0** → todos OK → **Apresentação final** ao usuário (formato D-16 estendido) → encerra `/ei-ajustes`.
-   - **K_correcao >= 1** → passe controle para a **subseção "Correção iterativa"** mais adiante neste Passo 6 (preenchida pelo Plan 02 da Phase 4). Mantenha em memória a lista consolidada (para a subseção consumir) e o contador `correcoes_por_arquivo` (inicializado em 0 para todos os M arquivos da rodada inicial — Plan 02 incrementa).
+   - **K_correcao >= 1** → passe controle para a **subseção "Correção iterativa"** mais adiante neste Passo 6 (loop de re-edit + re-fan-out COMPLETO dos M reviewers — REVW-04). Mantenha em memória a lista consolidada (para a subseção consumir) e o contador `correcoes_por_arquivo` (inicializado em 0 para todos os M arquivos da rodada inicial — a subseção incrementa).
    - **K_correcao = 0 E K_bloqueado >= 1** → não há retry possível (BLOQUEAR é terminal) → **Apresentação final** ao usuário com `⊗` para cada bloqueado → encerra `/ei-ajustes`.
 
-5. **Apresentação final ao usuário** (estendida no Plan 02 com estados `OK_APOS_CORRECAO` / `CAP_CORRECAO` / `FALHO_EDITOR_NA_CORRECAO`). Versão deste Plan 01 (sem rodadas de correção ainda — todos os arquivos saíram da rodada 1):
+5. **Apresentação final ao usuário** → ver **Apresentação final estendida (D-16 estilo, 6 estados)** abaixo, dentro da subseção "Correção iterativa". Ela cobre o caso simples (sem rodadas de correção) E os casos com rodadas de correção em um único template unificado.
+
+Carryover do Passo 5: arquivos com `status_final` em {FALHO, PULADO, CANCELADO} aparecem como linhas herdadas (✗, ⊘, ⊘ respectivamente) na Apresentação final estendida — NÃO são auditados nesta phase.
+
+#### Subseção "Correção iterativa" (REVW-04 — fail-soft com cap por arquivo + re-fan-out completo)
+
+**Pré-condição:** este bloco SÓ é acionado quando o bloco pós-Tasks do Passo 6 (acima) reportou K_correcao >= 1. K_bloqueado pode ser >= 0 (bloqueados saem para Apresentação final sem entrar no loop — BLOQUEAR é terminal). K_ok pode ser >= 0 (aprovados na rodada inicial seguem para Apresentação final com `✓` direto).
+
+#### ⚠️ REGRA INVIOLÁVEL DO PASSO 6 (REVW-04 — RE-FAN-OUT COMPLETO após CORRECAO)
+
+Quando algum arquivo for re-editado após receber `<veredito>CORRECAO</veredito>`, **TODOS os M reviewers** são re-fan-out na rodada seguinte (re-fan-out COMPLETO).
+
+- **NUNCA re-revise APENAS o K que pediu CORRECAO.** O cross-context dos outros M-1 reviewers mudou porque o arquivo K foi re-editado — re-review parcial NÃO detectaria nova inconsistência introduzida pela correção. Re-review parcial reintroduz literalmente o bug-âncora.
+- **Custo aceito:** M-1 reviews adicionais por rodada de correção. Cap dura de 2 correções por arquivo limita: pior caso = 3 fan-outs totais de reviewers (inicial + correção rodada 1 + correção rodada 2).
+- **Re-fan-out usa EXATAMENTE o template do Plan 01** (mesma REGRA INVIOLÁVEL REVW-01, mesmo `<contexto_cruzado>`, mesmos marcadores). O `<contexto_cruzado>` é RECONSTRUÍDO na rodada seguinte (porque arquivos K foram re-editados — conteúdo dos M-1 irmãos do K, e do K visto pelos M-1, MUDOU).
+
+**Contador `correcoes_por_arquivo` (espelha `retries_por_arquivo` da Phase 3 D-11/D-15):**
+
+Mantenha mentalmente um dicionário `correcoes_por_arquivo` (variável mental do prompt) durante esta execução de `/ei-ajustes`. Chave = `path` literal de cada arquivo da rodada inicial (M arquivos); valor = inteiro de correções JÁ aplicadas para esse arquivo. Inicialize em `0` para TODOS os M arquivos no primeiro fan-out de reviewers (Plan 01 — bloco pós-Tasks, passo 4).
+
+- O contador INCREMENTA APENAS quando o arquivo K com veredito=CORRECAO é efetivamente re-spawned no `docs-editor-conciso` na próxima rodada (ANTES de emitir a Task de re-edit, faça `correcoes_por_arquivo[path] += 1`).
+- O contador NÃO incrementa em arquivos com veredito=OK, veredito=BLOQUEAR, ou arquivos que ainda nem entraram em rodada de correção.
+- **Cap dura: 2 correções por arquivo (3 reviews totais por arquivo).** Se `correcoes_por_arquivo[path] >= 2` (já aplicou 2 correções = 3 reviews) e o arquivo ainda recebe veredito=CORRECAO na rodada subsequente, NÃO inclua esse arquivo em nova rodada de re-edit — ele recebe a mensagem literal de cap (abaixo) e é marcado como `status_final_reviewer=CAP_CORRECAO`. Outros arquivos com correções restantes continuam normalmente.
+
+**Mensagem literal de cap estourado (REVW-04):**
+
+Quando um arquivo estoura o cap (rodada 3 ainda com veredito=CORRECAO), apresente ao usuário (após a rodada que estourou):
 
 ```
-Resumo final do /ei-ajustes (M={M} arquivos auditados, rodadas=1):
+Auditoria de `<path>` falhou após 3 rodadas. Re-rode `/ei-ajustes` manualmente.
+```
+
+Esse arquivo NÃO entra em nenhuma rodada futura nesta execução. Outros arquivos com correções restantes continuam.
+
+**Loop de correção (re-edit + re-fan-out COMPLETO):**
+
+Enquanto K_correcao >= 1 com algum `correcoes_por_arquivo[path] < 2`:
+
+1. **Filtre os arquivos elegíveis para re-edit:** arquivos com `veredito=CORRECAO` na rodada atual E `correcoes_por_arquivo[path] < 2`. Chame essa quantidade de `K_reedit`.
+2. **Arquivos com veredito=CORRECAO mas `correcoes_por_arquivo[path] >= 2`** (cap estourado): marcar como `status_final_reviewer=CAP_CORRECAO`; apresentar mensagem literal de cap; remover da rodada futura.
+3. **Arquivos com veredito=BLOQUEADO**: marcar como `status_final_reviewer=BLOQUEADO` com feedback capturado; NÃO entram no loop (BLOQUEAR é terminal — A6 do RESEARCH).
+4. **Arquivos com veredito=OK** (incluindo OK_APOS_CORRECAO de rodadas anteriores): marcar como `status_final_reviewer=OK` (1ª rodada) ou `OK_APOS_CORRECAO` (após pelo menos 1 correção); NÃO entram no loop.
+5. **Para cada um dos K_reedit arquivos:** `correcoes_por_arquivo[path] += 1` ANTES do dispatch.
+6. **Emita EXATAMENTE K_reedit chamadas paralelas à tool `Agent`** (uma por arquivo K_reedit, com `subagent_type: docs-editor-conciso`) na MESMA resposta — a REGRA INVIOLÁVEL do Passo 5 (paralelismo nativo) ainda se aplica.
+7. **Template do prompt de cada Task de re-edit** = MESMO template do Passo 5 (path, secao_tag, justificativa, descricao, objetivo, ESCOPO) + **campo extra `FEEDBACK DO REVIEWER`** contendo o `<feedback>` do veredito CORRECAO da rodada que pediu a correção. Bloco literal a injetar logo após `OBJETIVO DO AJUSTE` e antes de `LEMBRETE:` do template do Passo 5:
+
+```
+TAREFA: Edição corretiva (foi pedida correção pelo reviewer cross-context).
+
+FEEDBACK DO REVIEWER (motivo da correção — aplique exatamente o que está aqui):
+<FEEDBACK_DO_VEREDITO_CORRECAO_DA_RODADA_ANTERIOR>
+
+Aplique a correção pedida pelo reviewer, mantendo a edição original. ESCOPO ainda é `<SECAO_TAG_DO_ANALYZER>` (mesmo limite). Se a correção pedida exigir mexer fora desse ESCOPO, NÃO edite — encerre com `<resultado>ERRO: correção pedida está fora do escopo declarado (secao_tag=<SECAO_TAG>)</resultado>`.
+```
+
+**Diferença chave do retry do Passo 5 (Phase 3 D-12 vs Pitfall 7 do RESEARCH):** retry da Phase 3 (editor falhou) = MESMO prompt sem histórico (é mesma falha). Correção da Phase 4 (reviewer pediu) = MESMO prompt + `FEEDBACK DO REVIEWER` adicionado (é tentativa DIFERENTE com nova informação). NÃO confunda os dois — esta subseção SEMPRE injeta o campo FEEDBACK no re-spawn.
+
+8. **NÃO re-invoque o `docs-analyzer`** (a análise não falhou — o conteúdo da edição foi pedido para corrigir).
+9. **Arquivos com veredito=OK em rodadas anteriores NUNCA são re-spawned no editor** — eles vão direto para o re-fan-out de reviewers da rodada seguinte (porque cross-context mudou).
+10. **Aprovação humana NÃO é reaberta** (A11 do RESEARCH — aprovação original do Passo 3.5 cobre o caso; espelha Phase 3 retry de editor que também não pede novo gate).
+
+**Após o re-spawn dos editores (K_reedit Tasks em paralelo) — parsing dos `<resultado>OK|ERRO</resultado>` (D-09 da Phase 3):**
+
+Reaproveite o bloco pós-Tasks do Passo 5 (mesma máquina de parsing dos N marcadores `<resultado>`). Para cada um dos K_reedit:
+
+- **(a) Exceção do Agent** → `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` com `feedback="Exceção do Agent no re-edit: <texto>"`; sai da próxima rodada de reviewers.
+- **(b) Marcador `<resultado>` ausente** → `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` com `feedback="Marcador <resultado> ausente no re-edit (fail-closed)"`; sai da próxima rodada.
+- **(c) `<resultado>OK</resultado>`** → re-edit aplicado com sucesso; arquivo segue para a próxima rodada de reviewers (re-fan-out COMPLETO).
+- **(d) `<resultado>ERRO: motivo</resultado>`**: aplicar a lógica do Gate de retry parcial do Passo 5 (Plan 02 da Phase 3). Especificamente:
+  - O contador `retries_por_arquivo[path]` do Passo 5 incrementa (esta é uma rodada nova de Edit, conta como retry de editor — independente do cap de correção de reviewer);
+  - Se `retries_por_arquivo[path] >= 2` (cap do editor estourou — Phase 3 D-11): arquivo cai para `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` com mensagem literal do Passo 5 (`"Edição de <path> falhou após 3 tentativas. Re-rode /ei-ajustes manualmente."`); sai da próxima rodada de reviewers.
+  - Se `retries_por_arquivo[path] < 2`: o Gate de retry parcial do Passo 5 abre normalmente com K=1 (apenas este arquivo) — usuário pode escolher "Tentar de novo apenas os falhos" (re-edit), "Pular falhos e seguir" (cai para FALHO_EDITOR_NA_CORRECAO), ou "Cancelar tudo" (encerra `/ei-ajustes`).
+
+**Limite combinado teórico (espelha Phase 3 D-11 cap teach-back):** cap=2 retries de editor × cap=2 correções de reviewer = pior caso 9 invocações totais por arquivo (3 Edit tries × 3 reviews). Raríssimo na prática mas explicitamente possível. Mensagens literais de cap (do Passo 5 e do Passo 6) tornam o limite visível ao usuário antes de estourar.
+
+**Após o parsing dos K_reedit `<resultado>`:**
+
+- Se algum re-edit virou `OK` → **re-fan-out COMPLETO dos M reviewers da rodada inicial** (não só dos K_reedit). Volte ao topo do Passo 6 (REGRA INVIOLÁVEL REVW-01 + template + bloco pós-Tasks do Plan 01). O `<contexto_cruzado>` é RECONSTRUÍDO com o novo conteúdo dos K_reedit + conteúdo atual dos demais (M-1 - K_reedit + K_reedit = M-1 vistos por cada).
+  - **Quem entra no re-fan-out:** todos os M arquivos da rodada inicial cujo `status_final_reviewer` ainda não foi resolvido (i.e., NÃO está em {OK, BLOQUEADO, CAP_CORRECAO, FALHO_EDITOR_NA_CORRECAO}). Arquivos OK em rodada anterior re-aparecem (porque cross-context mudou e podem virar CORRECAO ou BLOQUEAR agora).
+- Se TODOS os re-edits viraram `ERRO/FALHO_EDITOR_NA_CORRECAO` → loop termina sem novo fan-out (não há arquivo re-editado para auditar) → ir para Apresentação final estendida.
+
+11. **Loop natural termina quando:** K_correcao=0 (todos OK ou BLOQUEADO ou CAP_CORRECAO) OU todos os K_correcao da rodada estouraram cap=2 OU re-edits falharam para todos os K_reedit. Em qualquer caso, ir para Apresentação final estendida.
+
+#### Apresentação final estendida (D-16 estilo, 6 estados)
+
+Esta apresentação SUBSTITUI a versão inicial do Plan 01 (que tinha apenas 4 estados — sem rodadas de correção). Cobertura completa dos 6 estados de `status_final_reviewer` + 3 estados carryover do Passo 5.
+
+```
+Resumo final do /ei-ajustes (M={M} arquivos auditados, rodadas={N'}):
 - ✓ `<path1>` — APROVADO pelo reviewer (1ª rodada)
-- ⊗ `<path2>` — BLOQUEADO (motivo: <feedback>). Edit no disco; reverter manualmente se necessário.
-- ⊘ `<path3>` — PULADO no Passo 5 (não auditado)
-- ✗ `<path4>` — FALHO no Passo 5 (não auditado)
+- ✓ `<path2>` — APROVADO após {C} correção(ões)
+- ⊗ `<path3>` — BLOQUEADO (motivo: <feedback>). Edit no disco; reverter manualmente se necessário.
+- ✗ `<path4>` — CAP de correção estourado (motivo da última: <feedback>). Re-rode `/ei-ajustes` manualmente.
+- ✗ `<path5>` — FALHO no re-edit (cap do editor estourado durante correção)
+- ⊘ `<path6>` — PULADO no Passo 5 (não auditado)
+- ✗ `<path7>` — FALHO no Passo 5 (não auditado)
+- ⊘ `<path8>` — CANCELADO no Passo 5 (não auditado)
 ```
 
-Carryover do Passo 5: arquivos com `status_final` em {FALHO, PULADO, CANCELADO} aparecem como linhas herdadas (✗, ⊘, ⊘ respectivamente) — NÃO são auditados nesta phase.
+Mapeamento dos ícones:
+- `✓` = `status_final_reviewer` em {OK, OK_APOS_CORRECAO}
+- `⊗` = `status_final_reviewer=BLOQUEADO` (Edit no disco, reviewer rejeitou — A6 do RESEARCH)
+- `✗` = `status_final_reviewer` em {CAP_CORRECAO, FALHO_EDITOR_NA_CORRECAO, FALHO_NO_PASSO_5} (loop não convergiu)
+- `⊘` = `status_final_reviewer` em {PULADO_NO_PASSO_5, CANCELADO_NO_PASSO_5} (não auditado)
 
-#### Subseção "Correção iterativa" (preenchida pelo Plan 02 da Phase 4)
+`N'` = quantidade total de fan-outs de reviewer executados (1 = só rodada inicial; 2 = 1 correção; 3 = 2 correções = cap).
 
-> **Plan 02 da Phase 4 (stub):** Quando K_correcao >= 1 arquivos pediram correção, esta subseção materializa o loop de re-edit + re-fan-out completo com cap dura de 2 correções por arquivo (REVW-04). Bloco materializado pelo Plan 02 desta phase — atualmente é um placeholder para preservar o fluxo enquanto Plan 02 não foi executado.
+Após o resumo, encerre `/ei-ajustes`. NÃO há próximo passo automático nesta phase (Phase 5 introduzirá hook editor→reviewer; este Plan 02 mantém a transição manual via Claude principal igual ao fluxo atual).
 
 ## Regras
 
