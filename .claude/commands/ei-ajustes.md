@@ -276,6 +276,24 @@ Quando a lista aprovada no Passo 3.5 tiver N arquivos, emita **EXATAMENTE N cham
 - **N=1 é caso degenerado da MESMA rota** (1 tool call em 1 turn) — não há código alternativo para single-file. Mesma instrução, mesmo template. Comportamento observável para o usuário em N=1 é idêntico ao fluxo pré-Phase 3 (PARL-01 — zero regressão).
 - **Editor cego pros irmãos:** cada Task recebe APENAS o prompt do seu arquivo. NÃO inclua no prompt da Task A a lista de outros arquivos sendo editados, suas justificativas ou seus paths (D-07 — cruzamento é responsabilidade dos reviewers da Phase 4).
 
+#### ⚠️ REGRA INVIOLÁVEL DO PASSO 5 (HOOK-02 — sentinela pré-dispatch)
+
+ANTES de emitir as N chamadas paralelas à tool `Agent` (subagent_type: `docs-editor-conciso`) na MESMA resposta, escreva em UMA linha de texto livre o sentinela LITERAL abaixo (substitua os placeholders pelos valores reais; preserve os atributos exatos):
+
+`<ei-ajustes-round id="round-<UNIX_TIMESTAMP>-<3_CARACTERES_ALFANUM>" expected_editors="<N>" phase="inicial"/>`
+
+Onde:
+- `<UNIX_TIMESTAMP>` = timestamp Unix do momento atual (ex: `1748090430`). Gere uma vez por rodada — NÃO reuse.
+- `<3_CARACTERES_ALFANUM>` = 3 caracteres alfanuméricos (`[a-z0-9]{3}`) aleatórios. Apenas alfanum — SEM aspas, SEM `<`, SEM `>`, SEM caractere especial (necessário para o regex do hook `post-ajustes-fanout.sh` ser à prova de injection).
+- `<N>` = quantidade EXATA de Tasks de `docs-editor-conciso` que você vai disparar nesta resposta. Deve bater 1:1 com o número de tool calls (sanity check do hook).
+- `phase="inicial"` = literal fixo para o dispatch inicial do Passo 5. (Retry parcial usa `phase="retry-parl04"`; correção REVW-04 usa `phase="correcao-revw04-r1"` ou `r2`.)
+
+Mantenha em memória o valor de `id` desta rodada — você precisará dele para emitir `<ei-ajustes-round-consumed id="..."/>` quando o hook injetar o reason no próximo turno (ver REGRA INVIOLÁVEL HOOK-02 do Passo 6).
+
+- **NUNCA emita as Tasks sem o sentinela.** Sem sentinela, o hook não dispara, o Passo 6 trava em fallback ou nunca acontece.
+- **NUNCA emita o sentinela em turno separado das Tasks.** Sentinela e Tasks vão na MESMA RESPOSTA, sentinela primeiro como linha de texto, Tasks logo abaixo como tool calls paralelas.
+- **NUNCA reuse o `id` de uma rodada anterior.** Cada round (inicial, retry PARL-04, correção REVW-04 r1, correção REVW-04 r2) gera NOVO id. Reusar id faz o hook ficar silencioso (vê `consumed` do round anterior — anti-replay D-06).
+
 #### Template do prompt de CADA Task
 
 Construa o prompt para cada `docs-editor-conciso` **exatamente** neste formato (substitua os placeholders pelos valores do `<arquivo>` correspondente; mantenha a estrutura — uma Task por arquivo da lista aprovada):
@@ -432,7 +450,11 @@ Quando o usuário escolhe `"Tentar de novo apenas os falhos"`:
 
 1. Filtre a lista de falhos para incluir APENAS arquivos com `retries_por_arquivo[path] < 2` (têm retries restantes). Arquivos com cap estourado já foram tratados acima.
 2. Para cada arquivo restante: `retries_por_arquivo[path] += 1`.
-3. Emita **EXATAMENTE N' chamadas paralelas à tool `Agent`** (uma por arquivo restante, `subagent_type: docs-editor-conciso`) na MESMA resposta — segue a REGRA INVIOLÁVEL DO PASSO 5 do Plan 01.
+3. **ANTES de emitir o re-dispatch, emita NOVO sentinela** (HOOK-02 D-03) em UMA linha de texto livre, no MESMO turno das Tasks de retry, com NOVO `id` (NUNCA reuse o id da rodada anterior) e `phase="retry-parl04"`:
+
+   `<ei-ajustes-round id="round-<NOVO_UNIX_TIMESTAMP>-<NOVOS_3_ALFANUM>" expected_editors="<N_LINHA>" phase="retry-parl04"/>`
+
+   Em seguida, emita **EXATAMENTE N' chamadas paralelas à tool `Agent`** (uma por arquivo restante, `subagent_type: docs-editor-conciso`) na MESMA resposta — segue a REGRA INVIOLÁVEL DO PASSO 5 (PARL-02 — paralelismo nativo) E a REGRA INVIOLÁVEL DO PASSO 5 (HOOK-02 — sentinela pré-dispatch).
 4. **MESMO prompt do dispatch original** (D-12): mesmo `path`, `secao_tag`, `justificativa`, `descricao`, `objetivo`, `ESCOPO`. NÃO altere o template. NÃO inclua histórico de falhas anteriores no prompt (editor é cego pros irmãos E cego ao seu próprio histórico — cada Task é fresh).
 5. **NÃO re-invoque o `docs-analyzer`** (a análise não falhou — a edição falhou; re-analisar é desperdício e pode mudar a decisão de path/secao_tag o que viola D-12).
 6. **Arquivos com status=OK na rodada anterior NUNCA são re-spawned** — em nenhuma rodada (D-12). Eles seguem direto para o Passo 6 ao final.
