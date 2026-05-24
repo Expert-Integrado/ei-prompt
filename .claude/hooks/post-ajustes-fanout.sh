@@ -42,10 +42,14 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 #    Idempotente: sed é no-op se o conteúdo já estiver não-escapado.
 TAIL=$(tail -n 400 "$TRANSCRIPT" | sed 's/\\"/"/g')
 
-# 4) Extrair o ÚLTIMO sentinela emitido no tail (regex captura id="..." entre aspas duplas).
-#    Se não houver sentinela, este turno NÃO é fan-out de editores — sair silencioso.
+# 4) Extrair o ÚLTIMO sentinela emitido no tail.
+#    Regex RESTRITA ao formato canônico cravado na REGRA INVIOLÁVEL HOOK-02 do Passo 5:
+#    `id="round-<unix_ts>-<3_alfanum>"`. Evita falso-positivo contra placeholders
+#    como `id="..."` em PLAN.md/documentação ou fragmentos de regex em transcripts
+#    de outras sessões (Claude Code/orquestrador discutindo o próprio hook).
+#    Se não houver sentinela canônico, este turno NÃO é fan-out de editores — sair silencioso.
 ROUND_ID=$(printf '%s' "$TAIL" \
-  | grep -o '<ei-ajustes-round id="[^"]*"' \
+  | grep -oE '<ei-ajustes-round id="round-[0-9]+-[a-z0-9]{3}"' \
   | tail -1 \
   | sed 's/.*id="\([^"]*\)"/\1/')
 [ -z "$ROUND_ID" ] && exit 0

@@ -61,8 +61,11 @@ JSON
     # (`"` vira `\"`). Normalizamos antes dos greps para que `<ei-ajustes-round id="..."/>`
     # case. Idempotente (sed no-op se já não-escapado). Espelha fix de post-ajustes-fanout.sh.
     TAIL_AJUSTES=$(tail -n 400 "$TRANSCRIPT" | sed 's/\\"/"/g')
+    # Regex RESTRITA ao formato canônico (mesma da post-ajustes-fanout.sh):
+    # `id="round-<unix>-<3alfanum>"`. Evita falso-positivo contra placeholders e
+    # fragmentos de regex em transcripts não-/ei-ajustes (orquestrador discutindo o hook).
     ROUND_ID_AJUSTES=$(printf '%s' "$TAIL_AJUSTES" \
-      | grep -o '<ei-ajustes-round id="[^"]*"' \
+      | grep -oE '<ei-ajustes-round id="round-[0-9]+-[a-z0-9]{3}"' \
       | tail -1 \
       | sed 's/.*id="\([^"]*\)"/\1/')
     if [ -n "$ROUND_ID_AJUSTES" ] && ! printf '%s' "$TAIL_AJUSTES" | grep -qF "<ei-ajustes-round-consumed id=\"$ROUND_ID_AJUSTES\""; then
