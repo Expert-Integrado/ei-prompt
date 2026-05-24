@@ -662,7 +662,7 @@ Reaproveite o bloco pós-Tasks do Passo 5 (mesma máquina de parsing dos N marca
 **Após o parsing dos K_reedit `<resultado>`:**
 
 - Se algum re-edit virou `OK` → **re-fan-out COMPLETO dos M reviewers da rodada inicial** (não só dos K_reedit). Volte ao topo do Passo 6 (REGRA INVIOLÁVEL REVW-01 + template + bloco pós-Tasks do Plan 01). O `<contexto_cruzado>` é RECONSTRUÍDO com o novo conteúdo dos K_reedit + conteúdo atual dos demais (M-1 - K_reedit + K_reedit = M-1 vistos por cada).
-  - **Quem entra no re-fan-out:** todos os M arquivos da rodada inicial cujo `status_final_reviewer` ainda não foi resolvido (i.e., NÃO está em {OK, BLOQUEADO, CAP_CORRECAO, FALHO_EDITOR_NA_CORRECAO}). Arquivos OK em rodada anterior re-aparecem (porque cross-context mudou e podem virar CORRECAO ou BLOQUEAR agora).
+  - **Quem entra no re-fan-out:** todos os M arquivos da rodada inicial cujo `status_final_reviewer` ainda NÃO esteja em estado terminal (i.e., NÃO está em {BLOQUEADO, CAP_CORRECAO, FALHO_EDITOR_NA_CORRECAO}). Arquivos previamente OK TAMBÉM re-entram (porque cross-context mudou e podem virar CORRECAO ou BLOQUEAR agora — A4 do RESEARCH e REGRA INVIOLÁVEL REVW-04 acima: re-review parcial reintroduz o bug-âncora).
 - Se TODOS os re-edits viraram `ERRO/FALHO_EDITOR_NA_CORRECAO` → loop termina sem novo fan-out (não há arquivo re-editado para auditar) → ir para Apresentação final estendida.
 
 11. **Loop natural termina quando:** K_correcao=0 (todos OK ou BLOQUEADO ou CAP_CORRECAO) OU todos os K_correcao da rodada estouraram cap=2 OU re-edits falharam para todos os K_reedit. Em qualquer caso, ir para Apresentação final estendida.
