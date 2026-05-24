@@ -354,7 +354,7 @@ Detecção de falha (D-09): NÃO use comandos do sistema de controle de versão 
 
 4. **Rotear pelo valor de K:**
    - **K = 0** (todos OK) → siga para o **Passo 6** (Phase 4 ainda vai mexer no Passo 6; nesta phase, basta apresentar o resumo final ao usuário e prosseguir como hoje).
-   - **K >= 1** (pelo menos 1 falho) → passe controle para a **subseção "Gate de retry parcial"** mais adiante neste Passo 5 (preenchida pelo Plan 02 da Phase 3). Mantenha em memória a lista consolidada (para o gate consumir) e o contador `retries_por_arquivo` (inicializado em 0 para todos os arquivos da rodada — Plan 02 incrementa).
+   - **K >= 1** (pelo menos 1 falho) → passe controle para a **subseção "Gate de retry parcial"** mais adiante neste Passo 5 (PARL-04 — fail-soft com cap por arquivo). Mantenha em memória a lista consolidada (para o gate consumir) e o contador `retries_por_arquivo` (inicializado em 0 para todos os arquivos da rodada — o gate incrementa).
 
 5. **Apresentação do estado consolidado ao usuário** (antes do retry gate, se K>=1): UMA linha curta listando cada arquivo da rodada com seu status. Formato sugerido (D-16 — wording é discricionário; este formato é o default):
 
@@ -368,9 +368,98 @@ Resultado do fan-out (N={N} arquivos):
 
 Os ✓ apareceram com status=OK; os ✗ com status=FALHO. Esta apresentação é puramente informativa — o gate de retry parcial (Plan 02) é quem decide o que fazer com os falhos.
 
-#### Subseção "Gate de retry parcial" (preenchida pelo Plan 02 da Phase 3)
+#### Subseção "Gate de retry parcial" (PARL-04 — fail-soft com cap por arquivo)
 
-> **Plan 02 stub:** Quando K>=1 arquivos falharam, esta subseção apresenta o gate de retry com 3 opções ("Tentar de novo apenas os falhos" / "Pular falhos e seguir" / "Cancelar tudo") e gerencia o contador `retries_por_arquivo` com cap dura de 2 retries (D-10, D-11, D-12). Bloco materializado pelo Plan 02 desta phase — atualmente é um stub para preservar o fluxo enquanto Plan 02 não foi executado.
+**Pré-condição:** este bloco SÓ é acionado quando o bloco pós-Tasks do Passo 5 (acima) reportou K>=1 falhos. Quando K=0, pule este bloco e siga direto para a "Apresentação final" no fim do Passo 5.
+
+**Contador `retries_por_arquivo` (D-11, D-15):**
+
+Mantenha mentalmente um dicionário `retries_por_arquivo` (variável mental do prompt) durante esta execução de `/ei-ajustes`. Chave = `path` literal de cada arquivo da lista aprovada original; valor = inteiro de retries JÁ executados para esse arquivo. Inicialize em `0` para TODOS os N arquivos no momento do dispatch inicial (Plan 01 — bloco pós-Tasks, passo 4).
+
+- O contador INCREMENTA APENAS quando o usuário escolhe `"Tentar de novo apenas os falhos"` E o arquivo é efetivamente re-spawned na próxima rodada (ANTES de emitir a Task de retry, faça `retries_por_arquivo[path] += 1`).
+- O contador NÃO incrementa em `"Pular falhos e seguir"`, `"Cancelar tudo"`, ou em arquivos com status=OK.
+- **Cap dura: 2 retries por arquivo (D-11).** Se `retries_por_arquivo[path] >= 2` (ou seja, já fez 2 retries = 3 tentativas totais somando a original) e o arquivo ainda está em FALHO, NÃO inclua esse arquivo na próxima rodada de retry — ele recebe a mensagem literal de cap (abaixo) e é marcado como `status_final=FALHO` com `tentativas=3`. Outros arquivos com retries restantes continuam normalmente.
+
+**Mensagem literal de cap estourado (D-11):**
+
+Quando um arquivo estoura o cap (retry #3 ainda falha), apresente ao usuário (após a rodada que estourou):
+
+```
+Edição de `<path>` falhou após 3 tentativas. Re-rode `/ei-ajustes` manualmente.
+```
+
+Esse arquivo NÃO entra em nenhuma rodada futura nesta execução. Outros arquivos com retries restantes continuam.
+
+**AskUserQuestion do gate de retry parcial (D-10):**
+
+Construa o campo `question` listando os K arquivos falhos da rodada atual (com motivo extraído do marcador) em formato numerado. Inclua na pergunta uma nota explícita de que `"Cancelar tudo"` NÃO desfaz Edits já aplicados (D-10 — Edits são atômicos).
+
+Estrutura literal (substitua os placeholders `<path_K>` e `<motivo_K>` pelos valores reais dos arquivos com status=FALHO; gere quantas linhas numeradas quantos forem os falhos):
+
+```json
+{
+  "questions": [{
+    "question": "Os seguintes arquivos falharam (tentativa <T>/3):\n\n1. `<path_1>` — <motivo_1>\n2. `<path_2>` — <motivo_2>\n\nOs (N-K) arquivos editados com sucesso permanecem alterados em disco. Cancelar interrompe apenas a revisão.\n\nO que deseja fazer?",
+    "header": "Retry",
+    "multiSelect": false,
+    "options": [
+      {"label": "Tentar de novo apenas os falhos", "description": "Re-spawna o docs-editor-conciso somente para os arquivos falhos. Arquivos OK não são tocados."},
+      {"label": "Pular falhos e seguir", "description": "Mantém os falhos como FALHO no resumo final e prossegue para a auditoria dos arquivos OK."},
+      {"label": "Cancelar tudo", "description": "Interrompe o /ei-ajustes. Edits já aplicados NÃO são revertidos (Edit é atômico)."}
+    ]
+  }]
+}
+```
+
+Notas críticas (mesmas do estilo Phase 2):
+- NÃO listar `"Outro"` — a UI adiciona automaticamente.
+- `<T>` no campo question é a tentativa ATUAL para os falhos da rodada (1 na primeira aparição do gate; 2 após o primeiro retry; 3 após o segundo retry — equivalente a `max(retries_por_arquivo[path] for path in falhos_da_rodada) + 1`).
+- `header` deve ter ≤12 caracteres (`"Retry"` tem 5 — OK).
+- Se um arquivo já estourou o cap antes deste AskUserQuestion (mensagem literal já apresentada), ele NÃO aparece na lista numerada do question — só aparecem arquivos com tentativas restantes.
+- Se TODOS os K falhos estouraram o cap simultaneamente, NÃO renderize o AskUserQuestion (não há nada para o usuário decidir) — pule direto para a "Apresentação final".
+
+**Interpretação da resposta do gate:**
+
+- Resposta = `"Tentar de novo apenas os falhos"` → re-spawn (ver subseção "Retry isolado" abaixo). Após o retry, o bloco pós-Tasks do Passo 5 (Plan 01) RERODA com a nova rodada (parsing dos novos marcadores), e se K'>=1 falhos persistirem com retries restantes, ESTE gate REABRE. Loop natural limitado pelo cap por arquivo.
+- Resposta = `"Pular falhos e seguir"` → marque TODOS os falhos restantes como `status_final=PULADO` (mantém `tentativas` atual) e siga para "Apresentação final".
+- Resposta = `"Cancelar tudo"` → marque TODOS os falhos restantes como `status_final=CANCELADO`, marque os OKs como `status_final=OK`, apresente a "Apresentação final" e ENCERRE o `/ei-ajustes` sem ir para o Passo 6 (sem auditoria). Inclua na apresentação a frase: `"Os ${N-K} arquivos editados com sucesso permanecem alterados em disco. Re-rode /ei-ajustes se quiser tentar novamente os falhos."`
+- Resposta = `"Outro"` (texto livre via UI) → **tratar como `"Cancelar tudo"`** (mesma rota; fail-closed — este gate não suporta texto livre).
+- Resposta vazia / `answers={}` / qualquer coisa diferente das acima → **tratar como `"Cancelar tudo"`** (REGRA INVIOLÁVEL — fail-closed, mesmo padrão da Phase 2).
+
+**Retry isolado — re-spawn paralelo dos falhos aprovados (D-12):**
+
+Quando o usuário escolhe `"Tentar de novo apenas os falhos"`:
+
+1. Filtre a lista de falhos para incluir APENAS arquivos com `retries_por_arquivo[path] < 2` (têm retries restantes). Arquivos com cap estourado já foram tratados acima.
+2. Para cada arquivo restante: `retries_por_arquivo[path] += 1`.
+3. Emita **EXATAMENTE N' chamadas paralelas à tool `Agent`** (uma por arquivo restante, `subagent_type: docs-editor-conciso`) na MESMA resposta — segue a REGRA INVIOLÁVEL DO PASSO 5 do Plan 01.
+4. **MESMO prompt do dispatch original** (D-12): mesmo `path`, `secao_tag`, `justificativa`, `descricao`, `objetivo`, `ESCOPO`. NÃO altere o template. NÃO inclua histórico de falhas anteriores no prompt (editor é cego pros irmãos E cego ao seu próprio histórico — cada Task é fresh).
+5. **NÃO re-invoque o `docs-analyzer`** (a análise não falhou — a edição falhou; re-analisar é desperdício e pode mudar a decisão de path/secao_tag o que viola D-12).
+6. **Arquivos com status=OK na rodada anterior NUNCA são re-spawned** — em nenhuma rodada (D-12). Eles seguem direto para o Passo 6 ao final.
+
+Após o re-spawn, o controle volta ao bloco pós-Tasks do Passo 5 (Plan 01) que reroda o parsing dos N' marcadores e gera uma nova lista consolidada da rodada — se ainda houver K'>=1 falhos com retries restantes, este gate REABRE; se K'=0, siga para "Apresentação final".
+
+**Apresentação final (D-16):**
+
+Antes de seguir para o Passo 6 (auditoria — Phase 4) OU de encerrar via "Cancelar tudo", apresente ao usuário um resumo de UMA linha por arquivo da rodada original com o status final consolidado. Formato sugerido (D-16 — wording é discricionário, este é o default):
+
+```
+Resumo final do /ei-ajustes (N={N} arquivos, K_inicial={K}, retries={total_retries}):
+- ✓ `<path1>` — OK (1ª tentativa)
+- ✓ `<path2>` — OK (após 2 tentativas)
+- ✗ `<path3>` — FALHO após 3 tentativas. Re-rode `/ei-ajustes` manualmente.
+- ⊘ `<path4>` — PULADO pelo usuário (motivo: <motivo_da_última_tentativa>)
+- ⊘ `<path5>` — CANCELADO (tudo) (motivo: <motivo_da_última_tentativa>)
+```
+
+Mapeamento dos ícones:
+- `✓` = status_final OK
+- `✗` = status_final FALHO (cap estourado)
+- `⊘` = status_final PULADO ou CANCELADO
+
+Após o resumo:
+- Se houver pelo menos 1 arquivo com `status_final=OK` E o usuário NÃO escolheu "Cancelar tudo" → **siga para o Passo 6** (auditoria via `/ei-review` — Phase 4 ainda vai refatorar isso para fan-out de reviewers).
+- Se TODOS os arquivos terminaram com FALHO/PULADO/CANCELADO → encerre o `/ei-ajustes` sem ir para o Passo 6 (não há nada para auditar).
 
 ### Passo 6: Ativar `/ei-review` automaticamente
 O editor terminará com a mensagem `Edição concluída ... Para validar, ative /ei-review <ALVO> <AGENTE>`. **Você (agente principal) deve então executar `/ei-review <alvo> <agente>` automaticamente** — substitua pelos valores reais. Para multi-agente, use aspas envolvendo cliente+especialidade. Exemplos: `/ei-review malu Qualifier` (single) ou `/ei-review "Brunno Brandi Consumidor" Qualifier` (multi). O `/ei-review` delega ao `docs-reviewer` e retorna o veredicto (APROVADO/REPROVADO).
