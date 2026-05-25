@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.9.1] - 2026-05-25
+## [2.0.0] - 2026-05-25
 
 **Descontinuação completa dos slash commands de mantenedor (`/ei-edit`, `/ei-review`, `/ei-ctx`).** v1.9.0 já tinha tirado os 3 do `manifest.files` (saíram da distribuição npm) e adicionou `deprecated_files` para cleanup proativo nas máquinas dos usuários que vieram de versões antigas. Em v1.9.1 a remoção é completa: os 3 arquivos saem do repo source também, e o array `deprecated_files` é removido do manifest (cleanup já aconteceu em v1.9.0). Toda a funcionalidade que dependia desses comandos foi reorganizada — auditoria de templates passa a ser operação manual do mantenedor dentro do clone, e o pipeline automatizado de cliente roda exclusivamente via `/ei-ajustes`.
 
