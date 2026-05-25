@@ -121,7 +121,10 @@ ${COLORS.yellow}Uso:${COLORS.reset}
 
 ${COLORS.yellow}Arquivos instalados/atualizados:${COLORS.reset}
 ${manifest.files.map((f) => `  - ${f}`).join("\n")}
-`);
+${manifest.deprecated_files && manifest.deprecated_files.length ? `
+${COLORS.yellow}Arquivos removidos (legados):${COLORS.reset}
+${manifest.deprecated_files.map((f) => `  - ${f}`).join("\n")}
+` : ""}`);
 }
 
 const cmd = process.argv[2];
