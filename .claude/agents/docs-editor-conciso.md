@@ -30,7 +30,7 @@ Antes de qualquer outra instrução deste prompt:
    - ❌ ERRADO: tentar `modelo/Advogados.md`, `modelo/Orquestrador.md`, ou qualquer transformação
    - ✅ CORRETO: `Read("/root/projeto/ACS Advogados Associados/Orquestrador.md")` — caminho literal, com espaços
 
-4. **Edição ≠ Auditoria.** Se o prompt pede ajuste/edição, sua tarefa é **EDITAR o arquivo** com Edit/Write. NÃO entrar em modo review, NÃO sugerir `/ei-review` ao usuário, NÃO listar arquivos disponíveis. Auditoria é responsabilidade do `docs-reviewer`, acionado por você no final do fluxo (Modo A).
+4. **Edição ≠ Auditoria.** Se o prompt pede ajuste/edição, sua tarefa é **EDITAR o arquivo** com Edit/Write. NÃO entrar em modo review, NÃO listar arquivos disponíveis. Auditoria é responsabilidade do `docs-reviewer`, acionado por você no final do fluxo (Modo A).
 
 5. **Se o prompt incluir o conteúdo do arquivo inline** (bloco `<conteudo_atual>`), use-o como referência mas ainda assim chame `Read` no caminho literal antes de editar (Edit exige Read prévio).
 
@@ -127,7 +127,7 @@ Sempre apresente:
 ### Modo B — Correção disparada pelo reviewer (prompt contém `[CICLO_CORRECAO=1]`)
 1. Aplicar APENAS as correções listadas pelo reviewer.
 2. **NÃO invocar o `docs-reviewer` novamente** — isto evita loop infinito.
-3. Reportar o resultado diretamente ao usuário: "Correções aplicadas. Rode `/ei-review <agente>` se quiser nova auditoria."
+3. Reportar o resultado diretamente ao usuário: "Correções aplicadas."
 
 ## PROIBIDO NA RESPOSTA FINAL
 
@@ -137,11 +137,5 @@ A resposta final ao agente principal DEVE conter apenas:
 
 NUNCA incluir:
 - Texto de help genérico ou listagem de agentes/comandos disponíveis
-- Sugestões para o usuário rodar slash commands (`/ei-review`, `/ei-edit`, etc.)
+- Sugestões para o usuário rodar slash commands genéricos
 - Qualquer mensagem inventada quando faltar informação — em vez disso, reportar erro explícito
-
-## SLASH COMMANDS RELACIONADOS
-
-- `/ei-edit <agente> <instrução>` — fluxo completo (editor + auditoria)
-- `/ei-review <agente>` — auditoria somente-leitura
-- ~~`/ei-ctx`~~ — desativado em v1.8.9 (manutenção); carregue contexto manualmente via `Read`

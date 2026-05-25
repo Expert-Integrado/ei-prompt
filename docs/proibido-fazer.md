@@ -4,12 +4,11 @@
 
 ## Regra Inviolável: `modelo/` é Read-Only
 
-**NUNCA fazer alterações nos arquivos dentro da pasta `modelo/`.** Os templates base são imutáveis.
+**NUNCA fazer alterações nos arquivos dentro da pasta `modelo/`.** Os templates base são imutáveis no fluxo distribuído.
 
 - Todas as alterações vão na pasta do cliente específico (ex: `malu/`, `joao/`) via `/ei-ajustes <cliente> <descrição>`.
 - Para criar novo cliente: `/ei-cria-cliente <nome>` — ele copia `modelo/` sem alterar.
-- `/ei-review` pode **auditar** `modelo/*.md` em modo leitura, mas **nunca editar**.
-- Edição autorizada em `modelo/` só via `/ei-edit <agente> <instrução>` (que dispara editor + auditor).
+- Edição de templates em `modelo/` (quando necessária) é feita pelo mantenedor diretamente no clone do repo source, fora dos comandos públicos.
 
 ## O que NÃO pode ser ajustado via prompts
 

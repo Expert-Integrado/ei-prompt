@@ -22,7 +22,7 @@ Os arquivos são baixados do repo [`Expert-Integrado/ei-prompt`](https://github.
 - `.claude/agents/*.md` — subagentes (scaffolder, editor, reviewer)
 - `.claude/settings.json` — configuração dos hooks
 - `.claude/hooks/*.sh` — scripts que injetam contexto automaticamente
-- `.claude/commands/ei-*.md` — slash commands (`/ei-cria-cliente`, `/ei-ajustes`, `/ei-edit`, `/ei-review`; `/ei-ctx` desativado em v1.8.9 — em manutenção)
+- `.claude/commands/ei-*.md` — slash commands `/ei-cria-cliente`, `/ei-ajustes`, `/ei-update`.
 
 ## Como funciona
 
