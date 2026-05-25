@@ -26,10 +26,5 @@
     ".claude/commands/ei-cria-cliente.md",
     ".claude/commands/ei-ajustes.md",
     ".claude/commands/ei-update.md"
-  ],
-  "deprecated_files": [
-    ".claude/commands/ei-edit.md",
-    ".claude/commands/ei-review.md",
-    ".claude/commands/ei-ctx.md"
   ]
 }

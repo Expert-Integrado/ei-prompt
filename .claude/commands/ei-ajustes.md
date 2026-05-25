@@ -330,9 +330,7 @@ AO FINALIZAR (OVERRIDE do Modo A do FINALIZAÇÃO — D-08): NÃO invoque o `doc
    - Se NÃO conseguiu aplicar (arquivo não encontrado pelo Read, seção não encontrada no arquivo, ajuste fora do escopo declarado em ESCOPO, exceção em Edit/Write, qualquer outro impedimento), emita LITERALMENTE: `<resultado>ERRO: <motivo curto, UMA linha, sem quebras de linha></resultado>` (ex: `<resultado>ERRO: Seção <perguntas_iniciais> não encontrada em Orquestrador.md</resultado>`)
 
 2. SEGUNDA linha (aviso ao agente principal — mantido do fluxo atual):
-   > Edição concluída em `<CAMINHO_ABSOLUTO_DO_PASSO_2>`. Para validar, ative `/ei-review <ALVO> <AGENTE>` — o `docs-reviewer` fará a auditoria.
-
-(Substitua `<ALVO>` pelo cliente — ou `"<cliente> <especialidade>"` (com aspas) se multi-agente — e `<AGENTE>` pelo nome do agente. Ex single: `/ei-review malu Qualifier`. Ex multi: `/ei-review "Brunno Brandi Consumidor" Qualifier`.)
+   > Edição concluída em `<CAMINHO_ABSOLUTO_DO_PASSO_2>`. Auditoria automática roda em seguida via `docs-reviewer` no Passo 6.
 
 ⚠️ NUNCA omita o marcador `<resultado>...</resultado>`. NUNCA inverta a ordem (marcador SEMPRE antes do aviso). NUNCA emita `<resultado>OK</resultado>` se Edit/Write falhou ou se o ajuste teve que sair da seção declarada — nesses casos use a forma `<resultado>ERRO: ...</resultado>` com motivo curto.
 ```
@@ -480,7 +478,7 @@ Mapeamento dos ícones:
 - `⊘` = status_final PULADO ou CANCELADO
 
 Após o resumo:
-- Se houver pelo menos 1 arquivo com `status_final=OK` E o usuário NÃO escolheu "Cancelar tudo" → **siga para o Passo 6** (auditoria via `/ei-review` — Phase 4 ainda vai refatorar isso para fan-out de reviewers).
+- Se houver pelo menos 1 arquivo com `status_final=OK` E o usuário NÃO escolheu "Cancelar tudo" → **siga para o Passo 6** (fan-out paralelo de `docs-reviewer` com contexto cruzado).
 - Se TODOS os arquivos terminaram com FALHO/PULADO/CANCELADO → encerre o `/ei-ajustes` sem ir para o Passo 6 (não há nada para auditar).
 
 ### Passo 6: Despachar `docs-reviewer` em paralelo (fan-out cross-context)
@@ -760,5 +758,5 @@ Após o resumo, encerre `/ei-ajustes`. NÃO há próximo passo automático nesta
 ## Regras
 
 - NUNCA edite o arquivo diretamente — sempre via `docs-editor-conciso`.
-- NUNCA aplique ajuste em `modelo/*.md` neste comando (use `/ei-edit` para isso).
+- NUNCA aplique ajuste em `modelo/*.md` neste comando — templates são read-only no fluxo distribuído.
 - Se a pasta do cliente não existir, sugerir `/ei-cria-cliente <nome>` antes.

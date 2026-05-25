@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.1] - 2026-05-25
+
+**Descontinuação completa dos slash commands de mantenedor (`/ei-edit`, `/ei-review`, `/ei-ctx`).** v1.9.0 já tinha tirado os 3 do `manifest.files` (saíram da distribuição npm) e adicionou `deprecated_files` para cleanup proativo nas máquinas dos usuários que vieram de versões antigas. Em v1.9.1 a remoção é completa: os 3 arquivos saem do repo source também, e o array `deprecated_files` é removido do manifest (cleanup já aconteceu em v1.9.0). Toda a funcionalidade que dependia desses comandos foi reorganizada — auditoria de templates passa a ser operação manual do mantenedor dentro do clone, e o pipeline automatizado de cliente roda exclusivamente via `/ei-ajustes`.
+
+- **`.claude/commands/ei-edit.md`, `ei-review.md`, `ei-ctx.md`:** deletados via `git rm` (não existem mais nem no source).
+- **`manifest.json`:** array `deprecated_files` removido. v1.9.0 já fez a limpeza em máquinas existentes; cleanup loop em `bin/cli.js` simplesmente no-op se o campo estiver ausente (Array.isArray guard preserva compat).
+- **`CLAUDE.md`:** removida a nota "Comandos internos (mantenedor)"; warning de `/ei-ctx` desativado também sai (só hook `inject-ei-context.sh` permanece mencionado como em manutenção). Hook `post-scaffolder-review.sh` perde menção a `/ei-edit legado`.
+- **`COMANDOS.md`:** rewrite — removidas as seções `/ei-edit`, `/ei-review`, `/ei-ctx` inteiras e o índice "Comandos internos". Só os 3 públicos (`/ei-cria-cliente`, `/ei-ajustes`, `/ei-update`) + tabela de hooks + agentes.
+- **`README.md`:** linha de slash commands não menciona mais os internos.
+- **`docs/proibido-fazer.md`:** regra `modelo/ read-only` reescrita sem referenciar `/ei-edit` / `/ei-review`. Edição de templates passa a ser "operação manual do mantenedor no clone do repo source".
+- **`.claude/agents/docs-reviewer.md`:** removida seção "SLASH COMMANDS RELACIONADOS"; mensagens de output não sugerem mais `/ei-review` / `/ei-edit`.
+- **`.claude/agents/docs-editor-conciso.md`:** removida seção "SLASH COMMANDS RELACIONADOS"; mensagens não sugerem mais slash commands específicos.
+- **`.claude/commands/ei-ajustes.md`:** mensagem pós-edit (linha 333) não menciona mais `/ei-review`; nota Phase 4 (linha 483) atualizada; regra "NUNCA aplique em `modelo/`" reescrita sem referência a `/ei-edit`.
+- **Compat:** zero impacto em usuários finais — esses comandos já não eram distribuídos desde v1.9.0. Usuários que ainda tiverem os arquivos legados em suas máquinas devem rodar `npx @expertzinhointegrado/ei-prompt@1.9.0` UMA VEZ antes de migrar para v1.9.1+ (v1.9.0 ainda executa o cleanup).
+
 ## [1.9.0] - 2026-05-25
 
 **Distribuição completa do pipeline novo `/ei-ajustes` (analyzer + parallel editors/reviewers + hook automático) + split público/interno dos slash commands + cleanup proativo de comandos legados.** Comandos de mantenedor (`/ei-edit`, `/ei-review`, `/ei-ctx`) deixam de ser distribuídos via `npx ei-prompt` — saem do `manifest.json`. Permanecem no repo source (intocados) e seguem invocáveis pelo mantenedor operando dentro do clone do repositório. Usuários finais agora veem na paleta apenas `/ei-cria-cliente`, `/ei-ajustes` e `/ei-update`. **`/ei-ajustes` ganha pipeline novo end-to-end:** subagente `docs-analyzer` identifica arquivo+seção, gate de aprovação `AskUserQuestion`, fan-out paralelo de editores (`docs-editor-conciso`), revisão paralela cross-context (`docs-reviewer`) e transição editor→reviewer via hook `Stop` (`post-ajustes-fanout.sh`).

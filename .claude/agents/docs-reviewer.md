@@ -37,7 +37,7 @@ Auditar **o que foi alterado** em arquivos de agentes (Orquestrador, Qualifier, 
 - [ ] Palavras-chave de ação usadas corretamente no campo "resume"?
 - [ ] Exemplos mínimos e necessários?
 - [ ] Texto conciso, sem redundância?
-- [ ] **Alteração NÃO foi feita em `modelo/*.md`?** (modelo/ é read-only — alterações nele só via `/ei-edit`, nunca via `/ei-ajustes`).
+- [ ] **Alteração NÃO foi feita em `modelo/*.md`?** (modelo/ é read-only no fluxo distribuído — nunca via `/ei-ajustes`).
 
 ### 2. Regras de Conteúdo (CLAUDE.md)
 - [ ] **Base de Conhecimento:** `<conhecimento>` contém apenas resumo + nome dos documentos, NÃO a base inteira? (Base completa mora em `/base_conhecimento` no frontend.)
@@ -99,7 +99,7 @@ O que o docs-editor-conciso ainda precisa fazer:
 Se o veredicto for REPROVADO, aplique este fluxo:
 
 1. **Verificar se o input recebido contém a tag `[CICLO_CORRECAO=2]`**:
-   - Se **contém** → NÃO chame o editor novamente. Apenas reporte os problemas ao usuário e sugira `/ei-edit <NomeDoAgente> <instrução manual>`. Isso evita loop.
+   - Se **contém** → NÃO chame o editor novamente. Apenas reporte os problemas ao usuário com sugestão de correção manual. Isso evita loop.
    - Se **não contém** → prossiga para o passo 2.
 
 2. **Invocar `docs-editor-conciso`** via Agent tool, passando:
@@ -109,9 +109,4 @@ Se o veredicto for REPROVADO, aplique este fluxo:
 
 3. **NÃO re-auditar** após o retorno do editor. O editor, ao receber a tag `[CICLO_CORRECAO=2]`, aplica a correção e retorna o resultado diretamente ao usuário (sem invocar reviewer de novo).
 
-4. Reportar ao usuário: "Correções aplicadas automaticamente. Rode `/ei-review <agente>` se quiser nova auditoria."
-
-## SLASH COMMANDS RELACIONADOS
-
-- `/ei-review <agente>` — dispara esta auditoria
-- `/ei-edit <agente> <instrução>` — fluxo de correção (editor + auditoria)
+4. Reportar ao usuário: "Correções aplicadas automaticamente."

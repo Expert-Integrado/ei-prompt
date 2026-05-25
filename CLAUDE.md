@@ -2,7 +2,7 @@
 
 > CLAUDE.md é o **índice geral**. Regras detalhadas estão fracionadas em `docs/`.
 >
-> ⚠️ **v1.8.9:** Sistema de injeção automática de contexto (hook `inject-ei-context.sh` + slash command `/ei-ctx`) **desativado para manutenção**. Carregue manualmente via `Read` os arquivos da tabela abaixo + `CLAUDE.md`.
+> ⚠️ **v1.8.9:** Sistema de injeção automática de contexto (hook `inject-ei-context.sh`) **desativado para manutenção**. Carregue manualmente via `Read` os arquivos da tabela abaixo + `CLAUDE.md`.
 
 ## Mapa de Regras
 
@@ -67,8 +67,6 @@ Cliente Multi/
 | `/ei-ajustes "<cliente> <especialidade>" <descrição>` | _(Multi-agente)_ Aspas em volta de cliente+especialidade. Ex: `/ei-ajustes "Brunno Brandi Consumidor" a IA está falando sobre valores` |
 | `/ei-update` | Re-executa `npx @expertzinhointegrado/ei-prompt@latest` na pasta atual e mostra o CHANGELOG da versão mais nova |
 
-**Comandos internos (mantenedor):** `/ei-edit`, `/ei-review`, `/ei-ctx` permanecem disponíveis no clone do repo source (ver [`COMANDOS.md`](COMANDOS.md)). Não são distribuídos via `npx ei-prompt` para usuários finais. `/ei-ctx` segue desativado para manutenção (v1.8.9).
-
 ## Regras Básicas
 
 - **Edição de agentes:** sempre via `docs-editor-conciso`. Caminho exato recebido, sem trocar extensão (`.md` e `.txt` são iguais).
@@ -76,7 +74,7 @@ Cliente Multi/
 - **Aprovação humana (gate-duro):** entre análise e edição, `/ei-ajustes` apresenta um `AskUserQuestion` (Passo 3.5) com a recomendação do analyzer; sem resposta explícita de "Aprovar e editar" (caminho edit) ou "Confirmar" (caminho clarify/gate duplo), nenhum `docs-editor-conciso` é acionado. Detalhe em `.claude/commands/ei-ajustes.md` (Passo 3.5).
 - **Edição paralela (fan-out v3):** quando a aprovação envolve N≥1 arquivos, `/ei-ajustes` despacha N instâncias paralelas de `docs-editor-conciso` em UMA única resposta (Passo 5). Cada editor emite `<resultado>OK</resultado>` ou `<resultado>ERRO: …</resultado>`; falhas oferecem retry isolado (cap de 2 retries por arquivo). Detalhe em `.claude/commands/ei-ajustes.md` (Passo 5).
 - **Revisão paralela cross-context:** após o fan-out de editores (Passo 5), `/ei-ajustes` despacha M instâncias paralelas de `docs-reviewer` em UMA única resposta (Passo 6), cada uma recebendo `<contexto_cruzado>` com os M-1 irmãos da rodada. Cada reviewer emite `<veredito>OK|CORRECAO|BLOQUEAR</veredito>` + `<feedback>`; CORRECAO dispara re-edit + re-fan-out COMPLETO dos M reviewers (cap de 2 correções por arquivo). Detalhe em `.claude/commands/ei-ajustes.md` (Passo 6).
-- **Pipeline via hook (Stop event):** ao fim do fan-out de editores no Passo 5, o hook `.claude/hooks/post-ajustes-fanout.sh` (registrado no `.claude/settings.json` no evento `Stop`) detecta o sentinela `<ei-ajustes-round id=...>` no transcript e injeta `reason` (schema correto do Stop event — não `additionalContext`) instruindo o main Claude a emitir `<ei-ajustes-round-consumed id=...>` e prosseguir ao Passo 6. Protocolo sentinela ↔ consumed é stateless (zero arquivo de estado), idempotente, e re-dispara em CADA novo dispatch (retry PARL-04, correção REVW-04). Fallback é o **ESTADO PADRÃO**: se o hook não acionar (desabilitado / com bug / settings sem o bloco Stop), o `/ei-ajustes` continua manual como Phase 4 e adiciona a nota D-17 no resumo final. Hook antigo `.claude/hooks/post-scaffolder-review.sh` (SubagentStop, `/ei-edit` legado + `client-project-scaffolder`) ganha guarda silenciosa que detecta o sentinela e sai exit 0 (D-11 — coexistência sem conflito). Detalhe em `.claude/commands/ei-ajustes.md` (Passo 5 REGRA INVIOLÁVEL HOOK-02 + Passo 6 REGRA INVIOLÁVEL HOOK-02).
+- **Pipeline via hook (Stop event):** ao fim do fan-out de editores no Passo 5, o hook `.claude/hooks/post-ajustes-fanout.sh` (registrado no `.claude/settings.json` no evento `Stop`) detecta o sentinela `<ei-ajustes-round id=...>` no transcript e injeta `reason` (schema correto do Stop event — não `additionalContext`) instruindo o main Claude a emitir `<ei-ajustes-round-consumed id=...>` e prosseguir ao Passo 6. Protocolo sentinela ↔ consumed é stateless (zero arquivo de estado), idempotente, e re-dispara em CADA novo dispatch (retry PARL-04, correção REVW-04). Fallback é o **ESTADO PADRÃO**: se o hook não acionar (desabilitado / com bug / settings sem o bloco Stop), o `/ei-ajustes` continua manual como Phase 4 e adiciona a nota D-17 no resumo final. Hook antigo `.claude/hooks/post-scaffolder-review.sh` (SubagentStop, `client-project-scaffolder`) ganha guarda silenciosa que detecta o sentinela e sai exit 0 (D-11 — coexistência sem conflito). Detalhe em `.claude/commands/ei-ajustes.md` (Passo 5 REGRA INVIOLÁVEL HOOK-02 + Passo 6 REGRA INVIOLÁVEL HOOK-02).
 - **Auditoria:** sempre via `docs-reviewer` após edição.
 - **`modelo/` é read-only.** Detalhes em [`docs/proibido-fazer.md`](docs/proibido-fazer.md).
 - **Princípios de edição:** ver [`docs/regras-edicao.md`](docs/regras-edicao.md).
