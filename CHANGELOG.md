@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.0] - 2026-05-24
+
+**Split público/interno dos slash commands + cleanup proativo de comandos legados.** Comandos de mantenedor (`/ei-edit`, `/ei-review`, `/ei-ctx`) deixam de ser distribuídos via `npx ei-prompt` — saem do `manifest.json`. Permanecem no repo source (intocados) e seguem invocáveis pelo mantenedor operando dentro do clone do repositório. Usuários finais agora veem na paleta apenas `/ei-cria-cliente`, `/ei-ajustes` e `/ei-update`.
+
+- **`manifest.json`:** removidas 3 entradas de `files` (`.claude/commands/ei-edit.md`, `ei-review.md`, `ei-ctx.md`). Novo campo aditivo `deprecated_files` lista os mesmos 3 paths para cleanup proativo. Schema mantém compat com CLIs anteriores (campo novo é ignorado pelo cli.js antigo).
+- **`bin/cli.js`:** nova função `removeFile(relPath)` (paralela a `writeFile`) faz `fs.unlinkSync` em paths declarados em `manifest.deprecated_files`, antes do loop principal de download. Fail-soft em erro (warning + continue, nunca aborta). Resumo final ganha contador `removidos`. Zero nova dependência (mantém constraint zero-deps).
+- **`CLAUDE.md`:** tabela "Slash Commands" reduzida aos 3 públicos + nota "Comandos internos (mantenedor)" com link para `COMANDOS.md`.
+- **`COMANDOS.md`:** novo índice no topo separando "Comandos públicos" de "Comandos internos (mantenedor)". Seções detalhadas dos comandos internos ganham callout explícito ("Comando interno (mantenedor). Não distribuído via `npx ei-prompt`...") sem perder a referência completa para o mantenedor.
+- **`README.md`:** linha de slash commands aponta só os públicos e menciona explicitamente que comandos de mantenedor não são distribuídos.
+- **Compat:** sintaxe `/ei-ajustes <cliente> <descrição>` e `/ei-ajustes "<cliente> <especialidade>" <descrição>` inalteradas. Clientes legados (`malu/`, `Brunno Brandi/Consumidor/`) passam pelo novo fluxo sem migração manual.
+
 ## [1.8.9] - 2026-05-23
 
 **Sistema de injeção automática de contexto desativado para manutenção.** O hook `inject-ei-context.sh`, o slash command `/ei-ctx` e todas as chamadas explícitas em commands/agents foram neutralizadas. Carregamento de contexto agora é manual via `Read` até a manutenção ser concluída.
