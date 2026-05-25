@@ -2,7 +2,7 @@
 
 > **Nota:** este arquivo é documentação interna do repositório. **Não é publicado no npm nem distribuído via `ei-prompt install`.**
 
-Todos os comandos rodam dentro do Claude Code (após instalar o pacote via `npx @expertzinhointegrado/ei-prompt@latest`).
+Todos os comandos rodam dentro do Claude Code. Os comandos públicos vêm instalados via `npx @expertzinhointegrado/ei-prompt@latest`; os comandos internos (mantenedor) ficam disponíveis quando o Claude Code é aberto dentro do clone do repo source.
 
 ## Comandos públicos (distribuídos via `npx ei-prompt`)
 
