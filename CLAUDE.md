@@ -65,9 +65,9 @@ Cliente Multi/
 | `/ei-cria-cliente <nome>` | Cria novo projeto de cliente (single ou multi-agente). Ex: `/ei-cria-cliente malu` |
 | `/ei-ajustes <cliente> <descrição>` | Aplica ajuste em agente de cliente existente. Ex: `/ei-ajustes malu a ia esta falando sobre valores` |
 | `/ei-ajustes "<cliente> <especialidade>" <descrição>` | _(Multi-agente)_ Aspas em volta de cliente+especialidade. Ex: `/ei-ajustes "Brunno Brandi Consumidor" a IA está falando sobre valores` |
-| `/ei-edit <agente> <instrução>` | Edita template em `modelo/*.md` (editor + auditoria automática) |
-| `/ei-review <alvo> <agente>` | Audita um agente (template ou cliente) — somente leitura. Ex single: `/ei-review malu Qualifier`. Ex multi: `/ei-review "Brunno Brandi Consumidor" Qualifier`. |
-| ~~`/ei-ctx`~~ | **Desativado em v1.8.9 (manutenção).** Carregue contexto manualmente via `Read`. |
+| `/ei-update` | Re-executa `npx @expertzinhointegrado/ei-prompt@latest` na pasta atual e mostra o CHANGELOG da versão mais nova |
+
+**Comandos internos (mantenedor):** `/ei-edit`, `/ei-review`, `/ei-ctx` permanecem disponíveis no clone do repo source (ver [`COMANDOS.md`](COMANDOS.md)). Não são distribuídos via `npx ei-prompt` para usuários finais. `/ei-ctx` segue desativado para manutenção (v1.8.9).
 
 ## Regras Básicas
 
