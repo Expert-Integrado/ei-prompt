@@ -56,11 +56,33 @@ async function writeFile(relPath, content, { overwrite }) {
   return exists ? "updated" : "added";
 }
 
+function removeFile(relPath) {
+  const dest = path.join(process.cwd(), relPath);
+  if (!fs.existsSync(dest)) {
+    return "absent";
+  }
+  try {
+    fs.unlinkSync(dest);
+    log("red", "remove", `${relPath} ${COLORS.dim}(deprecated)${COLORS.reset}`);
+    return "removed";
+  } catch (err) {
+    log("yellow", "warn  ", `não removi ${relPath}: ${err.message} ${COLORS.dim}(continuando)${COLORS.reset}`);
+    return "warn";
+  }
+}
+
 async function run({ overwrite }) {
   log("cyan", "ei-prompt", `baixando de ${manifest.repo}@${manifest.branch}`);
   console.log();
 
-  const results = { added: 0, updated: 0, unchanged: 0, skipped: 0, failed: 0 };
+  const results = { added: 0, updated: 0, unchanged: 0, skipped: 0, failed: 0, removed: 0 };
+
+  const deprecated = Array.isArray(manifest.deprecated_files) ? manifest.deprecated_files : [];
+  for (const file of deprecated) {
+    const status = removeFile(file);
+    if (status === "removed") results.removed++;
+    // status === "absent" ou "warn" não conta no agregador (silencioso ou já logou warning)
+  }
 
   for (const file of manifest.files) {
     try {
@@ -77,7 +99,7 @@ async function run({ overwrite }) {
   log(
     "green",
     "pronto",
-    `${results.added} adicionados, ${results.updated} atualizados, ${results.unchanged} sem mudanças, ${results.skipped} ignorados, ${results.failed} falhas`,
+    `${results.added} adicionados, ${results.updated} atualizados, ${results.unchanged} sem mudanças, ${results.skipped} ignorados, ${results.removed} removidos, ${results.failed} falhas`,
   );
 
   if (results.failed > 0) process.exit(1);
