@@ -4,6 +4,20 @@
 
 Todos os comandos rodam dentro do Claude Code (após instalar o pacote via `npx @expertzinhointegrado/ei-prompt@latest`).
 
+## Comandos públicos (distribuídos via `npx ei-prompt`)
+
+- [`/ei-cria-cliente`](#ei-cria-cliente-nome) — cria novo projeto de cliente
+- [`/ei-ajustes`](#ei-ajustes-cliente-descrição) — aplica ajuste em agente de cliente existente
+- [`/ei-update`](#ei-update) — re-executa o CLI e mostra o CHANGELOG da versão mais nova
+
+## Comandos internos (mantenedor)
+
+> Estes comandos **não são distribuídos via `npx ei-prompt`**. Permanecem no repositório (`.claude/commands/ei-edit.md`, `ei-review.md`, `ei-ctx.md`) e são invocados **operando dentro do clone do repo source** (`~/EiPrompt/` ou onde o mantenedor tenha clonado). Quando o mantenedor abre o Claude Code no clone, os comandos aparecem na paleta normalmente.
+
+- [`/ei-edit`](#ei-edit-agente-instrução) — edita template em `modelo/*.md`
+- [`/ei-review`](#ei-review-agente) — audita agente (read-only)
+- [`/ei-ctx`](#ei-ctx--desativado-em-v189) — DESATIVADO em v1.8.9 (manutenção)
+
 ---
 
 ## `/ei-cria-cliente <nome>`
@@ -63,7 +77,7 @@ Aplica um ajuste em um agente de cliente **já existente** (não em `modelo/`).
 
 ## `/ei-edit <agente> <instrução>`
 
-> ⚠️ **Aviso:** edita arquivos em `modelo/`. O CLAUDE.md marca `modelo/` como read-only, então prefira `/ei-ajustes` para mudanças de cliente. Use `/ei-edit` apenas quando quiser mudar o template base (raro).
+> ⚠️ **Comando interno (mantenedor).** Não distribuído via `npx ei-prompt`; só disponível no clone do repo source. Edita arquivos em `modelo/` (CLAUDE.md marca como read-only no fluxo de cliente). Use apenas quando quiser mudar o template base — para ajustes em cliente, use `/ei-ajustes`.
 
 **Uso:**
 ```
@@ -81,6 +95,8 @@ Aplica um ajuste em um agente de cliente **já existente** (não em `modelo/`).
 ---
 
 ## `/ei-review <agente>`
+
+> ⚠️ **Comando interno (mantenedor).** Não distribuído via `npx ei-prompt`; só disponível no clone do repo source.
 
 Auditoria **somente-leitura** de um template em `modelo/`. Não edita nada.
 
@@ -100,6 +116,8 @@ Auditoria **somente-leitura** de um template em `modelo/`. Não edita nada.
 
 ## ~~`/ei-ctx`~~ — DESATIVADO em v1.8.9
 
+> ⚠️ **Comando interno (mantenedor).** Não distribuído via `npx ei-prompt`; só disponível no clone do repo source.
+>
 > Sistema de injeção automática de contexto está em **manutenção** desde v1.8.9. O slash command `/ei-ctx` e os hooks que chamavam `inject-ei-context.sh` foram temporariamente desligados.
 
 **Substituição manual:** carregue via `Read` os arquivos:
