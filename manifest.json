@@ -17,10 +17,12 @@
     ".claude/agents/recepcionista-scaffolder.md",
     ".claude/agents/docs-editor-conciso.md",
     ".claude/agents/docs-reviewer.md",
+    ".claude/agents/docs-analyzer.md",
     ".claude/settings.json",
     ".claude/hooks/inject-ei-context.sh",
     ".claude/hooks/prompt-matches-agent.sh",
     ".claude/hooks/post-scaffolder-review.sh",
+    ".claude/hooks/post-ajustes-fanout.sh",
     ".claude/commands/ei-cria-cliente.md",
     ".claude/commands/ei-ajustes.md",
     ".claude/commands/ei-update.md"
