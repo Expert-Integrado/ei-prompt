@@ -57,7 +57,13 @@ async function writeFile(relPath, content, { overwrite }) {
 }
 
 function removeFile(relPath) {
-  const dest = path.join(process.cwd(), relPath);
+  const cwd = process.cwd();
+  const dest = path.resolve(cwd, relPath);
+  // Defense-in-depth: bloqueia path traversal via '..' em manifest comprometido
+  if (!dest.startsWith(cwd + path.sep) && dest !== cwd) {
+    log("yellow", "warn  ", `path fora do CWD ignorado: ${relPath} ${COLORS.dim}(continuando)${COLORS.reset}`);
+    return "warn";
+  }
   if (!fs.existsSync(dest)) {
     return "absent";
   }
