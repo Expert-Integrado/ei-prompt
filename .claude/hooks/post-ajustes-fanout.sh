@@ -36,11 +36,14 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 # 3) Janela do turno atual: últimas 400 linhas do transcript JSONL (tail aproximado;
 #    abordagem mais robusta de filtrar por requestId está documentada em RESEARCH Pitfall 6
 #    como melhoria futura — tail -n 400 + idempotência por id é suficiente na prática).
-#    NORMALIZAÇÃO JSONL (CR-01 fix): o conteúdo de mensagens assistant é armazenado como
-#    string JSON-escapada — `"` dentro do conteúdo vira `\"`. Normalizamos `\"` → `"` no
-#    tail para que os greps abaixo (que procuram `<ei-ajustes-round id="..."/>`) casem.
+#    FILTRO type:assistant (Phase 5 fix iter 3): considerar APENAS mensagens do assistant.
+#    O sentinela é emitido pelo main Claude em texto livre — vive em `"type":"assistant"`.
+#    Tool results (que carregam conteúdo de PLAN.md/CONTEXT.md com placeholders e regex
+#    pattern literal) são `"type":"user"` no JSONL e NÃO devem disparar o hook.
+#    NORMALIZAÇÃO JSONL (CR-01 fix): conteúdo de mensagens assistant é string JSON-escapada
+#    — `"` vira `\"`. Normalizamos `\"` → `"` para que os greps abaixo casem.
 #    Idempotente: sed é no-op se o conteúdo já estiver não-escapado.
-TAIL=$(tail -n 400 "$TRANSCRIPT" | sed 's/\\"/"/g')
+TAIL=$(tail -n 400 "$TRANSCRIPT" | grep '"type":"assistant"' | sed 's/\\"/"/g')
 
 # 4) Extrair o ÚLTIMO sentinela emitido no tail.
 #    Regex RESTRITA ao formato canônico cravado na REGRA INVIOLÁVEL HOOK-02 do Passo 5:

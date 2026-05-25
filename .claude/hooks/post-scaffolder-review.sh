@@ -60,7 +60,9 @@ JSON
     # NORMALIZAÇÃO JSONL (CR-01 fix): conteúdo de mensagens assistant é JSON-escapado
     # (`"` vira `\"`). Normalizamos antes dos greps para que `<ei-ajustes-round id="..."/>`
     # case. Idempotente (sed no-op se já não-escapado). Espelha fix de post-ajustes-fanout.sh.
-    TAIL_AJUSTES=$(tail -n 400 "$TRANSCRIPT" | sed 's/\\"/"/g')
+    # Filtro type:assistant (Phase 5 fix iter 3): tool_results carregando PLAN.md/CONTEXT.md
+    # com placeholders e regex pattern são "type":"user" — não contam como emissão real.
+    TAIL_AJUSTES=$(tail -n 400 "$TRANSCRIPT" | grep '"type":"assistant"' | sed 's/\\"/"/g')
     # Regex RESTRITA ao formato canônico (mesma da post-ajustes-fanout.sh):
     # `id="round-<unix>-<3alfanum>"`. Evita falso-positivo contra placeholders e
     # fragmentos de regex em transcripts não-/ei-ajustes (orquestrador discutindo o hook).
