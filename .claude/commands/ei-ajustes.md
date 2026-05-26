@@ -81,7 +81,7 @@ Aplique seu fluxo de análise e devolva APENAS o XML conforme seu <formato_respo
    - Extrair `<decisao>` (`edit` ou `clarify`).
    - Extrair `<confianca>` (`alta`, `media`, `baixa`).
    - Se `<decisao>edit</decisao>`: extrair **TODOS** os elementos `<arquivo>` em ordem (não apenas o primeiro). Para cada um, capturar `<path>`, `<secao_tag>`, `<secao_descricao>`, `<justificativa>`. Esta lista completa vai inteira para o Passo 3.5 e é apresentada ao usuário em UMA única tela (APPR-03 — D-04 tudo-ou-nada).
-   - Se `<decisao>clarify</decisao>`: extrair TODAS as `<opcao>` dentro de `<opcoes_correcao>` (id, titulo, arquivo, secao_tag). Ignore a opção `id="outro"` ao construir as options do AskUserQuestion — a UI adiciona "Outro" automaticamente (D-05).
+   - Se `<decisao>clarify</decisao>`: extrair TODAS as `<opcao>` dentro de `<opcoes_correcao>` (id, titulo, descricao_leiga, arquivo, secao_tag). `<descricao_leiga>` é o texto em PT-BR comum (sem jargão) que aparece no `description` do AskUserQuestion do [B] — D-22. Se ausente (analyzer antigo), fallback usa `<titulo>` repetido. Ignore a opção `id="outro"` ao construir as options do AskUserQuestion — a UI adiciona "Outro" automaticamente (D-05).
    - Se a resposta NÃO for XML parseável, estiver vazia, ou não contiver `<decisao>` → **PARAR aqui** e seguir para o caminho ERRO do Passo 3.5 (falha-fechado D-13).
 
 5. **Roteamento para o Passo 3.5 (gate de aprovação):**
@@ -143,21 +143,23 @@ Notas críticas:
 
 Quando `<decisao>clarify</decisao>` (confiança media ou baixa), o analyzer já devolveu 3 `<opcao>` concretas em `<opcoes_correcao>`. Mapeie cada uma para uma `option` do AskUserQuestion (D-05):
 
-- `label` = `<titulo>` da opção (ENXUGUE para <=5 palavras se necessário, preservando o verbo de ação — ex: "Remover menção a valores")
-- `description` = `<arquivo> → <secao_tag>` (formato literal: ``Orquestrador.md` → `<perguntas_iniciais>``)
+- `label` = `<titulo>` da opção (já vem em linguagem leiga, ≤5 palavras — use literalmente; se exceder 5 palavras, enxugue PRESERVANDO o tom leigo, NUNCA reintroduza jargão técnico)
+- `description` = `<descricao_leiga>` da opção (linguagem comum, sem citar arquivo ou tag — D-22). Se o analyzer (versão antiga) NÃO devolver `<descricao_leiga>`, use fallback `<titulo>` repetido em vez de expor `<arquivo>`/`<secao_tag>` para o usuário leigo.
+
+Os campos `<arquivo>` e `<secao_tag>` ficam guardados internamente para o caminho [B.2] e o despacho ao `docs-editor-conciso` — NÃO aparecem no AskUserQuestion do [B].
 
 Adicione UMA opção fixa `"Cancelar"` no final. NÃO liste `"Outro"` — a UI adiciona automaticamente.
 
 ```json
 {
   "questions": [{
-    "question": "O `docs-analyzer` não tem certeza do ajuste. Escolha a ação:",
+    "question": "A análise não tem certeza do ajuste. Escolha qual mudança a IA deve aplicar:",
     "header": "Esclarecer",
     "multiSelect": false,
     "options": [
-      {"label": "<titulo opção 1>", "description": "`<arquivo1>` → `<secao_tag1>`"},
-      {"label": "<titulo opção 2>", "description": "`<arquivo2>` → `<secao_tag2>`"},
-      {"label": "<titulo opção 3>", "description": "`<arquivo3>` → `<secao_tag3>`"},
+      {"label": "<titulo leigo opção 1>", "description": "<descricao_leiga opção 1>"},
+      {"label": "<titulo leigo opção 2>", "description": "<descricao_leiga opção 2>"},
+      {"label": "<titulo leigo opção 3>", "description": "<descricao_leiga opção 3>"},
       {"label": "Cancelar", "description": "Encerra sem editar."}
     ]
   }]

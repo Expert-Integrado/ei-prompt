@@ -73,9 +73,15 @@ Schema obrigatório (devolver LITERALMENTE neste shape):
   <!-- Mais <arquivo> quando N>=2 -->
 </arquivos>
 <opcoes_correcao>
-  <!-- PREENCHER SOMENTE quando decisao=clarify. 3 opções de AÇÃO concreta + a opção "Outro" SEMPRE presente. -->
+  <!-- PREENCHER SOMENTE quando decisao=clarify. 3 opções de AÇÃO concreta + a opção "Outro" SEMPRE presente.
+       IMPORTANTE: <titulo> e <descricao_leiga> são lidos por uma PESSOA LEIGA (não-técnica) que vai aprovar
+       o ajuste via AskUserQuestion. Use linguagem do dia-a-dia, sem jargão técnico. NÃO cite nomes de arquivo,
+       NÃO cite tags XML, NÃO use termos como "Orquestrador / Qualifier / Scheduler / Protractor / seção / tag".
+       Fale o que a IA VAI FAZER DE DIFERENTE com o cliente. Os campos <arquivo> e <secao_tag> ficam para o
+       sistema usar internamente — não vão aparecer para o usuário. -->
   <opcao id="1">
-    <titulo>Texto curto descrevendo uma ALTERAÇÃO concreta (não 'qual arquivo')</titulo>
+    <titulo>Frase curta (até 5 palavras) descrevendo a MUDANÇA DE COMPORTAMENTO, em linguagem comum</titulo>
+    <descricao_leiga>1-2 frases em PT-BR simples explicando o que a IA passará a fazer (ou deixar de fazer) com o cliente. Sem jargão técnico, sem citar arquivo ou tag.</descricao_leiga>
     <arquivo>NomeDoArquivo.md</arquivo>
     <secao_tag><tag_xml_literal></secao_tag>
   </opcao>
@@ -91,6 +97,7 @@ Regras do schema:
 - `<secao_tag>` é a tag XML LITERAL encontrada no arquivo do agente do cliente (ex: `<perguntas_iniciais>`, `<regras_gerais>`). Não inventar tag.
 - `<secao_descricao>` é PT-BR curto (≤80 caracteres) para humanos lerem.
 - `<path>` é o caminho ABSOLUTO e LITERAL devolvido pelo Glob (inclui espaços se houver).
+- **`<titulo>` e `<descricao_leiga>` (em `<opcoes_correcao>`) devem ser escritos para PESSOAS LEIGAS**: PT-BR comum, foco no comportamento da IA com o cliente. PROIBIDO citar nome de arquivo (`Orquestrador.md`, `Qualifier.md` etc.), nome de papel técnico ("Orquestrador", "Qualifier", "Scheduler", "Protractor"), tag XML (`<perguntas_iniciais>`), ou palavras como "seção", "tag", "regra geral", "fluxo". O leitor é o dono do negócio que vai aprovar o ajuste — ele entende o que a IA faz na conversa, não a arquitetura interna.
 </formato_resposta>
 
 <exemplos>
@@ -131,17 +138,20 @@ Saída esperada:
 <arquivos></arquivos>
 <opcoes_correcao>
   <opcao id="1">
-    <titulo>Remover menção a valores das perguntas iniciais do Orquestrador</titulo>
+    <titulo>Parar de perguntar sobre preço</titulo>
+    <descricao_leiga>A IA deixa de tocar no assunto de valores nas primeiras mensagens com o lead. Ela só fala de preço se o próprio lead perguntar.</descricao_leiga>
     <arquivo>Orquestrador.md</arquivo>
     <secao_tag><perguntas_iniciais></secao_tag>
   </opcao>
   <opcao id="2">
-    <titulo>Adicionar regra no Qualifier para não citar valores antes da qualificação</titulo>
+    <titulo>Não falar preço antes de validar o lead</titulo>
+    <descricao_leiga>A IA passa a esperar terminar de avaliar se a pessoa tem o perfil de cliente antes de mencionar qualquer valor.</descricao_leiga>
     <arquivo>Qualifier.md</arquivo>
     <secao_tag><regras_gerais></secao_tag>
   </opcao>
   <opcao id="3">
-    <titulo>Adicionar bloqueio geral de valores em <regras_gerais> do Orquestrador</titulo>
+    <titulo>Nunca enviar preço pelo chat</titulo>
+    <descricao_leiga>A IA nunca cita valores na conversa, em momento nenhum. Quando o lead insistir, ela explica que esse assunto é tratado em outra etapa.</descricao_leiga>
     <arquivo>Orquestrador.md</arquivo>
     <secao_tag><regras_gerais></secao_tag>
   </opcao>
@@ -158,6 +168,7 @@ Saída esperada:
 - NUNCA invente tag XML que não existe no arquivo do cliente — leia o conteúdo e use a tag literal.
 - NUNCA pule a leitura de TODOS os `.md` do cliente — análise rasa = bug-âncora.
 - Em `<opcoes_correcao>`, cada opção é uma AÇÃO concreta (não "qual arquivo?"). A opção "Outro" é OBRIGATÓRIA.
+- **Linguagem leiga obrigatória em `<opcoes_correcao>`:** `<titulo>` e `<descricao_leiga>` são lidos por uma pessoa NÃO-TÉCNICA via `AskUserQuestion`. Escreva como se estivesse explicando para o dono do negócio o que a IA fará de diferente na conversa com o lead. Sem nomes de arquivo, sem nomes de papéis técnicos (Orquestrador/Qualifier/Scheduler/Protractor), sem tags XML, sem palavras como "seção", "tag" ou "regra geral". Se ficar tentado a usar essas palavras, reformule em comportamento observável ("a IA passa a...", "a IA deixa de...").
 - Devolva APENAS o XML estruturado em `<formato_resposta>` — nenhum texto livre antes ou depois.
 </regras>
 
