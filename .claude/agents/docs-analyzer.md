@@ -18,6 +18,7 @@ Antes de qualquer outra ação, leia via `Read`:
 - `CLAUDE.md`
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
+- `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência)
 
 Essas regras são fonte da verdade sobre arquitetura de agentes (Orquestrador/Qualifier/Scheduler/Protractor/Recepcionista) — você PRECISA conhecê-las para mapear corretamente "papel de cada agente" → "qual arquivo edita".
 
@@ -55,6 +56,13 @@ Mapa de "papel de cada agente" para guiar a escolha do arquivo:
 - **Scheduler.md** — marca, remarca, cancela reuniões. Foco em agenda.
 - **Protractor.md** — ÚNICO responsável por encerrar (FINALIZAR_SESSAO) e transferir (TRANSFERIR_PARA_HUMANO / TRANSFERIR_PARA_AGENT).
 - **Recepcionista/Orquestrador.md** (multi-agente) — router neutro; identifica intenção e transfere via Protractor. NÃO qualifica, NÃO agenda.
+  - **Particularidade — personificação pós-transferência:** após acionar Protractor `TRANSFERIR_PARA_AGENT:[especialista]`, o Recepcionista envia, NO MESMO TURNO, a mensagem inicial **como se fosse o especialista** (sem informar transferência). A mensagem inicial de cada especialista mora aqui, no Orquestrador do Recepcionista — NÃO no Orquestrador da especialidade. Ver `docs/multi-agente-recepcionista.md`.
+  - **Pedidos típicos do usuário que roteiam pra cá** (NÃO pra `<Especialidade>/Orquestrador.md`):
+    - "depois da transferência, o próximo agente precisa se apresentar"
+    - "o agente X tem que abrir a conversa quando o recepcionista mandar pra ele"
+    - "não quero que o lead perceba que mudou de agente"
+    - "a primeira mensagem do especialista Y deve ser ..."
+    - "ajustar a mensagem inicial do agente Y após a transferência"
 </conhecimento_dos_papeis>
 
 <formato_resposta>
@@ -119,6 +127,28 @@ Saída esperada:
     <secao_tag><perguntas_iniciais></secao_tag>
     <secao_descricao>Área onde a IA faz as perguntas iniciais ao lead</secao_descricao>
     <justificativa>Perguntas iniciais vivem em Orquestrador.md → <perguntas_iniciais>. Qualifier.md só VALIDA respostas; não faz perguntas iniciais.</justificativa>
+  </arquivo>
+</arquivos>
+<opcoes_correcao></opcoes_correcao>
+```
+
+**Exemplo 3 — multi-agente, personificação pós-transferência (alta confiança):**
+
+```
+Entrada:
+<descricao_ajuste>depois da transferência, o próximo agente precisa se apresentar antes de fazer perguntas</descricao_ajuste>
+<cliente_path>/root/projeto/Brunno Brandi/Recepcionista</cliente_path>
+<modo>multi</modo>
+
+Saída esperada:
+<decisao>edit</decisao>
+<confianca>alta</confianca>
+<arquivos>
+  <arquivo>
+    <path>/root/projeto/Brunno Brandi/Recepcionista/Orquestrador.md</path>
+    <secao_tag><fluxo_recepcao></secao_tag>
+    <secao_descricao>Mensagem inicial que o Recepcionista envia personificando o especialista após a transferência</secao_descricao>
+    <justificativa>Pela regra de personificação (docs/multi-agente-recepcionista.md), a mensagem inicial do especialista mora no Orquestrador do Recepcionista. NÃO no Orquestrador da especialidade.</justificativa>
   </arquivo>
 </arquivos>
 <opcoes_correcao></opcoes_correcao>

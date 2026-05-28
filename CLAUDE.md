@@ -11,6 +11,7 @@
 | [`docs/regras-edicao.md`](docs/regras-edicao.md) | Como editar prompts: concisão, estrutura, formato de resposta, `<conhecimento>`, envio de mídia |
 | [`docs/regras-validacao.md`](docs/regras-validacao.md) | Checklists pós-edição e validação de arquitetura |
 | [`docs/proibido-fazer.md`](docs/proibido-fazer.md) | Limites duros: `modelo/` read-only, o que não pode ser ajustado, o que não entra em `<conhecimento>` |
+| [`docs/multi-agente-recepcionista.md`](docs/multi-agente-recepcionista.md) | Multi-agente: Recepcionista **personifica** o especialista após `TRANSFERIR_PARA_AGENT` (mensagem inicial vem do Recepcionista, não do especialista) |
 
 ## Commits
 - Não incluir assinatura "Generated with Claude Code" nem "Co-Authored-By"
@@ -50,7 +51,8 @@ Cliente Multi/
 ### Fluxo
 1. Lead chega → **Recepcionista** apresenta a empresa de forma neutra e identifica intenção.
 2. Mapeia a intenção contra `<agentes_disponiveis>` e aciona Protractor com `TRANSFERIR_PARA_AGENT:[especialidade]`.
-3. A especialidade assume a conversa via `mensagem_inicial_sugerida` retornada pelo Protractor.
+3. **No MESMO turno**, o Recepcionista envia a mensagem inicial **personificando o especialista** (sem informar ao lead que houve transferência). Ver [`docs/multi-agente-recepcionista.md`](docs/multi-agente-recepcionista.md).
+4. A partir da **próxima mensagem do lead**, a especialidade assume de fato a conversa.
 
 ### Quando usar
 - Cliente com 2+ frentes que exigem qualificação ou fluxo distintos.
