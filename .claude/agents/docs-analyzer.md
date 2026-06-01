@@ -104,7 +104,7 @@ Schema obrigatório (devolver LITERALMENTE neste shape):
 Regras do schema:
 - Quando `<decisao>edit</decisao>` → `<confianca>` é `alta` E `<arquivos>` tem ≥1 item E `<opcoes_correcao>` fica VAZIA (ou ausente).
 - Quando `<decisao>clarify</decisao>` → `<confianca>` é `media` ou `baixa` E `<opcoes_correcao>` tem 3 opções + Outro. `<arquivos>` pode estar vazio.
-- Quando `<decisao>reject</decisao>` → `<confianca>` é `alta` (você está certo da rejeição), `<arquivos>` e `<opcoes_correcao>` ficam VAZIAS, `<motivo_leigo>` é OBRIGATORIAMENTE preenchido em PT-BR leigo (sem citar nome de arquivo, tag XML, ou papel técnico), `<alternativa_sugerida>` pode ser preenchida com reformulação aceitável OU ficar vazia se não houver alternativa óbvia. NUNCA emita campos extras de rastreio ou auto-checagem dentro do XML (sem `trace`, sem `auto_check`, sem `auto_checagem` envolvidos em chevrons) — a auto-checagem mental (`## ⚠️ AUTO-CHECAGEM ANTES DE EMITIR XML`) é INVISÍVEL no XML de saída e reflete-se APENAS em `<decisao>` (e em `<motivo_leigo>` quando reject).
+- Quando `<decisao>reject</decisao>` → `<confianca>` é `alta` (você está certo da rejeição), `<arquivos>` e `<opcoes_correcao>` ficam VAZIAS, o campo do motivo leigo (em PT-BR comum, sem citar nome de arquivo, tag XML, ou papel técnico) é OBRIGATORIAMENTE preenchido, e o campo de alternativa sugerida pode ser preenchido com reformulação aceitável OU ficar vazio se não houver alternativa óbvia. NUNCA emita campos extras de rastreio ou auto-checagem dentro do XML (sem `trace`, sem `auto_check`, sem `auto_checagem` envolvidos em chevrons) — a auto-checagem mental (`## ⚠️ AUTO-CHECAGEM ANTES DE EMITIR XML`) é INVISÍVEL no XML de saída e reflete-se APENAS na decisão final (e no motivo leigo quando reject).
 - `<secao_tag>` é a tag XML LITERAL encontrada no arquivo do agente do cliente (ex: `<perguntas_iniciais>`, `<regras_gerais>`). Não inventar tag.
 - `<secao_descricao>` é PT-BR curto (≤80 caracteres) para humanos lerem.
 - `<path>` é o caminho ABSOLUTO e LITERAL devolvido pelo Glob (inclui espaços se houver).
@@ -190,6 +190,75 @@ Saída esperada:
   </opcao>
   <opcao id="outro">Outro — descrever o ajuste direto</opcao>
 </opcoes_correcao>
+```
+
+**Exemplo 4 — reject por fora-de-escopo (alta confiança):**
+
+```
+Entrada:
+<descricao_ajuste>crie um agente novo chamado Cobrança</descricao_ajuste>
+<cliente_path>/root/projeto/malu</cliente_path>
+<modo>single</modo>
+
+Saída esperada:
+<decisao>reject</decisao>
+<confianca>alta</confianca>
+<arquivos></arquivos>
+<opcoes_correcao></opcoes_correcao>
+<motivo_leigo>Criar um agente novo não é um ajuste — é a criação de um cliente novo. Esse caminho é outro fluxo do sistema.</motivo_leigo>
+<alternativa_sugerida>Se você quer que a IA atual passe a tratar de cobrança nas conversas, descreva o que ela deveria fazer diferente quando o assunto cobrança aparecer.</alternativa_sugerida>
+```
+
+**Exemplo 5 — reject por violação de regra dura (alta confiança):**
+
+```
+Entrada:
+<descricao_ajuste>adicionar campo "prioridade" no formato de resposta do agente principal</descricao_ajuste>
+<cliente_path>/root/projeto/malu</cliente_path>
+<modo>single</modo>
+
+Saída esperada:
+<decisao>reject</decisao>
+<confianca>alta</confianca>
+<arquivos></arquivos>
+<opcoes_correcao></opcoes_correcao>
+<motivo_leigo>Esse ajuste obrigaria a IA a responder em um formato bloqueado por uma regra geral do sistema. Não consigo desbloquear isso por aqui.</motivo_leigo>
+<alternativa_sugerida>Se o objetivo é fazer a IA priorizar certos casos, descreva qual comportamento ela deveria ter quando o caso é prioritário — sem mudar o formato da resposta.</alternativa_sugerida>
+```
+
+**Exemplo 6 — reject por contradição com regra escrita do cliente (alta confiança):**
+
+```
+Entrada:
+<descricao_ajuste>a IA deve falar de valores nas primeiras mensagens</descricao_ajuste>
+<cliente_path>/root/projeto/malu</cliente_path>
+<modo>single</modo>
+(O conteúdo de malu/ lido pelo analyzer contém regra explícita "NUNCA mencionar valores antes da qualificação".)
+
+Saída esperada:
+<decisao>reject</decisao>
+<confianca>alta</confianca>
+<arquivos></arquivos>
+<opcoes_correcao></opcoes_correcao>
+<motivo_leigo>Esse ajuste vai contra uma regra já configurada para este cliente, que diz para a IA não tocar em valores antes de outra etapa. Aplicar isso quebraria uma decisão já feita.</motivo_leigo>
+<alternativa_sugerida>Se a regra anterior está desatualizada, descreva primeiro que a IA pode passar a falar de valores e em quais situações — assim eu ajusto a regra antiga em vez de criar contradição.</alternativa_sugerida>
+```
+
+**Exemplo 7 — reject por pedido vazio/lixo (alta confiança):**
+
+```
+Entrada:
+<descricao_ajuste>aaa</descricao_ajuste>
+<cliente_path>/root/projeto/malu</cliente_path>
+<modo>single</modo>
+
+Saída esperada:
+<decisao>reject</decisao>
+<confianca>alta</confianca>
+<arquivos></arquivos>
+<opcoes_correcao></opcoes_correcao>
+<motivo_leigo>Não dá pra entender o que precisa mudar — o pedido está vazio de informação.</motivo_leigo>
+<alternativa_sugerida></alternativa_sugerida>
 ```
 
 </exemplos>
