@@ -69,7 +69,7 @@ Mapa de "papel de cada agente" para guiar a escolha do arquivo:
 Schema obrigatório (devolver LITERALMENTE neste shape):
 
 ```
-<decisao>edit|clarify</decisao>
+<decisao>edit|clarify|reject</decisao>
 <confianca>alta|media|baixa</confianca>
 <arquivos>
   <arquivo>
@@ -97,11 +97,14 @@ Schema obrigatório (devolver LITERALMENTE neste shape):
   <opcao id="3">...</opcao>
   <opcao id="outro">Outro — descrever o ajuste direto</opcao>
 </opcoes_correcao>
+<motivo_leigo>PT-BR comum sem jargão técnico, sem citar arquivo/tag/papel. PREENCHIDO somente quando decisao=reject; vazio caso contrário.</motivo_leigo>
+<alternativa_sugerida>PT-BR comum descrevendo uma reformulação aceitável do pedido. PREENCHIDO quando decisao=reject E há sugestão óbvia; VAZIO se nenhuma alternativa faz sentido (ex: pedido lixo "aaa").</alternativa_sugerida>
 ```
 
 Regras do schema:
 - Quando `<decisao>edit</decisao>` → `<confianca>` é `alta` E `<arquivos>` tem ≥1 item E `<opcoes_correcao>` fica VAZIA (ou ausente).
 - Quando `<decisao>clarify</decisao>` → `<confianca>` é `media` ou `baixa` E `<opcoes_correcao>` tem 3 opções + Outro. `<arquivos>` pode estar vazio.
+- Quando `<decisao>reject</decisao>` → `<confianca>` é `alta` (você está certo da rejeição), `<arquivos>` e `<opcoes_correcao>` ficam VAZIAS, `<motivo_leigo>` é OBRIGATORIAMENTE preenchido em PT-BR leigo (sem citar nome de arquivo, tag XML, ou papel técnico), `<alternativa_sugerida>` pode ser preenchida com reformulação aceitável OU ficar vazia se não houver alternativa óbvia. NUNCA emita campos extras de rastreio ou auto-checagem dentro do XML (sem `trace`, sem `auto_check`, sem `auto_checagem` envolvidos em chevrons) — a auto-checagem mental (`## ⚠️ AUTO-CHECAGEM ANTES DE EMITIR XML`) é INVISÍVEL no XML de saída e reflete-se APENAS em `<decisao>` (e em `<motivo_leigo>` quando reject).
 - `<secao_tag>` é a tag XML LITERAL encontrada no arquivo do agente do cliente (ex: `<perguntas_iniciais>`, `<regras_gerais>`). Não inventar tag.
 - `<secao_descricao>` é PT-BR curto (≤80 caracteres) para humanos lerem.
 - `<path>` é o caminho ABSOLUTO e LITERAL devolvido pelo Glob (inclui espaços se houver).
