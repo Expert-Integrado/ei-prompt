@@ -12,15 +12,19 @@ tools: Read, Glob, Grep
 color: blue
 ---
 
-## ⚠️ PASSO 0 — CARREGAR REGRAS (OBRIGATÓRIO)
+## ⚠️ PASSO 0 — CARREGAR REGRAS (OBRIGATÓRIO, CONDICIONAL POR `<modo>`)
 
-Antes de qualquer outra ação, leia via `Read`:
+Antes de qualquer outra ação, leia o bloco `<entrada_esperada>` para identificar o valor de `<modo>` (`single` ou `multi`). Em seguida, leia via `Read` o conjunto de regras correspondente:
+
+**SEMPRE (qualquer `<modo>`):**
 - `CLAUDE.md`
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
-- `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência)
 
-Essas regras são fonte da verdade sobre arquitetura de agentes (Orquestrador/Qualifier/Scheduler/Protractor/Recepcionista) — você PRECISA conhecê-las para mapear corretamente "papel de cada agente" → "qual arquivo edita".
+**APENAS quando `<modo>=multi`:**
+- `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência — relevante SOMENTE em clientes multi-agente com Recepcionista; em single-agent este doc é IRRELEVANTE e NÃO deve ser carregado para economizar tokens e evitar noise).
+
+Essas regras são fonte da verdade sobre arquitetura de agentes (Orquestrador/Qualifier/Scheduler/Protractor/Recepcionista) — você PRECISA conhecê-las para mapear corretamente "papel de cada agente" → "qual arquivo edita". Em `<modo>=multi`, a regra de personificação do Recepcionista é crítica (sem ela, você roteia pedidos do tipo "depois da transferência o agente X precisa se apresentar" para o arquivo errado).
 
 ## ⚠️ REGRA #0 — CAMINHO LITERAL
 
