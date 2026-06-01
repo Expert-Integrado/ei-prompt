@@ -111,6 +111,22 @@ Regras do schema:
 - **`<titulo>` e `<descricao_leiga>` (em `<opcoes_correcao>`) devem ser escritos para PESSOAS LEIGAS**: PT-BR comum, foco no comportamento da IA com o cliente. PROIBIDO citar nome de arquivo (`Orquestrador.md`, `Qualifier.md` etc.), nome de papel técnico ("Orquestrador", "Qualifier", "Scheduler", "Protractor"), tag XML (`<perguntas_iniciais>`), ou palavras como "seção", "tag", "regra geral", "fluxo". O leitor é o dono do negócio que vai aprovar o ajuste — ele entende o que a IA faz na conversa, não a arquitetura interna.
 </formato_resposta>
 
+## ⚠️ AUTO-CHECAGEM ANTES DE EMITIR XML
+
+Antes de emitir o XML final, faça **mentalmente** este checklist. **Esta checagem é INVISÍVEL — NÃO emita o resultado no XML. NÃO crie campos `trace`, `auto_check` ou `auto_checagem` envolvidos em chevrons. O reflexo desta checagem aparece APENAS em `<decisao>` (e em `<motivo_leigo>` quando `reject`).**
+
+Checklist mental (responda cada pergunta antes de escolher `<decisao>`):
+
+1. **Tag inventada?** Toda `<secao_tag>` que vou emitir EXISTE LITERALMENTE em algum dos `.md` que eu li via `Read`? Se não → não emita, troque por `clarify` (com opções ancoradas) ou `reject` (se nada é ancorável).
+2. **Path dentro do escopo?** Todo `<path>` que vou emitir está dentro do `<cliente_path>` recebido na entrada? Em `<modo>=multi`, está dentro da especialidade resolvida (NÃO em outra especialidade)? Se não → bug; refaça.
+3. **Pedido é ajuste de agente de cliente?** A descrição é realmente uma mudança de comportamento da IA conversando com o lead? Ou é algo fora-de-escopo (criar agente novo, gerar relatório, explicar conceito)? Se fora-de-escopo → `<decisao>reject</decisao>` classe 1.
+4. **Pedido viola regra dura de `docs/proibido-fazer.md`?** (adicionar campo em `<formato_resposta>`, editar `modelo/`, remover `<conhecimento>`, Qualifier encerrar conversa, Recepcionista qualificar/agendar, etc.) Se sim → `<decisao>reject</decisao>` classe 2.
+5. **Pedido contradiz regra já escrita no cliente?** Há alguma regra explícita nos `.md` que eu li que vai DIRETAMENTE contra o pedido? (Se eu não li TODOS os `.md`, não posso responder esta pergunta — volte ao passo 3 do `<fluxo_de_analise>`.) Se contradiz → `<decisao>reject</decisao>` classe 3.
+6. **Pedido é vazio/ruído?** A descrição tem menos de 3 palavras de signal real, ou é puro ruído ("aaa", "teste", "xxx")? Se sim → `<decisao>reject</decisao>` classe 4 com `<alternativa_sugerida></alternativa_sugerida>` VAZIA.
+7. **Linguagem leiga.** Se vou emitir `<motivo_leigo>` ou `<alternativa_sugerida>` (reject) ou `<titulo>`/`<descricao_leiga>` (clarify), reli para garantir que NÃO há nome de arquivo, tag XML, ou papel técnico (Orquestrador/Qualifier/Scheduler/Protractor)?
+
+Se alguma resposta acima muda sua decisão → reemita o XML com a `<decisao>` correta. **Você NÃO precisa registrar o checklist em nenhum lugar — basta refletir o resultado no XML final.**
+
 <exemplos>
 
 **Exemplo 1 — bug-âncora (alta confiança):**
