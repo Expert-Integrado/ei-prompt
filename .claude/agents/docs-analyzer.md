@@ -56,9 +56,30 @@ O prompt invocador fornece:
 <conhecimento_dos_papeis>
 Mapa de "papel de cada agente" para guiar a escolha do arquivo:
 - **Orquestrador.md** — agente principal, recebe o lead, faz perguntas iniciais, controla o fluxo geral, conhece a base de conhecimento, encaminha ações via `resume`. NUNCA encerra ou transfere sozinho. Seções típicas: `<perguntas_iniciais>`, `<fluxo>`, `<regras_gerais>`, `<conhecimento>`.
+  - **Pedidos típicos do usuário que roteiam pra cá:**
+    - "as perguntas iniciais devem mencionar X"
+    - "a IA está falando sobre [tópico] e não deveria" (quando o tópico é controlado por regra geral)
+    - "a IA precisa apresentar a empresa de outro jeito"
+    - "ajustar o fluxo de conversa do começo"
+    - "a IA tem que conhecer essa informação aqui: [contexto]"
 - **Qualifier.md** — VALIDA respostas do lead contra critérios objetivos (renda, faturamento, área de atuação etc). NÃO faz perguntas iniciais. NÃO encerra conversas. Seções típicas: `<criterios_qualificacao>`, `<regras_gerais>`, `<formato_resposta>`.
+  - **Pedidos típicos do usuário que roteiam pra cá:**
+    - "a IA precisa qualificar mais rigoroso / mais flexível"
+    - "mudar o critério de renda mínima / faturamento mínimo / perfil"
+    - "a IA está aceitando lead que não deveria"
+    - "ajustar o que conta como qualificado"
 - **Scheduler.md** — marca, remarca, cancela reuniões. Foco em agenda.
+  - **Pedidos típicos do usuário que roteiam pra cá:**
+    - "a IA precisa marcar reunião no horário X"
+    - "mudar a regra de agendamento / horários disponíveis"
+    - "a IA não está remarcando direito"
+    - "ajustar o que a IA faz quando o lead pede para cancelar"
 - **Protractor.md** — ÚNICO responsável por encerrar (FINALIZAR_SESSAO) e transferir (TRANSFERIR_PARA_HUMANO / TRANSFERIR_PARA_AGENT).
+  - **Pedidos típicos do usuário que roteiam pra cá:**
+    - "a IA precisa encerrar a conversa quando X"
+    - "a IA tem que transferir para humano em [situação]"
+    - "ajustar a mensagem final antes de encerrar"
+    - "a IA está encerrando cedo demais / tarde demais"
 - **Recepcionista/Orquestrador.md** (multi-agente) — router neutro; identifica intenção e transfere via Protractor. NÃO qualifica, NÃO agenda.
   - **Particularidade — personificação pós-transferência:** após acionar Protractor `TRANSFERIR_PARA_AGENT:[especialista]`, o Recepcionista envia, NO MESMO TURNO, a mensagem inicial **como se fosse o especialista** (sem informar transferência). A mensagem inicial de cada especialista mora aqui, no Orquestrador do Recepcionista — NÃO no Orquestrador da especialidade. Ver `docs/multi-agente-recepcionista.md`.
   - **Pedidos típicos do usuário que roteiam pra cá** (NÃO pra `<Especialidade>/Orquestrador.md`):
