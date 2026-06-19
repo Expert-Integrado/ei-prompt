@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.5] - 2026-06-18
+
+**Estrutura o `<fluxo_de_conversa>` do Orquestrador em ETAPAS numeradas.** O template do Orquestrador deixa de carregar o placeholder genérico `[FLUXO_DE_CONVERSA]` e passa a trazer um esqueleto fixo de etapas — `## ETAPA 1: Abertura`, `## ETAPA 2: Qualificação`, `## ETAPA 3: Pós-Qualificação` (com os 3 ramos `qualificado` / `desqualificado` / `informacoes_insuficientes`) e `## ETAPA 4: Agendamento` (opcional). Ao gerar/editar um cliente, preenche-se apenas os `[PLACEHOLDERS]` em prosa, preservando títulos, rótulos (`**Mensagem Inicial:**`, `**Perfil do Lead:**`, `**Mensagem:**`, `**Ação:**`) e marcadores `>> AÇÃO:`. A transferência/encerramento é sempre ação de uma etapa existente — não existe "etapa de transferência final".
+
+- **`modelo/Orquestrador.md`:** placeholder `[FLUXO_DE_CONVERSA]` substituído pelo esqueleto de ETAPAS; tag `<fluxo_conversa>` renomeada para `<fluxo_de_conversa>`.
+- **`docs/regras-edicao.md`:** nova seção documentando a estrutura padrão do `<fluxo_de_conversa>` (cabeçalho fixo, etapas, regra de quando existe/não existe a ETAPA 4, não duplicar detalhes operacionais no fluxo).
+- **`docs/regras-validacao.md`:** novo checklist de validação do `<fluxo_de_conversa>` (etapas numeradas, rótulos preservados, 3 ramos na ETAPA 3, ausência de "etapa de transferência final").
+- **`.claude/agents/client-project-scaffolder.md`:** instrução para preservar títulos/rótulos/marcadores das ETAPAS e remover a ETAPA 4 quando o atendimento não agenda.
+- **`package.json`:** version `2.0.4` → `2.0.5`.
+- **Compat:** alteração de template + docs. Clientes já gerados não são afetados; a nova estrutura passa a valer para clientes criados/ajustados a partir desta versão.
+
 ## [2.0.4] - 2026-05-28
 
 **Documenta regra de personificação pós-transferência no fluxo multi-agente do Recepcionista.** Após o Recepcionista acionar Protractor com `TRANSFERIR_PARA_AGENT:[especialista]`, **quem envia a primeira mensagem ao lead em nome do especialista é o próprio Recepcionista** — personificando o especialista no MESMO turno da transferência, sem informar ao lead que houve mudança de agente. Somente a próxima mensagem do lead em diante é roteada de fato para o agente especialista. Esta regra existia apenas implicitamente no `mensagem_inicial_sugerida` do Protractor; agora é regra de projeto explícita, com lugar definido (Orquestrador do Recepcionista, NÃO do especialista) e roteamento determinístico no `docs-analyzer` para pedidos do tipo "o agente X precisa se apresentar após a transferência".
