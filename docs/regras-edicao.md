@@ -14,6 +14,51 @@
 3. `<regras>` — Regras únicas, sem duplicação
 4. `<formato>` — Output esperado
 
+## Casca XML (`<agente>`)
+
+Todo prompt gerado (templates de `modelo/` e prompts de cliente) é envolvido numa **casca XML de raiz única**, para permitir validação automatizada de boa-formação e intercâmbio com o Prompt Builder (mesmo formato byte-compatível).
+
+**Formato exato** (não alterar):
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="{TIPO}">
+
+{TODO O CONTEÚDO DO PROMPT — intacto, incluindo os separadores "---"}
+
+</agente>
+```
+Declaração na 1ª linha; `<agente>` na 2ª (atributos numa linha, separados por espaço); uma linha em branco; conteúdo; uma linha em branco; `</agente>` na última.
+
+**Atributos:**
+| Atributo | Valor |
+|----------|-------|
+| `xmlns` | `https://expertintegrado.com.br/super-sdr/prompt` (constante) |
+| `versao` | `1.0` — sobe só se a ESTRUTURA da casca mudar |
+| `tipo` | identificador do prompt (mapa abaixo) |
+| `origem` | _(opcional)_ rastreio de origem — ex.: `recepcionista` |
+| `agente_id` | id do agente, se houver; **omitir o atributo** se não houver (EI hoje omite) |
+| `gerado_em` | ISO 8601 do tagueamento; **omitir** se não souber (EI hoje omite) |
+
+**Mapa de `tipo`** (valores em inglês, iguais ao `PromptType` do builder):
+
+| Template | `tipo` |
+|----------|--------|
+| Orquestrador | `orchestrator` |
+| Qualifier | `qualifier` |
+| Protractor | `protractor` |
+| Scheduler | `scheduler` |
+| Follow-Up | `followup` |
+| Recepcionista | `orchestrator` + `origem="recepcionista"` (materializa como `Orquestrador.md` do stack router) |
+
+**Regras invioláveis da casca:**
+- **Raiz única:** todo o prompt fica dentro de um único par `<agente>…</agente>`.
+- **Conteúdo intacto:** não reordenar, não remover; as tags internas (`<objetivo>`, `<fluxo_de_conversa>`, etc.) não mudam.
+- **Sem escaping / sem CDATA:** o conteúdo é texto para a LLM e fica literal. `&`/`<` **não** são escapados.
+- **Idempotência:** ao re-gerar um prompt que já tem casca, **remover a casca antiga antes** de reaplicar — nunca aninhar `<agente><agente>`.
+- **Ao re-ler/parsear:** remover a casca (miolo entre `<agente …>` e `</agente>`) antes de processar; conteúdo **legado sem casca também é válido**.
+
+**Boilerplate sem `<`/`&` crus:** como o conteúdo não é escapado, o texto FIXO do template não pode conter `<` ou `&` crus (quebram a boa-formação). Ao editar regras/boilerplate: escreva "sinais de menor/maior" em vez de `<>`, e refira seções por nome em crases (`` `conhecimento` ``) em vez de `<conhecimento>`. (`>`, `[ ]`, `{ }` são texto comum e podem ficar.)
+
 ## Estrutura do `<fluxo_de_conversa>` (Orquestrador)
 
 O fluxo do Orquestrador segue ETAPAS numeradas, no MESMO formato gerado pelo Prompt Builder (prompts intercambiáveis):

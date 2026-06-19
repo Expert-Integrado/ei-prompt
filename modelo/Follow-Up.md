@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="followup">
+
 <objetivo>
 Gerar mensagem de follow-up para reengajar o lead. Sua resposta será enviada diretamente ao lead.
 </objetivo>
@@ -29,3 +32,5 @@ Gerar mensagem de follow-up para reengajar o lead. Sua resposta será enviada di
   - Identificar quantas tentativas o cliente costuma fazer antes de desistir
 -->
 </templates>
+
+</agente>
