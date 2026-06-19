@@ -10,9 +10,21 @@
 
 ## Estrutura Padrão de Prompts
 1. `<objetivo>` — Missão central (máx 5 itens)
-2. `<fluxo>` — Passos sequenciais SEM repetir regras
+2. `<fluxo>` — Passos sequenciais SEM repetir regras. No **Orquestrador**, é o `<fluxo_de_conversa>` em ETAPAS numeradas (ver seção abaixo)
 3. `<regras>` — Regras únicas, sem duplicação
 4. `<formato>` — Output esperado
+
+## Estrutura do `<fluxo_de_conversa>` (Orquestrador)
+
+O fluxo do Orquestrador segue ETAPAS numeradas, no MESMO formato gerado pelo Prompt Builder (prompts intercambiáveis):
+
+1. **Cabeçalho fixo:** `# ETAPAS DO ATENDIMENTO` + a linha `REGRA FUNDAMENTAL: ...` (siga em ordem, não pule, não repita pergunta).
+2. **`## ETAPA 1: Abertura`** — `**Mensagem Inicial:**` com a primeira fala ao lead.
+3. **`## ETAPA 2: Qualificação`** — `**Perfil do Lead:**` + perguntas numeradas (`1. "..."`, quantas o atendimento exigir) + `>> AÇÃO: Chamar Tool Qualifier para avaliar qualificação`.
+4. **`## ETAPA 3: Pós-Qualificação`** — três ramos: `### Se result = "qualificado"`, `### Se result = "desqualificado"`, `### Se result = "informacoes_insuficientes"`, cada um com `**Mensagem:**` e `**Ação:**` (`>> AÇÃO: ...`).
+5. **`## ETAPA 4: Agendamento`** — SOMENTE se o lead qualificado for agendar. Nesse caso, a **Ação** do ramo `qualificado` (ETAPA 3) é `>> AÇÃO: Prosseguir para ETAPA 4 (Agendamento)` e a chamada ao Scheduler fica AQUI (não na ETAPA 3). Se o atendimento NÃO agenda, a Ação do `qualificado` resolve na própria ETAPA 3 (ex.: `>> AÇÃO: Chamar Tool Protractor para transferir para humano`) e **não existe ETAPA 4**. **Não existe "etapa de transferência final".**
+
+**Ao preencher/editar:** preserve os títulos `## ETAPA N:`, os rótulos (`**Mensagem Inicial:**`, `**Perfil do Lead:**`, `**Mensagem:**`, `**Ação:**`) e os marcadores `>> AÇÃO:`. O conteúdo (mensagens, perfil, perguntas) é livre, em prosa adaptada ao cliente. As ações apenas **referenciam** os agentes auxiliares — os detalhes operacionais ficam em `<regras_qualificacao>`, `<regras_agendamento>`, `<regras_protractor>` (NÃO duplicar no fluxo).
 
 ## Ao Editar Prompts Existentes
 1. **Antes de adicionar:** Verificar se a regra já existe em outra seção

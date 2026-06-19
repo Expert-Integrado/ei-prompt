@@ -53,6 +53,7 @@ Se o `modo` não foi passado, **pergunte ao usuário** antes de prosseguir.
    - Se o usuário disser que NÃO TEM: marque explicitamente como `[PENDENTE - informação não fornecida]`.
 2. Não prossiga para atualização até ter perguntado sobre TODOS os campos.
 3. **Em modo `multi-agente-especialidade-unica`:** colete dados **só dessa especialidade** (frases características, regras de qualificação, conhecimento, mídias, etc.). Cada chamada é independente — pergunte tudo do zero, não assuma contexto de chamadas anteriores.
+4. **`<fluxo_de_conversa>` do Orquestrador (estrutura de ETAPAS):** o template já traz o esqueleto (`## ETAPA 1: Abertura`, `## ETAPA 2: Qualificação`, `## ETAPA 3: Pós-Qualificação`, `## ETAPA 4: Agendamento`). Substitua APENAS os `[PLACEHOLDERS]` (mensagem de abertura, perfil do lead, perguntas, mensagens de resultado) por conteúdo do cliente, em prosa. **Preserve** os títulos `## ETAPA N:`, os rótulos (`**Mensagem Inicial:**`, `**Perfil do Lead:**`, `**Mensagem:**`, `**Ação:**`) e os marcadores `>> AÇÃO:`. A ETAPA 2 pode ter quantas perguntas o atendimento exigir. **Remova a ETAPA 4** se o atendimento não prevê agendamento (só transfere/encerra) — nesse caso a ação fica na ETAPA 3. **NUNCA** crie "etapa de transferência final".
 
 ### Fase 4.5: Coleta de Mídias (obrigatório perguntar)
 1. Pergunte: **"Tem alguma mídia (imagem, vídeo, PDF) para o agente enviar ao lead?"**

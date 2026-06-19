@@ -26,6 +26,14 @@
 - [ ] _(Multi-agente)_ Recepcionista **não** qualifica nem agenda — só roteia?
 - [ ] _(Multi-agente)_ Protractor da especialidade tem `TRANSFERIR_PARA_AGENT` ativo?
 
+## Validação do `<fluxo_de_conversa>` (Orquestrador)
+- [ ] Segue ETAPAS numeradas: `## ETAPA 1` (Abertura) → `2` (Qualificação) → `3` (Pós-Qualificação) → `4` (Agendamento, só se agenda)?
+- [ ] Cabeçalho `# ETAPAS DO ATENDIMENTO` + linha `REGRA FUNDAMENTAL` presentes?
+- [ ] Rótulos preservados (`**Mensagem Inicial:**`, `**Perfil do Lead:**`, `**Mensagem:**`, `**Ação:**`) e ações via `>> AÇÃO: Chamar Tool ...`?
+- [ ] ETAPA 3 tem os 3 ramos (`qualificado` / `desqualificado` / `informacoes_insuficientes`)?
+- [ ] **NÃO** há "etapa de transferência final" (a transferência é ação da ETAPA 3)?
+- [ ] Detalhes de agendamento/transferência ficam em `<regras_agendamento>`/`<regras_protractor>`, sem duplicar no fluxo?
+
 ## Auditoria Automática
 Após edição via `docs-editor-conciso`, o `docs-reviewer` valida automaticamente:
 - Respeito aos princípios de otimização (`docs/regras-edicao.md`)
