@@ -34,6 +34,20 @@
 - [ ] **NÃO** há "etapa de transferência final" (a transferência é ação da ETAPA 3)?
 - [ ] Detalhes de agendamento/transferência ficam em `<regras_agendamento>`/`<regras_protractor>`, sem duplicar no fluxo?
 
+## Validação da Casca XML (`<agente>`)
+- [ ] Prompt começa com `<?xml version="1.0" encoding="UTF-8"?>` na 1ª linha?
+- [ ] 2ª linha é `<agente xmlns="…/super-sdr/prompt" versao="1.0" tipo="…">` (atributos numa linha)?
+- [ ] `tipo` correto para o agente (orchestrator / qualifier / protractor / scheduler / followup; Recepcionista = `orchestrator` + `origem="recepcionista"`)?
+- [ ] Raiz única — todo o conteúdo dentro de um só par `<agente>…</agente>`, **sem aninhar**?
+- [ ] Boilerplate fixo **sem `<` ou `&` crus** (usar "sinais de menor/maior" e nomes em crases)?
+- [ ] Conteúdo intacto — sem escaping, sem CDATA, tags internas preservadas?
+
+**Como validar a boa-formação** (deve PASSAR em prompt de conteúdo limpo, FALHAR apontando linha/coluna quando houver quebra):
+```sh
+xmllint --noout modelo/*.md        # ou qualquer parser XML disponível no ambiente
+```
+> **Ponto cego ACEITO:** como o conteúdo não é escapado, um **campo VARIÁVEL do cliente** preenchido com `<` ou `&` crus (ex.: "M&A", "valor < R$ 50k") fará a validação acusar quebra **naquele** prompt. Isso é esperado e aceito — **não** introduzir escaping nem CDATA para "consertar". O limite vale só para conteúdo do cliente; o boilerplate fixo dos templates é mantido limpo e valida sempre.
+
 ## Auditoria Automática
 Após edição via `docs-editor-conciso`, o `docs-reviewer` valida automaticamente:
 - Respeito aos princípios de otimização (`docs/regras-edicao.md`)

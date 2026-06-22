@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.0.6] - 2026-06-19
+
+**Casca XML `<agente>` nos prompts — raiz única para validação automatizada.** Todos os 6 templates de `modelo/` passam a ser envolvidos numa casca XML com raiz única (`<agente>`), tornando os prompts byte-compatíveis com o Prompt Builder da SuperSDR. A casca inclui declaração XML, namespace, versão de layout e `tipo` do agente (mapa fixo em inglês, igual ao `PromptType` do builder). O conteúdo interno (tags como `<objetivo>`, `<fluxo_de_conversa>`, separadores `---`) permanece intacto, sem escaping nem CDATA. A operação é idempotente: ao re-gerar um prompt com casca existente, a casca antiga é removida antes de reaplicar.
+
+- **`modelo/Orquestrador.md`**: casca `tipo="orchestrator"`. Boilerplate corrigido: regra #11 (`<>`) reescrita como "sinais de menor/maior", ref a `` `<conhecimento>` `` e `` `<regras_agendamento>` `` trocadas por nome em crases.
+- **`modelo/Qualifier.md`**: casca `tipo="qualifier"`. Boilerplate já estava limpo.
+- **`modelo/Protractor.md`**: casca `tipo="protractor"`. Boilerplate corrigido: comentário `////` com `<objetivo>` e `<response_format>` trocados por nome em crases.
+- **`modelo/Scheduler.md`**: casca `tipo="scheduler"`. Boilerplate já estava limpo.
+- **`modelo/Follow-Up.md`**: casca `tipo="followup"`. Boilerplate já estava limpo.
+- **`modelo/Recepcionista.md`**: casca `tipo="orchestrator"` + `origem="recepcionista"` (materializa como `Orquestrador.md` do stack router). Boilerplate corrigido: 10 refs inline a tags (`` `<agentes_disponiveis>` ``, `` `<fluxo_conversa>` ``, `` `<regras_recepcao>` ``, `` `<fluxo_recepcao>` ``, `` `<regras_gerais>` ``) trocadas por nome em crases; regra #6 (`<>`) reescrita como "sinais de menor/maior".
+- **`docs/regras-edicao.md`**: nova seção "Casca XML" com especificação completa (formato exato, tabela de atributos, mapa de `tipo`, regras invioláveis de raiz única / conteúdo intacto / idempotência / parse de legado, e regra de boilerplate sem `<`/`&` crus).
+- **`docs/regras-validacao.md`**: novo checklist de validação da casca + como rodar (`xmllint --noout`) + ponto cego documentado: campos VARIÁVEIS do cliente com `<` ou `&` crus quebram a validação naquele prompt — esperado e aceito; **não** introduzir escaping/CDATA.
+- **`package.json`**: version `2.0.5` → `2.0.6`.
+- **Compat:** alteração de template. Clientes já gerados sem a casca continuam válidos (legado aceito). A casca passa a ser aplicada nos clientes criados/ajustados a partir desta versão.
+
 ## [2.0.5] - 2026-06-18
 
 **Estrutura o `<fluxo_de_conversa>` do Orquestrador em ETAPAS numeradas.** O template do Orquestrador deixa de carregar o placeholder genérico `[FLUXO_DE_CONVERSA]` e passa a trazer um esqueleto fixo de etapas — `## ETAPA 1: Abertura`, `## ETAPA 2: Qualificação`, `## ETAPA 3: Pós-Qualificação` (com os 3 ramos `qualificado` / `desqualificado` / `informacoes_insuficientes`) e `## ETAPA 4: Agendamento` (opcional). Ao gerar/editar um cliente, preenche-se apenas os `[PLACEHOLDERS]` em prosa, preservando títulos, rótulos (`**Mensagem Inicial:**`, `**Perfil do Lead:**`, `**Mensagem:**`, `**Ação:**`) e marcadores `>> AÇÃO:`. A transferência/encerramento é sempre ação de uma etapa existente — não existe "etapa de transferência final".
