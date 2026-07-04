@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.7] - 2026-07-04
+
+**Hotfix: loop infinito do hook `post-scaffolder-review.sh` com subagente em background.**
+
+- **`.claude/hooks/post-scaffolder-review.sh`**: o evento `SubagentStop` dispara em cada pausa de um subagente assíncrono (fim de turno aguardando `SendMessage`), não só no encerramento final — e, em background, o `additionalContext` era entregue de volta ao próprio `client-project-scaffolder`, que não tem a tool `Agent`, gerando loop infinito de reinjeções idênticas. O branch `client-project-scaffolder)` agora usa o mesmo padrão sentinela do branch `docs-editor-conciso)`: o texto injetado manda o receptor emitir `<scaffolder-review-triggered/>` antes de qualquer coisa, e o hook sai silencioso (`exit 0`) quando encontra o marcador no transcript (janela de 2000 linhas, mensagens `assistant`, com normalização de escape JSONL). A instrução também cobre o caso do receptor sem a tool `Agent`: apenas emite o marcador e segue o trabalho.
+- **`package.json`**: version `2.0.6.` (com ponto sobrando — semver inválido) corrigida para `2.0.7`.
+
 ## [2.0.6] - 2026-06-19
 
 **Casca XML `<agente>` nos prompts — raiz única para validação automatizada.** Todos os 6 templates de `modelo/` passam a ser envolvidos numa casca XML com raiz única (`<agente>`), tornando os prompts byte-compatíveis com o Prompt Builder da SuperSDR. A casca inclui declaração XML, namespace, versão de layout e `tipo` do agente (mapa fixo em inglês, igual ao `PromptType` do builder). O conteúdo interno (tags como `<objetivo>`, `<fluxo_de_conversa>`, separadores `---`) permanece intacto, sem escaping nem CDATA. A operação é idempotente: ao re-gerar um prompt com casca existente, a casca antiga é removida antes de reaplicar.
