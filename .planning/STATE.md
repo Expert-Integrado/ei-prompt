@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: xml-validation-hook
-status: executing
-stopped_at: "Phase 01 Plan 03 Task 3: blocking human-verify checkpoint reached (Tasks 1-2 committed). Awaiting live Stop/SubagentStop verification per PLAN.md how-to-verify steps."
-last_updated: "2026-07-04T23:27:33.081Z"
+status: complete
+stopped_at: "Phase 01 (xml-validation-hook) fully executed — Plan 03 Task 3 human-verify checkpoint approved. Ready to plan Phase 2."
+last_updated: "2026-07-04T23:33:41.829Z"
 last_activity: 2026-07-04
-last_activity_desc: Phase 01 execution started
+last_activity_desc: Completed 01-03-PLAN.md (Task 3 human-verify checkpoint approved) — Phase 01 fully executed, all 7 requirements (XMLV-01..07) satisfied
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 0
+  completed_plans: 3
+  percent: 33
 ---
 
 # Project State
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 01 — xml-validation-hook
+**Current focus:** Phase 01 — xml-validation-hook (complete) → Phase 02 next
 
 ## Current Position
 
-Phase: 01 (xml-validation-hook) — EXECUTING
-Plan: 3 of 3
-Status: PAUSED at checkpoint (Task 3 of 3, blocking human-verify)
-Last activity: 2026-07-04 — Tasks 1-2 of 01-03-PLAN.md committed (6455f15, cf05978); awaiting Task 3 human verification
+Phase: 01 (xml-validation-hook) — COMPLETE
+Plan: 3 of 3 (all executed)
+Status: Phase complete — ready to plan Phase 2
+Last activity: 2026-07-04 — 01-03-PLAN.md Task 3 human-verify checkpoint approved; Phase 01 fully executed, all 7 requirements (XMLV-01..07) satisfied
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: -
+- Total plans completed: 3
+- Average duration: ~27 min
+- Total execution time: ~1h 20m
 
 **By Phase:**
 
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P01 | 20min | 3 tasks | 12 files |
 | Phase 01 P02 | 25min | 2 tasks | 2 files |
+| Phase 01 P03 | 35min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - Phase 2: Criação de cliente vira 3 passos (scaffold → coleta → preenchimento) com gate duro entre coleta e preenchimento, mesmo padrão do gate humano de `/ei-ajustes` Passo 3.5.
 - [Phase 01]: XMLV-01 coluna de erro: col:1 quando linha 1 não começa com <?xml (ausência total), ou índice de divergência preciso quando o prefixo <?xml está presente mas diverge depois — Satisfaz literalmente os dois comportamentos especificados no PLAN.md para missing-declaration.md (col 1) e wrong-declaration.md (coluna precisa de divergência)
 - [Phase 01]: Confirmed real transcript shape (message.content[].type=tool_use/.name/.input.file_path) empirically against live JSONL transcripts in this repo — Resolves RESEARCH.md Open Question A1 without leaving it as an assumption
+- [Phase 01]: Confirmed real Stop/SubagentStop pipeline behavior against a live Claude Code session (Task 3 human-verify): broken casca blocked with actionable file+line/col detail, fixed file stops normally, existing /ei-ajustes and client-project-scaffolder hook flows unaffected
+- [Phase 01]: Deliberately omitted stop_hook_active early-exit in validate-xml-casca.sh (D-07/Pitfall 4) — hook re-checks a stateless fact every cycle, not a one-shot instruction
 
 ### Roadmap Evolution
 
@@ -96,7 +99,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-04T23:27:33.070Z
-Stopped at: Phase 01 Plan 03 Task 3: blocking human-verify checkpoint reached (Tasks 1-2 committed). Awaiting live Stop/SubagentStop verification per PLAN.md how-to-verify steps.
-Resume file: .planning/phases/01-xml-validation-hook/01-03-PLAN.md
+Last session: 2026-07-04T23:32:42.905Z
+Stopped at: Completed 01-03-PLAN.md — Phase 01 (xml-validation-hook) fully executed. All 3 plans complete, all 7 requirements (XMLV-01..07) satisfied. Ready to plan Phase 2 (3-Step Gated Client Scaffolding).
+Resume file: None
 </content>

@@ -11,7 +11,7 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: XML Validation Hook** - Deterministic hook catches broken/malformed XML casca in client files automatically, wired into the existing Stop/SubagentStop pipeline.
+- [x] **Phase 1: XML Validation Hook** - Deterministic hook catches broken/malformed XML casca in client files automatically, wired into the existing Stop/SubagentStop pipeline. (completed 2026-07-04)
 - [ ] **Phase 2: 3-Step Gated Client Scaffolding** - Client creation split into scaffold → gather → fill steps with a hard gate, applied to both single-agent and multi-agent modes.
 
 ## Phase Details
@@ -30,7 +30,7 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
   4. The hook runs automatically when `post-ajustes-fanout.sh` (Stop) or `post-scaffolder-review.sh` (SubagentStop) fire — no manual invocation required — and the existing sentinel/anti-loop protocols in both hooks continue to work unchanged.
   5. Running the hook against a file whose valid casca wraps client content containing raw `<`/`&` that breaks the parse reports a parse failure without any auto-escaping/CDATA "correction" being applied — the blind spot is preserved, not silently patched.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -43,7 +43,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03-PLAN.md — Bash wrapper, Stop/SubagentStop registration, manifest.json distribution, human checkpoint
+- [x] 01-03-PLAN.md — Bash wrapper, Stop/SubagentStop registration, manifest.json distribution, human checkpoint
 
 ### Phase 2: 3-Step Gated Client Scaffolding
 
@@ -68,7 +68,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. XML Validation Hook | 2/3 | In Progress|  |
+| 1. XML Validation Hook | 3/3 | Complete   | 2026-07-04 |
 | 2. 3-Step Gated Client Scaffolding | 0/TBD | Not started | - |
 </content>
 
