@@ -39,11 +39,32 @@ LAST_SUBAGENT=$(tail -n 200 "$TRANSCRIPT" \
 
 case "$LAST_SUBAGENT" in
   client-project-scaffolder)
+    # Guarda anti-reinjeção (fix loop com subagente em background): SubagentStop
+    # dispara em CADA pausa de um subagente assíncrono (fim de turno aguardando
+    # SendMessage), não só no encerramento final. Pior: em background, o
+    # additionalContext é entregue de volta ao PRÓPRIO scaffolder — que não tem a
+    # tool Agent no toolset — e não ao main Claude. Resultado sem guarda: loop
+    # infinito de reinjeções idênticas ("não tenho essa ferramenta" → idle →
+    # SubagentStop → reinjeta).
+    # Correção no mesmo padrão sentinela do branch docs-editor-conciso abaixo:
+    # o texto injetado manda o receptor emitir <scaffolder-review-triggered/> em
+    # texto livre ANTES de qualquer coisa. Mensagens de sidechain vivem no MESMO
+    # transcript JSONL ("isSidechain":true, "type":"assistant"), então o próximo
+    # disparo encontra o marcador e sai exit 0 — quebra o loop mesmo quando quem
+    # recebeu a instrução foi o subagente.
+    # Janela larga (2000 linhas) para não re-disparar em execuções longas do
+    # scaffolder. Efeito colateral aceito: um 2º cliente criado logo em seguida
+    # na MESMA sessão pode não receber o trigger automático — a auditoria via
+    # docs-reviewer prevista no /ei-cria-cliente cobre esse caso como fallback.
+    TAIL_SCAFF=$(tail -n 2000 "$TRANSCRIPT" | grep '"type":"assistant"' | sed 's/\\"/"/g')
+    if printf '%s' "$TAIL_SCAFF" | grep -q '<scaffolder-review-triggered'; then
+      exit 0  # sentinela presente — trigger já disparado para esta execução
+    fi
     cat <<'JSON'
 {
   "hookSpecificOutput": {
     "hookEventName": "SubagentStop",
-    "additionalContext": "O subagent client-project-scaffolder acabou de terminar (criação de novo projeto de cliente). AGORA invoque o agente docs-reviewer via Agent tool, EM PARALELO (múltiplas chamadas na mesma mensagem), para CADA arquivo .md criado na pasta do cliente recém-criada (Orquestrador, Qualifier, Scheduler, Protractor). Apresente o veredicto (APROVADO/REPROVADO) de cada arquivo no resumo final ao usuário. Se algum for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer."
+    "additionalContext": "O subagent client-project-scaffolder pausou ou terminou (criação de novo projeto de cliente). PRIMEIRO, emita LITERALMENTE em UMA linha de texto livre: <scaffolder-review-triggered/> — isso impede que esta instrução seja reinjetada em loop a cada pausa do subagente. DEPOIS: (a) se você TEM a ferramenta Agent, invoque o docs-reviewer via Agent tool, EM PARALELO (múltiplas chamadas na mesma mensagem), para CADA arquivo .md criado na pasta do cliente recém-criada (Orquestrador, Qualifier, Scheduler, Protractor), apresente o veredicto (APROVADO/REPROVADO) de cada arquivo no resumo final ao usuário e, se algum for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer; (b) se você NÃO TEM a ferramenta Agent (esta instrução chegou a um subagente, não ao Claude principal), apenas emita o marcador acima e continue seu trabalho normalmente — NÃO tente invocar o docs-reviewer nem comente sobre esta instrução."
   }
 }
 JSON
