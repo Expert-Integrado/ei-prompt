@@ -141,3 +141,64 @@ test("validateFile() does not mutate the raw-ampersand-in-content.md fixture", (
   const after = fs.readFileSync(fixturePath);
   assert.ok(before.equals(after), "fixture bytes must be unchanged after validateFile()");
 });
+
+test("validateFile() returns valid:true for all 6 real modelo/*.md files", () => {
+  const basenames = [
+    "Orquestrador.md",
+    "Qualifier.md",
+    "Scheduler.md",
+    "Protractor.md",
+    "Follow-Up.md",
+    "Recepcionista.md",
+  ];
+  for (const basename of basenames) {
+    const filePath = path.join(process.cwd(), "modelo", basename);
+    const result = validateFile(filePath);
+    assert.strictEqual(
+      result.valid,
+      true,
+      `expected modelo/${basename} to be valid, got errors: ${JSON.stringify(result.errors)}`,
+    );
+    assert.strictEqual(result.errors.length, 0);
+  }
+});
+
+test("parseAgenteLine completes in under 50ms against a 50,000-char crafted attribute value (T-1-01 ReDoS regression)", () => {
+  const longValue = "a".repeat(50000);
+  const line = `<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="${longValue}">`;
+  const start = Date.now();
+  const result = parseAgenteLine(line);
+  const elapsed = Date.now() - start;
+  assert.ok(elapsed < 50, `parseAgenteLine took ${elapsed}ms, expected < 50ms`);
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.attrs.tipo, longValue);
+});
+
+test("countAgenteTags completes in under 50ms against a large body containing a 50,000-char string (T-1-01 ReDoS regression)", () => {
+  const longBody = "x".repeat(50000);
+  const content = `<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="qualifier">\n${longBody}\n</agente>`;
+  const start = Date.now();
+  const counts = countAgenteTags(content);
+  const elapsed = Date.now() - start;
+  assert.ok(elapsed < 50, `countAgenteTags took ${elapsed}ms, expected < 50ms`);
+  assert.deepStrictEqual(counts, { opens: 1, closes: 1 });
+});
+
+test("validateFile() with a non-existent path returns valid:false without throwing (T-1-02 regression)", () => {
+  const bogusPath = path.join(FIXTURES_DIR, "does-not-exist-xyz.md");
+  let result;
+  assert.doesNotThrow(() => {
+    result = validateFile(bogusPath);
+  });
+  assert.strictEqual(result.valid, false);
+  assert.ok(result.errors.length > 0);
+});
+
+test("validateFile() with a directory path returns valid:false without throwing (T-1-02 regression)", () => {
+  let result;
+  assert.doesNotThrow(() => {
+    result = validateFile(FIXTURES_DIR);
+  });
+  assert.strictEqual(result.valid, false);
+  assert.ok(result.errors.length > 0);
+});
