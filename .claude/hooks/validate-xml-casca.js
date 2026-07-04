@@ -206,6 +206,47 @@ function validateFile(filePath) {
   return { valid: result.valid, errors };
 }
 
+function discoverTouchedFiles(transcriptPath, tailLines = 400) {
+  let content;
+  try {
+    content = fs.readFileSync(transcriptPath, "utf8");
+  } catch (err) {
+    return [];
+  }
+
+  const allLines = content.split("\n");
+  const lines = allLines.slice(-tailLines);
+  const found = new Set();
+
+  for (const line of lines) {
+    if (!line.trim()) continue;
+
+    let parsed;
+    try {
+      parsed = JSON.parse(line);
+    } catch (err) {
+      continue;
+    }
+
+    if (!parsed || parsed.type !== "assistant") continue;
+
+    const messageContent = parsed.message && parsed.message.content;
+    if (!Array.isArray(messageContent)) continue;
+
+    for (const entry of messageContent) {
+      if (!entry || entry.type !== "tool_use") continue;
+      if (entry.name !== "Edit" && entry.name !== "Write") continue;
+      const filePath = entry.input && entry.input.file_path;
+      if (!filePath) continue;
+      found.add(filePath);
+    }
+  }
+
+  return Array.from(found).filter((fp) =>
+    Object.prototype.hasOwnProperty.call(TIPO_MAP, path.basename(fp)),
+  );
+}
+
 module.exports = {
   TIPO_MAP,
   normalizeContent,
@@ -214,4 +255,5 @@ module.exports = {
   countAgenteTags,
   validateCasca,
   validateFile,
+  discoverTouchedFiles,
 };
