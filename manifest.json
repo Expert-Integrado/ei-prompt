@@ -24,6 +24,8 @@
     ".claude/hooks/prompt-matches-agent.sh",
     ".claude/hooks/post-scaffolder-review.sh",
     ".claude/hooks/post-ajustes-fanout.sh",
+    ".claude/hooks/validate-xml-casca.sh",
+    ".claude/hooks/validate-xml-casca.js",
     ".claude/commands/ei-cria-cliente.md",
     ".claude/commands/ei-ajustes.md",
     ".claude/commands/ei-update.md"

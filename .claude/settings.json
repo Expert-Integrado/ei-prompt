@@ -9,6 +9,14 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-scaffolder-review.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate-xml-casca.sh"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -17,6 +25,14 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-ajustes-fanout.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate-xml-casca.sh"
           }
         ]
       }
