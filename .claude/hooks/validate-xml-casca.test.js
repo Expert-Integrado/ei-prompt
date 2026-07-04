@@ -272,3 +272,76 @@ test("discoverTouchedFiles dedupes multiple Edit calls against the same file_pat
   const result = discoverTouchedFiles(transcriptPath);
   assert.deepStrictEqual(result, [recognizedPath]);
 });
+
+function buildTranscriptForFile(filePath) {
+  const tempDir = makeTempDir();
+  const transcriptPath = path.join(tempDir, "transcript.jsonl");
+  const assistantLine = jsonlLine({
+    type: "assistant",
+    message: {
+      content: [{ type: "tool_use", name: "Edit", input: { file_path: filePath } }],
+    },
+  });
+  fs.writeFileSync(transcriptPath, assistantLine);
+  return transcriptPath;
+}
+
+test("runCli returns {decision:'block', reason} when the discovered file is broken", () => {
+  const tempDir = makeTempDir();
+  const brokenFilePath = path.join(tempDir, "Qualifier.md");
+  fs.writeFileSync(brokenFilePath, readFixture("missing-declaration.md"));
+
+  const transcriptPath = buildTranscriptForFile(brokenFilePath);
+  const result = runCli(["--transcript", transcriptPath]);
+
+  assert.strictEqual(result.decision, "block");
+  assert.ok(typeof result.reason === "string" && result.reason.length > 0);
+  assert.ok(result.reason.includes("Qualifier.md"), `reason should mention Qualifier.md, got: ${result.reason}`);
+  assert.ok(result.reason.includes("linha 1"), `reason should mention "linha 1", got: ${result.reason}`);
+});
+
+test("runCli returns {} when the discovered file is valid", () => {
+  const tempDir = makeTempDir();
+  const validFilePath = path.join(tempDir, "Orquestrador.md");
+  fs.writeFileSync(validFilePath, readFixture("valid-orquestrador.md"));
+
+  const transcriptPath = buildTranscriptForFile(validFilePath);
+  const result = runCli(["--transcript", transcriptPath]);
+
+  assert.deepStrictEqual(result, {});
+});
+
+test("runCli returns {} when no recognized files are discovered", () => {
+  const tempDir = makeTempDir();
+  const unrecognizedFilePath = path.join(tempDir, "README.md");
+  fs.writeFileSync(unrecognizedFilePath, "# not a client agent file");
+
+  const transcriptPath = buildTranscriptForFile(unrecognizedFilePath);
+  const result = runCli(["--transcript", transcriptPath]);
+
+  assert.deepStrictEqual(result, {});
+});
+
+test("runCli returns {} without throwing when --transcript is absent", () => {
+  let result;
+  assert.doesNotThrow(() => {
+    result = runCli([]);
+  });
+  assert.deepStrictEqual(result, {});
+});
+
+test("invoking validate-xml-casca.js directly as a CLI subprocess prints matching block JSON to stdout", () => {
+  const tempDir = makeTempDir();
+  const brokenFilePath = path.join(tempDir, "Qualifier.md");
+  fs.writeFileSync(brokenFilePath, readFixture("missing-declaration.md"));
+
+  const transcriptPath = buildTranscriptForFile(brokenFilePath);
+  const expected = runCli(["--transcript", transcriptPath]);
+
+  const stdout = execFileSync("node", [HOOK_PATH, "--transcript", transcriptPath], { encoding: "utf8" });
+  const lines = stdout.trim().split("\n");
+  assert.strictEqual(lines.length, 1, `expected exactly one line of stdout, got: ${stdout}`);
+
+  const parsed = JSON.parse(lines[0]);
+  assert.deepStrictEqual(parsed, expected);
+});
