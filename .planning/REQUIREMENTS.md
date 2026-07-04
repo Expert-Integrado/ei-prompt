@@ -11,7 +11,7 @@
 - [x] **XMLV-02**: Hook valida que a 2ª linha é `<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="…">` com atributos corretos numa linha só
 - [x] **XMLV-03**: Hook valida que o atributo `tipo` corresponde ao arquivo — mapeamento fixo: Orquestrador→`orchestrator`, Qualifier→`qualifier`, Scheduler→`scheduler`, Protractor→`protractor`, Follow-Up→`followup`, Recepcionista→`orchestrator` + `origem="recepcionista"`
 - [x] **XMLV-04**: Hook valida raiz única sem aninhamento — todo o conteúdo dentro de um único par `<agente>…</agente>`
-- [ ] **XMLV-05**: Hook roda automaticamente no pipeline de review (integrado aos hooks `Stop`/`SubagentStop` existentes — `post-ajustes-fanout.sh`, `post-scaffolder-review.sh`), sem exigir invocação manual
+- [x] **XMLV-05**: Hook roda automaticamente no pipeline de review (integrado aos hooks `Stop`/`SubagentStop` existentes — `post-ajustes-fanout.sh`, `post-scaffolder-review.sh`), sem exigir invocação manual
 - [x] **XMLV-06**: Falha do hook reporta arquivo + linha/coluna do problema (mensagem acionável, não só "falhou")
 - [x] **XMLV-07**: Ponto cego aceito preservado — conteúdo variável do cliente com `<`/`&` cru pode quebrar o parse; isso é esperado e não deve ser "consertado" com escaping/CDATA nem tratado como falha do hook em si
 
@@ -43,7 +43,7 @@
 | XMLV-02 | Phase 1 | Complete |
 | XMLV-03 | Phase 1 | Complete |
 | XMLV-04 | Phase 1 | Complete |
-| XMLV-05 | Phase 1 | Pending |
+| XMLV-05 | Phase 1 | Complete |
 | XMLV-06 | Phase 1 | Complete |
 | XMLV-07 | Phase 1 | Complete |
 | SCAF-01 | Phase 2 | Pending |
