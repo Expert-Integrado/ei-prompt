@@ -1,8 +1,8 @@
 ---
 phase: 1
 slug: xml-validation-hook
-status: draft
-nyquist_compliant: false
+status: verified
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-07-04
 ---
@@ -73,11 +73,11 @@ created: 2026-07-04
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 2s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies (the one exception, 01-03 Task 3, is `checkpoint:human-verify` — exempt by design)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (fixtures + test file built in 01-01 Task 1, RED before GREEN)
+- [x] No watch-mode flags
+- [x] Feedback latency < 2s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-07-04 (gsd-plan-checker verification pass — see 01-01/02/03-PLAN.md)

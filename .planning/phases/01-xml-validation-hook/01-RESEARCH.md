@@ -371,12 +371,13 @@ for (const f of files) {
 
 **If this table is empty:** N/A — see entries above; both concern the transcript-parsing layer, which the CONTEXT.md explicitly left to researcher/planner discretion (D-05).
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Exact `message.content[]` shape inside this project's actual Claude Code transcripts**
+   - **RESOLVED (during planning, 2026-07-04):** Confirmed empirically against real transcript JSONL files in `/root/.claude/projects/-root-EiPrompt/*.jsonl` — `message.content[].type==="tool_use"` / `.name` / `.input.file_path` is the correct shape. Plan 02 Task 1 implements `discoverTouchedFiles` directly against this confirmed shape, with no defensive alternate-shape branches.
    - What we know: The Agent SDK hooks documentation (fetched this session) references `tool_input.file_path` as an existing, real field name used in its own examples, and the general Claude API `tool_use` content-block shape (`type`, `name`, `input`) is a stable, well-known structure.
-   - What's unclear: Whether this project's transcript files (produced by the Claude Code CLI, not the Agent SDK directly) nest tool_use blocks under `message.content[]` at exactly this same path, or use `type:"tool_use"` at the top level of each JSONL record, or some other shape specific to CLI transcripts vs SDK message objects.
-   - Recommendation: Before finalizing the Node discovery function, the planner/implementer should run `tail -50 <any real transcript_path from a recent session> | node -e '...'` to `JSON.parse` a few real lines and print their structure — a 2-minute Wave 0 smoke-check that removes A1's risk entirely. This repo's own `.claude/hooks/*.sh` scripts prove `transcript_path` and `subagent_type` field names are correct at the top level; only the nested `tool_use` shape for Edit/Write calls remains unconfirmed against a REAL transcript in this session (no live transcript file was available to inspect directly in this research sandbox).
+   - What's unclear: ~~Whether this project's transcript files (produced by the Claude Code CLI, not the Agent SDK directly) nest tool_use blocks under `message.content[]` at exactly this same path~~ — resolved above.
+   - Recommendation (superseded): Before finalizing the Node discovery function, the planner/implementer should run `tail -50 <any real transcript_path from a recent session> | node -e '...'` to `JSON.parse` a few real lines and print their structure — a 2-minute Wave 0 smoke-check that removes A1's risk entirely. This repo's own `.claude/hooks/*.sh` scripts prove `transcript_path` and `subagent_type` field names are correct at the top level; only the nested `tool_use` shape for Edit/Write calls remains unconfirmed against a REAL transcript in this session (no live transcript file was available to inspect directly in this research sandbox). — **Superseded: this smoke-check was performed during planning; see RESOLVED note above.**
 
 2. **Should the hook validate `modelo/*.md` itself, or only client-copied files?**
    - What we know: `modelo/*.md` is read-only and should never be edited by the automation pipeline (docs/proibido-fazer.md); the XMLV requirements don't explicitly exclude modelo files from validation.
