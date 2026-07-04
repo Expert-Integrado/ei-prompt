@@ -3,7 +3,9 @@
 const test = require("node:test");
 const assert = require("node:assert");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 const {
   TIPO_MAP,
@@ -13,12 +15,23 @@ const {
   countAgenteTags,
   validateCasca,
   validateFile,
+  discoverTouchedFiles,
+  runCli,
 } = require("./validate-xml-casca.js");
 
 const FIXTURES_DIR = path.join(__dirname, "__fixtures__", "xml-casca");
+const HOOK_PATH = path.join(__dirname, "validate-xml-casca.js");
 
 function readFixture(name) {
   return fs.readFileSync(path.join(FIXTURES_DIR, name), "utf8");
+}
+
+function makeTempDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), "xml-casca-test-"));
+}
+
+function jsonlLine(obj) {
+  return JSON.stringify(obj);
 }
 
 function hasEscapeOrCdataWording(errors) {
@@ -201,4 +214,61 @@ test("validateFile() with a directory path returns valid:false without throwing 
   });
   assert.strictEqual(result.valid, false);
   assert.ok(result.errors.length > 0);
+});
+
+test("discoverTouchedFiles extracts recognized Edit/Write file_path values from assistant lines, ignoring user lines, unrecognized basenames, and malformed lines", () => {
+  const recognizedPath = path.join(process.cwd(), "modelo", "Qualifier.md");
+  const unrecognizedPath = "/tmp/notes.md";
+
+  const assistantLine = jsonlLine({
+    type: "assistant",
+    message: {
+      content: [
+        { type: "tool_use", name: "Edit", input: { file_path: recognizedPath } },
+        { type: "tool_use", name: "Write", input: { file_path: unrecognizedPath } },
+        { type: "text", text: "some narration" },
+      ],
+    },
+  });
+
+  const userLine = jsonlLine({
+    type: "user",
+    message: {
+      content: [{ type: "tool_use", name: "Edit", input: { file_path: recognizedPath } }],
+    },
+  });
+
+  const malformedLine = "{not valid json at all";
+
+  const tempDir = makeTempDir();
+  const transcriptPath = path.join(tempDir, "transcript.jsonl");
+  fs.writeFileSync(transcriptPath, [assistantLine, userLine, malformedLine].join("\n"));
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = discoverTouchedFiles(transcriptPath);
+  });
+
+  assert.deepStrictEqual(result, [recognizedPath]);
+});
+
+test("discoverTouchedFiles dedupes multiple Edit calls against the same file_path", () => {
+  const recognizedPath = path.join(process.cwd(), "modelo", "Orquestrador.md");
+
+  const assistantLine = jsonlLine({
+    type: "assistant",
+    message: {
+      content: [
+        { type: "tool_use", name: "Edit", input: { file_path: recognizedPath } },
+        { type: "tool_use", name: "Edit", input: { file_path: recognizedPath } },
+      ],
+    },
+  });
+
+  const tempDir = makeTempDir();
+  const transcriptPath = path.join(tempDir, "transcript.jsonl");
+  fs.writeFileSync(transcriptPath, assistantLine);
+
+  const result = discoverTouchedFiles(transcriptPath);
+  assert.deepStrictEqual(result, [recognizedPath]);
 });
