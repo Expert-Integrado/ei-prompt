@@ -135,6 +135,10 @@ None - no external service configuration required. This is a pure Node.js module
 - `TIPO_MAP`, `validateCasca`, and `validateFile` are stable exports Plan 02 can rely on without modification.
 - No blockers identified for Plan 02 (bash wrapper + hook registration) or Plan 03 (manifest.json/settings.json distribution).
 
+## Self-Check: PASSED
+
+All 12 created files exist on disk (validator module, test file, 10 fixtures) and all 4 task/summary commit hashes (`4e98f94`, `464ef33`, `a39b0b0`, `294b3dd`) are present in git log. No missing items.
+
 ---
 *Phase: 01-xml-validation-hook*
 *Completed: 2026-07-04*

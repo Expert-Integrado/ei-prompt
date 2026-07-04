@@ -7,13 +7,13 @@
 
 ### Validação de XML (Hook)
 
-- [ ] **XMLV-01**: Hook determinístico valida que cada arquivo de cliente (`.md` derivado de `modelo/`) começa com a declaração `<?xml version="1.0" encoding="UTF-8"?>` na 1ª linha
-- [ ] **XMLV-02**: Hook valida que a 2ª linha é `<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="…">` com atributos corretos numa linha só
-- [ ] **XMLV-03**: Hook valida que o atributo `tipo` corresponde ao arquivo — mapeamento fixo: Orquestrador→`orchestrator`, Qualifier→`qualifier`, Scheduler→`scheduler`, Protractor→`protractor`, Follow-Up→`followup`, Recepcionista→`orchestrator` + `origem="recepcionista"`
-- [ ] **XMLV-04**: Hook valida raiz única sem aninhamento — todo o conteúdo dentro de um único par `<agente>…</agente>`
+- [x] **XMLV-01**: Hook determinístico valida que cada arquivo de cliente (`.md` derivado de `modelo/`) começa com a declaração `<?xml version="1.0" encoding="UTF-8"?>` na 1ª linha
+- [x] **XMLV-02**: Hook valida que a 2ª linha é `<agente xmlns="https://expertintegrado.com.br/super-sdr/prompt" versao="1.0" tipo="…">` com atributos corretos numa linha só
+- [x] **XMLV-03**: Hook valida que o atributo `tipo` corresponde ao arquivo — mapeamento fixo: Orquestrador→`orchestrator`, Qualifier→`qualifier`, Scheduler→`scheduler`, Protractor→`protractor`, Follow-Up→`followup`, Recepcionista→`orchestrator` + `origem="recepcionista"`
+- [x] **XMLV-04**: Hook valida raiz única sem aninhamento — todo o conteúdo dentro de um único par `<agente>…</agente>`
 - [ ] **XMLV-05**: Hook roda automaticamente no pipeline de review (integrado aos hooks `Stop`/`SubagentStop` existentes — `post-ajustes-fanout.sh`, `post-scaffolder-review.sh`), sem exigir invocação manual
-- [ ] **XMLV-06**: Falha do hook reporta arquivo + linha/coluna do problema (mensagem acionável, não só "falhou")
-- [ ] **XMLV-07**: Ponto cego aceito preservado — conteúdo variável do cliente com `<`/`&` cru pode quebrar o parse; isso é esperado e não deve ser "consertado" com escaping/CDATA nem tratado como falha do hook em si
+- [x] **XMLV-06**: Falha do hook reporta arquivo + linha/coluna do problema (mensagem acionável, não só "falhou")
+- [x] **XMLV-07**: Ponto cego aceito preservado — conteúdo variável do cliente com `<`/`&` cru pode quebrar o parse; isso é esperado e não deve ser "consertado" com escaping/CDATA nem tratado como falha do hook em si
 
 ### Scaffolding de Cliente em 3 Passos
 
@@ -39,13 +39,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| XMLV-01 | Phase 1 | Pending |
-| XMLV-02 | Phase 1 | Pending |
-| XMLV-03 | Phase 1 | Pending |
-| XMLV-04 | Phase 1 | Pending |
+| XMLV-01 | Phase 1 | Complete |
+| XMLV-02 | Phase 1 | Complete |
+| XMLV-03 | Phase 1 | Complete |
+| XMLV-04 | Phase 1 | Complete |
 | XMLV-05 | Phase 1 | Pending |
-| XMLV-06 | Phase 1 | Pending |
-| XMLV-07 | Phase 1 | Pending |
+| XMLV-06 | Phase 1 | Complete |
+| XMLV-07 | Phase 1 | Complete |
 | SCAF-01 | Phase 2 | Pending |
 | SCAF-02 | Phase 2 | Pending |
 | SCAF-03 | Phase 2 | Pending |
@@ -54,6 +54,7 @@
 | SCAF-06 | Phase 2 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 13 total
 - Mapped to phases: 13
 - Unmapped: 0 ✓

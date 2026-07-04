@@ -30,12 +30,12 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
   4. The hook runs automatically when `post-ajustes-fanout.sh` (Stop) or `post-scaffolder-review.sh` (SubagentStop) fire — no manual invocation required — and the existing sentinel/anti-loop protocols in both hooks continue to work unchanged.
   5. Running the hook against a file whose valid casca wraps client content containing raw `<`/`&` that breaks the parse reports a parse failure without any auto-escaping/CDATA "correction" being applied — the blind spot is preserved, not silently patched.
 
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Core validator engine (validateCasca/validateFile, fixtures, node:test suite)
+- [x] 01-01-PLAN.md — Core validator engine (validateCasca/validateFile, fixtures, node:test suite)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -68,7 +68,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. XML Validation Hook | 0/3 | Planned | - |
+| 1. XML Validation Hook | 1/3 | In Progress|  |
 | 2. 3-Step Gated Client Scaffolding | 0/TBD | Not started | - |
 </content>
 

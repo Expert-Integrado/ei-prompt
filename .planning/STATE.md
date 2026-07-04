@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 1
-current_phase_name: XML Validation Hook
+current_phase: 01
+current_phase_name: xml-validation-hook
 status: executing
 stopped_at: Phase 1 context gathered
-last_updated: "2026-07-04T22:52:01.168Z"
+last_updated: "2026-07-04T23:14:36.727Z"
 last_activity: 2026-07-04
-last_activity_desc: Roadmap created, 13/13 requirements mapped across 2 phases.
+last_activity_desc: Phase 01 execution started
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 3
+  completed_plans: 1
   percent: 0
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 1: XML Validation Hook
+**Current focus:** Phase 01 — xml-validation-hook
 
 ## Current Position
 
-Phase: 1 of 2 (XML Validation Hook)
-Plan: 0 of TBD in current phase
+Phase: 01 (xml-validation-hook) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-07-04 — Roadmap created, 13/13 requirements mapped across 2 phases.
+Last activity: 2026-07-04 — Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P01 | 20min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,7 @@ Recent decisions affecting current work:
 
 - Phase 1: Validação de XML vira hook determinístico (Node built-in / `xmllint`), não regra em prompt — código sempre checa, editor de IA não pode simplesmente esquecer a regra.
 - Phase 2: Criação de cliente vira 3 passos (scaffold → coleta → preenchimento) com gate duro entre coleta e preenchimento, mesmo padrão do gate humano de `/ei-ajustes` Passo 3.5.
+- [Phase 01]: XMLV-01 coluna de erro: col:1 quando linha 1 não começa com <?xml (ausência total), ou índice de divergência preciso quando o prefixo <?xml está presente mas diverge depois — Satisfaz literalmente os dois comportamentos especificados no PLAN.md para missing-declaration.md (col 1) e wrong-declaration.md (coluna precisa de divergência)
 
 ### Roadmap Evolution
 
@@ -92,7 +94,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-04T22:05:32.297Z
+Last session: 2026-07-04T23:10:29.481Z
 Stopped at: Phase 1 context gathered
 Resume file: .planning/phases/01-xml-validation-hook/01-CONTEXT.md
 </content>
