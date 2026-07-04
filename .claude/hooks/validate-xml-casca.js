@@ -247,6 +247,31 @@ function discoverTouchedFiles(transcriptPath, tailLines = 400) {
   );
 }
 
+function runCli(argv) {
+  const flagIndex = argv.indexOf("--transcript");
+  if (flagIndex === -1 || flagIndex + 1 >= argv.length) {
+    return {};
+  }
+  const transcriptPath = argv[flagIndex + 1];
+
+  const files = discoverTouchedFiles(transcriptPath);
+  if (files.length === 0) {
+    return {};
+  }
+
+  const errors = [];
+  for (const filePath of files) {
+    const result = validateFile(filePath);
+    errors.push(...result.errors);
+  }
+
+  if (errors.length === 0) {
+    return {};
+  }
+
+  return { decision: "block", reason: errors.map((e) => e.message).join("\n") };
+}
+
 module.exports = {
   TIPO_MAP,
   normalizeContent,
@@ -256,4 +281,10 @@ module.exports = {
   validateCasca,
   validateFile,
   discoverTouchedFiles,
+  runCli,
 };
+
+if (require.main === module) {
+  const result = runCli(process.argv.slice(2));
+  console.log(JSON.stringify(result));
+}
