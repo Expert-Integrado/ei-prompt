@@ -33,8 +33,16 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 01-01-PLAN.md — Core validator engine (validateCasca/validateFile, fixtures, node:test suite)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01-02-PLAN.md — Transcript file discovery + CLI wiring (discoverTouchedFiles, runCli)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 01-03-PLAN.md — Bash wrapper, Stop/SubagentStop registration, manifest.json distribution, human checkpoint
 
 ### Phase 2: 3-Step Gated Client Scaffolding
