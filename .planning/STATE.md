@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: xml-validation-hook
-status: complete
-stopped_at: "Phase 01 (xml-validation-hook) fully executed — Plan 03 Task 3 human-verify checkpoint approved. Ready to plan Phase 2."
-last_updated: "2026-07-04T23:33:41.829Z"
+status: gaps_found
+stopped_at: "Phase 01 (xml-validation-hook) all 3 plans executed, but verifier found a gap (discoverTouchedFiles not turn-scoped, D-06) — 01-VERIFICATION.md created. Run /gsd-plan-phase 01 --gaps."
+last_updated: "2026-07-04T23:50:00.000Z"
 last_activity: 2026-07-04
-last_activity_desc: Completed 01-03-PLAN.md (Task 3 human-verify checkpoint approved) — Phase 01 fully executed, all 7 requirements (XMLV-01..07) satisfied
+last_activity_desc: Verified phase 01 — gaps_found (11/12 must-haves; discoverTouchedFiles turn-scoping gap, see 01-VERIFICATION.md)
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 0
   total_plans: 3
   completed_plans: 3
   percent: 33
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 01 — xml-validation-hook (complete) → Phase 02 next
+**Current focus:** Phase 01 — xml-validation-hook (gaps found — gap closure plan needed before advancing)
 
 ## Current Position
 
-Phase: 01 (xml-validation-hook) — COMPLETE
-Plan: 3 of 3 (all executed)
-Status: Phase complete — ready to plan Phase 2
-Last activity: 2026-07-04 — 01-03-PLAN.md Task 3 human-verify checkpoint approved; Phase 01 fully executed, all 7 requirements (XMLV-01..07) satisfied
+Phase: 01 (xml-validation-hook) — GAPS FOUND
+Plan: 3 of 3 executed, verification found 1 gap
+Status: Awaiting gap closure — run `/gsd-plan-phase 01 --gaps`
+Last activity: 2026-07-04 — Verifier found discoverTouchedFiles is not scoped to the current turn (D-06 violation); see 01-VERIFICATION.md
 
 Progress: [███░░░░░░░] 33%
 
@@ -99,7 +99,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-04T23:32:42.905Z
-Stopped at: Completed 01-03-PLAN.md — Phase 01 (xml-validation-hook) fully executed. All 3 plans complete, all 7 requirements (XMLV-01..07) satisfied. Ready to plan Phase 2 (3-Step Gated Client Scaffolding).
-Resume file: None
+Last session: 2026-07-04T23:50:00.000Z
+Stopped at: All 3 plans of Phase 01 executed; verification found 1 gap (discoverTouchedFiles turn-scoping, D-06). Run /gsd-plan-phase 01 --gaps to close it before advancing to Phase 2.
+Resume file: .planning/phases/01-xml-validation-hook/01-VERIFICATION.md
 </content>
