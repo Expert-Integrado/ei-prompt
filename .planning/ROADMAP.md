@@ -18,7 +18,7 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
 
 ### Phase 1: XML Validation Hook
 
-**Goal**: A client file with broken XML casca (missing/incorrect declaration, wrong `tipo`, nested/duplicate roots) is always caught by deterministic code — before or during review — with an actionable file+line/column error, without ever attempting to "fix" the accepted blind spot (raw `<`/`&` in client content).
+**Goal:** As a developer maintaining the ei-prompt AI editing pipeline (docs-editor-conciso, client-project-scaffolder), I want to have every client agent file's XML casca checked automatically by deterministic code, so that a broken casca (missing/incorrect declaration, wrong `tipo`, nested/duplicate roots) is always caught with an actionable file+line/column error — without ever auto-"fixing" the accepted raw `<`/`&` blind spot.
 **Mode:** mvp
 **Depends on**: Nothing (first phase; independent track from Phase 2)
 **Requirements**: XMLV-01, XMLV-02, XMLV-03, XMLV-04, XMLV-05, XMLV-06, XMLV-07
@@ -30,7 +30,12 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
   4. The hook runs automatically when `post-ajustes-fanout.sh` (Stop) or `post-scaffolder-review.sh` (SubagentStop) fire — no manual invocation required — and the existing sentinel/anti-loop protocols in both hooks continue to work unchanged.
   5. Running the hook against a file whose valid casca wraps client content containing raw `<`/`&` that breaks the parse reports a parse failure without any auto-escaping/CDATA "correction" being applied — the blind spot is preserved, not silently patched.
 
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Core validator engine (validateCasca/validateFile, fixtures, node:test suite)
+- [ ] 01-02-PLAN.md — Transcript file discovery + CLI wiring (discoverTouchedFiles, runCli)
+- [ ] 01-03-PLAN.md — Bash wrapper, Stop/SubagentStop registration, manifest.json distribution, human checkpoint
 
 ### Phase 2: 3-Step Gated Client Scaffolding
 
@@ -55,7 +60,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. XML Validation Hook | 0/TBD | Not started | - |
+| 1. XML Validation Hook | 0/3 | Planned | - |
 | 2. 3-Step Gated Client Scaffolding | 0/TBD | Not started | - |
 </content>
 
