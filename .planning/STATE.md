@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 01
-current_phase_name: xml-validation-hook
+current_phase: 02
+current_phase_name: three-step-gated-client-scaffolding
 status: planning
-stopped_at: Phase 02 context gathered
-last_updated: "2026-07-05T01:24:06.965Z"
+stopped_at: "Phase 02 (3-Step Gated Client Scaffolding) planned — 5 plans created, gsd-plan-checker VERIFICATION PASSED (6/6 requirements, 7/7 CONTEXT.md decisions covered). Ready to execute — run /gsd-execute-phase 02."
+last_updated: "2026-07-05T21:03:43.000Z"
 last_activity: 2026-07-05
-last_activity_desc: Verified phase 01 (12/12 must-haves, up from 11/12) — D-06/WR-02 gap closed by 01-04-PLAN.md
+last_activity_desc: Planned phase 02 — 5 plans (4 waves), plan-checker passed after 1 revision (RESEARCH.md open-questions + VALIDATION.md sign-off closeout)
 progress:
   total_phases: 3
   completed_phases: 1
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 01 — xml-validation-hook (complete, verified) → Phase 02 next
+**Current focus:** Phase 01 complete, verified → Phase 02 — three-step-gated-client-scaffolding (planned, ready to execute)
 
 ## Current Position
 
-Phase: 01 (xml-validation-hook) — COMPLETE, verified (12/12 must-haves) → Phase 02 (3-Step Gated Client Scaffolding) next
-Plan: 4 of 4 (all executed)
-Status: Ready to plan Phase 2 — run `/gsd-discuss-phase 02`
-Last activity: 2026-07-05 — Verified phase 01 (12/12 must-haves, up from 11/12) — D-06/WR-02 gap closed by 01-04-PLAN.md
+Phase: 02 (3-Step Gated Client Scaffolding) — PLANNED, verified (plan-checker passed) — Phase 01 complete, verified (12/12 must-haves)
+Plan: 0 of 5 (all pending execution)
+Status: Ready to execute — run `/gsd-execute-phase 02`
+Last activity: 2026-07-05 — Planned phase 02 (5 plans, 4 waves); plan-checker passed after 1 revision (RESEARCH.md open-questions + VALIDATION.md sign-off closeout)
 
 Progress: [███░░░░░░░] 33%
 
@@ -80,6 +80,8 @@ Recent decisions affecting current work:
 
 - Phase 3 added: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
 - Corrected `current_phase` back to 02 after phase-completion tooling advanced it straight to 03 — Phase 2 has no `.planning/phases/02-*` dir yet (never discussed/planned), so the next-phase resolver skipped over it. Roadmap order (1→2→3) and Phase 3's own "Depends on: Phase 2" are unaffected; Phase 2 is still next.
+- Renamed `.planning/phases/02-3-step-gated-client-scaffolding/` → `02-three-step-gated-client-scaffolding/` — gsd-tools' phase-token matcher folds leading numeric slug segments into the phase token, so the digit-leading slug ("3-step-...") resolved to token "02-3" instead of "02", making every `/gsd-*` command targeting phase 02 blind to the existing CONTEXT.md. Same collision would recur for any phase whose name starts with a digit — worth remembering if a future phase name starts with a number.
+- Reworded Phase 2's ROADMAP.md `**Goal:**` line into canonical "As a / I want to / so that" user-story form — the original outcome-statement phrasing blocked the planner under MVP mode (`planner-mvp-mode.md` requires the story form to derive vertical slices). No scope change, wording only.
 
 ### Pending Todos
 
@@ -103,7 +105,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-05T01:24:06.905Z
-Stopped at: Phase 02 context gathered
-Resume file: .planning/phases/02-three-step-gated-client-scaffolding/02-CONTEXT.md
+Last session: 2026-07-05T21:03:43.000Z
+Stopped at: Phase 02 planned (5 plans, verified) — ready to execute
+Resume file: .planning/phases/02-three-step-gated-client-scaffolding/02-05-PLAN.md
 </content>
