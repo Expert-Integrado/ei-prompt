@@ -12,7 +12,7 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: XML Validation Hook** - Deterministic hook catches broken/malformed XML casca in client files automatically, wired into the existing Stop/SubagentStop pipeline. (gaps found 2026-07-04 — see 01-VERIFICATION.md) (completed 2026-07-05)
-- [ ] **Phase 2: 3-Step Gated Client Scaffolding** - Client creation split into scaffold → gather → fill steps with a hard gate, applied to both single-agent and multi-agent modes.
+- [x] **Phase 2: 3-Step Gated Client Scaffolding** - Client creation split into scaffold → gather → fill steps with a hard gate, applied to both single-agent and multi-agent modes. (completed 2026-07-05)
 
 ## Phase Details
 
@@ -63,7 +63,7 @@ Plans:
   4. Running Passo 3 fills the template files with the data collected in Passo 2, preserving `{{variavel}}` placeholder syntax for anything not yet substituted and the `[PENDENTE - informação não fornecida]` marker for consciously pending fields.
   5. The full Passo 1→2→3 flow, including the hard gate, behaves identically for both `single-agent` and `multi-agente-especialidade-unica` modes.
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 **Wave 1**
@@ -81,7 +81,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 2/3 completion)*
 
-- [ ] 02-05-PLAN.md — Live-session verification checkpoint (both modes + deliberate Cancel test)
+- [x] 02-05-PLAN.md — Live-session verification checkpoint (both modes + deliberate Cancel test)
 
 ## Progress
 
@@ -91,7 +91,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
-| 2. 3-Step Gated Client Scaffolding | 4/5 | In Progress|  |
+| 2. 3-Step Gated Client Scaffolding | 5/5 | Complete   | 2026-07-05 |
 </content>
 
 ### Phase 3: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
