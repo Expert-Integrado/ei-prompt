@@ -220,6 +220,16 @@ test("discoverTouchedFiles extracts recognized Edit/Write file_path values from 
   const recognizedPath = path.join(process.cwd(), "modelo", "Qualifier.md");
   const unrecognizedPath = "/tmp/notes.md";
 
+  // A realistic human turn-start message: plain string content, no tool_use/tool_result at
+  // all. Placed FIRST so it establishes the turn boundary before the assistant's edits
+  // (Task 1's corrected turn-boundary semantics — see 01-04-PLAN.md).
+  const userLine = jsonlLine({
+    type: "user",
+    message: {
+      content: "algum texto do usuário",
+    },
+  });
+
   const assistantLine = jsonlLine({
     type: "assistant",
     message: {
@@ -231,18 +241,11 @@ test("discoverTouchedFiles extracts recognized Edit/Write file_path values from 
     },
   });
 
-  const userLine = jsonlLine({
-    type: "user",
-    message: {
-      content: [{ type: "tool_use", name: "Edit", input: { file_path: recognizedPath } }],
-    },
-  });
-
   const malformedLine = "{not valid json at all";
 
   const tempDir = makeTempDir();
   const transcriptPath = path.join(tempDir, "transcript.jsonl");
-  fs.writeFileSync(transcriptPath, [assistantLine, userLine, malformedLine].join("\n"));
+  fs.writeFileSync(transcriptPath, [userLine, assistantLine, malformedLine].join("\n"));
 
   let result;
   assert.doesNotThrow(() => {
@@ -250,6 +253,115 @@ test("discoverTouchedFiles extracts recognized Edit/Write file_path values from 
   });
 
   assert.deepStrictEqual(result, [recognizedPath]);
+});
+
+test("discoverTouchedFiles/runCli do not block on a file edited many turns ago and since deleted (WR-02 regression, 01-VERIFICATION.md/01-REVIEW.md)", () => {
+  const tempDir = makeTempDir();
+  const staleFilePath = path.join(tempDir, "Qualifier.md");
+  fs.writeFileSync(staleFilePath, readFixture("missing-declaration.md"));
+
+  const jsonlLines = [];
+  // Turn 1: genuine user line, then the assistant edits the stale file.
+  jsonlLines.push(jsonlLine({ type: "user", message: { content: "primeira mensagem do usuário" } }));
+  jsonlLines.push(
+    jsonlLine({
+      type: "assistant",
+      message: { content: [{ type: "tool_use", name: "Edit", input: { file_path: staleFilePath } }] },
+    }),
+  );
+
+  // ~50 filler turn pairs unrelated to the stale file.
+  for (let i = 0; i < 50; i++) {
+    jsonlLines.push(jsonlLine({ type: "user", message: { content: `mensagem de preenchimento ${i}` } }));
+    if (i % 2 === 0) {
+      jsonlLines.push(jsonlLine({ type: "assistant", message: { content: [{ type: "text", text: "ok" }] } }));
+    } else {
+      jsonlLines.push(
+        jsonlLine({
+          type: "assistant",
+          message: {
+            content: [{ type: "tool_use", name: "Edit", input: { file_path: "/tmp/unrelated-notes.md" } }],
+          },
+        }),
+      );
+    }
+  }
+
+  // Final current turn: genuine user line, assistant line with no Edit/Write at all.
+  jsonlLines.push(jsonlLine({ type: "user", message: { content: "última mensagem do usuário" } }));
+  jsonlLines.push(jsonlLine({ type: "assistant", message: { content: [{ type: "text", text: "sem edits" }] } }));
+
+  const transcriptPath = path.join(tempDir, "transcript.jsonl");
+  fs.writeFileSync(transcriptPath, jsonlLines.join("\n"));
+
+  // Delete the file from disk before invoking, mirroring the exact WR-02 repro.
+  fs.unlinkSync(staleFilePath);
+
+  const discovered = discoverTouchedFiles(transcriptPath);
+  assert.ok(!discovered.includes(staleFilePath), `expected stale file excluded, got: ${JSON.stringify(discovered)}`);
+
+  const result = runCli(["--transcript", transcriptPath]);
+  assert.deepStrictEqual(result, {});
+});
+
+test("discoverTouchedFiles still finds an earlier same-turn edit across an intervening tool_result relay line", () => {
+  const tempDirA = makeTempDir();
+  const filePathA = path.join(tempDirA, "Orquestrador.md");
+  fs.writeFileSync(filePathA, readFixture("valid-orquestrador.md"));
+
+  const tempDirB = makeTempDir();
+  const filePathB = path.join(tempDirB, "Scheduler.md");
+  fs.writeFileSync(filePathB, readFixture("valid-orquestrador.md"));
+
+  const userLine = jsonlLine({ type: "user", message: { content: "mensagem do usuário" } });
+  const assistantLineA = jsonlLine({
+    type: "assistant",
+    message: { content: [{ type: "tool_use", name: "Edit", input: { file_path: filePathA } }] },
+  });
+  // A realistic tool_result relay — content composed entirely of tool_result blocks — must
+  // NOT be treated as a new turn boundary.
+  const toolResultRelayLine = jsonlLine({
+    type: "user",
+    message: { content: [{ type: "tool_result", tool_use_id: "toolu_1", content: "ok" }] },
+  });
+  const assistantLineB = jsonlLine({
+    type: "assistant",
+    message: { content: [{ type: "tool_use", name: "Edit", input: { file_path: filePathB } }] },
+  });
+
+  const tempDir = makeTempDir();
+  const transcriptPath = path.join(tempDir, "transcript.jsonl");
+  fs.writeFileSync(
+    transcriptPath,
+    [userLine, assistantLineA, toolResultRelayLine, assistantLineB].join("\n"),
+  );
+
+  const result = discoverTouchedFiles(transcriptPath);
+  assert.deepStrictEqual(result.slice().sort(), [filePathA, filePathB].sort());
+});
+
+test("runCli treats a discovered-but-since-deleted current-turn file as a silent no-op, not a block", () => {
+  const tempDir = makeTempDir();
+  const filePath = path.join(tempDir, "Protractor.md");
+  fs.writeFileSync(filePath, readFixture("valid-orquestrador.md"));
+
+  const userLine = jsonlLine({ type: "user", message: { content: "mensagem do usuário" } });
+  const assistantLine = jsonlLine({
+    type: "assistant",
+    message: { content: [{ type: "tool_use", name: "Edit", input: { file_path: filePath } }] },
+  });
+  const transcriptPath = path.join(tempDir, "transcript.jsonl");
+  fs.writeFileSync(transcriptPath, [userLine, assistantLine].join("\n"));
+
+  fs.unlinkSync(filePath);
+
+  const cliResult = runCli(["--transcript", transcriptPath]);
+  assert.deepStrictEqual(cliResult, {});
+
+  const directResult = validateFile(filePath);
+  assert.strictEqual(directResult.valid, false);
+  assert.ok(directResult.errors.length > 0);
+  assert.strictEqual(directResult.errors[0].code, "ENOENT");
 });
 
 test("discoverTouchedFiles dedupes multiple Edit calls against the same file_path", () => {
