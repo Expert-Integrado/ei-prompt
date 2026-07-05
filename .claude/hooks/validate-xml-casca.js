@@ -186,14 +186,19 @@ function validateFile(filePath) {
   try {
     stat = fs.statSync(filePath);
   } catch (err) {
-    return { valid: false, errors: [{ message: `arquivo inacessível: ${filePath}` }] };
+    return { valid: false, errors: [{ message: `arquivo inacessível: ${filePath}`, code: err.code }] };
   }
 
   if (!stat.isFile()) {
     return { valid: false, errors: [{ message: `não é um arquivo regular: ${filePath}` }] };
   }
 
-  const content = fs.readFileSync(filePath, "utf8");
+  let content;
+  try {
+    content = fs.readFileSync(filePath, "utf8");
+  } catch (err) {
+    return { valid: false, errors: [{ message: `arquivo inacessível: ${filePath}`, code: err.code }] };
+  }
   const result = validateCasca(content, path.basename(filePath));
 
   const errors = result.errors.map((e) => {
@@ -204,6 +209,20 @@ function validateFile(filePath) {
   });
 
   return { valid: result.valid, errors };
+}
+
+// Distinguishes a genuine human/slash-command turn start from Claude Code's synthetic
+// tool_result-carrier "type":"user" messages — empirically confirmed against this repo's
+// own real transcripts that the large majority of "type":"user" lines are pure tool_result
+// relays, not new turns (D-06/WR-02).
+function isGenuineUserTurnStart(parsed) {
+  if (!parsed || parsed.type !== "user") return false;
+  const content = parsed.message && parsed.message.content;
+  if (typeof content === "string") return true;
+  if (Array.isArray(content)) {
+    return content.some((block) => block && block.type !== "tool_result");
+  }
+  return false;
 }
 
 function discoverTouchedFiles(transcriptPath, tailLines = 400) {
@@ -218,7 +237,27 @@ function discoverTouchedFiles(transcriptPath, tailLines = 400) {
   const lines = allLines.slice(-tailLines);
   const found = new Set();
 
-  for (const line of lines) {
+  // Scan backward for the most recent genuine user-turn-start line to scope discovery
+  // to the current turn only (D-06). Fail open to the full window if none is found —
+  // detection must never be silently narrower-than-intended just because a boundary
+  // couldn't be identified.
+  let turnStart = 0;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+    let parsed;
+    try {
+      parsed = JSON.parse(line);
+    } catch (err) {
+      continue;
+    }
+    if (isGenuineUserTurnStart(parsed)) {
+      turnStart = i;
+      break;
+    }
+  }
+
+  for (const line of lines.slice(turnStart)) {
     if (!line.trim()) continue;
 
     let parsed;
@@ -262,6 +301,12 @@ function runCli(argv) {
   const errors = [];
   for (const filePath of files) {
     const result = validateFile(filePath);
+    if (result.valid === false && result.errors.every((e) => e.code === "ENOENT")) {
+      // File discovered as touched in the current turn but since deleted from disk —
+      // "nothing to validate", not a casca violation (WR-02). Does not weaken D-07's
+      // "always blocks on a broken casca" for files that still exist.
+      continue;
+    }
     errors.push(...result.errors);
   }
 
