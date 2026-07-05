@@ -14,7 +14,9 @@
     "modelo/Protractor.md",
     "modelo/Follow-Up.md",
     "modelo/Recepcionista.md",
-    ".claude/agents/client-project-scaffolder.md",
+    ".claude/agents/client-scaffold-structure.md",
+    ".claude/agents/client-scaffold-collect.md",
+    ".claude/agents/client-scaffold-fill.md",
     ".claude/agents/recepcionista-scaffolder.md",
     ".claude/agents/docs-editor-conciso.md",
     ".claude/agents/docs-reviewer.md",
@@ -33,6 +35,7 @@
   "deprecated_files": [
     ".claude/commands/ei-edit.md",
     ".claude/commands/ei-review.md",
-    ".claude/commands/ei-ctx.md"
+    ".claude/commands/ei-ctx.md",
+    ".claude/agents/client-project-scaffolder.md"
   ]
 }
