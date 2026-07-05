@@ -105,5 +105,5 @@ Items acknowledged and carried forward from previous milestone close:
 
 Last session: 2026-07-05T01:24:06.905Z
 Stopped at: Phase 02 context gathered
-Resume file: .planning/phases/02-3-step-gated-client-scaffolding/02-CONTEXT.md
+Resume file: .planning/phases/02-three-step-gated-client-scaffolding/02-CONTEXT.md
 </content>

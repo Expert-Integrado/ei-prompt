@@ -4,7 +4,7 @@
 > Decisions are captured in CONTEXT.md — this log preserves the alternatives considered.
 
 **Date:** 2026-07-05
-**Phase:** 02-3-step-gated-client-scaffolding
+**Phase:** 02-three-step-gated-client-scaffolding
 **Areas discussed:** Granularidade dos passos, Escopo do split no modo multi-agente, Recepcionista entra no split?, UX do gate duro (Passo 2→3)
 
 ---
