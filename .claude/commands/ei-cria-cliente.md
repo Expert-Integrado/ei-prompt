@@ -131,17 +131,38 @@ Em ambos os casos (aprovação ou cancelamento), prossiga para o **Passo 5** (re
 
 > Não colete `descricao` nem `gatilhos` agora — o `recepcionista-scaffolder` vai pedir esses dados depois, quando os agentes especialistas já existirem.
 
-**(b) LOOP — criar cada especialidade via `client-project-scaffolder`**
-Para **cada nome** da lista coletada em (a), dispare o `client-project-scaffolder` via Agent tool **uma vez**. Ou seja: N especialidades = N invocações do agente, em sequência (não em paralelo).
+**(b) LOOP — para cada especialidade, encadear os 3 subagents + Gate de Confirmação**
+Para **cada nome** da lista coletada em (a), execute o mesmo ciclo de 4 etapas sequenciais do Passo 4A — estrutura → coleta → gate → preenchimento — antes de passar para a próxima especialidade. Ou seja: N especialidades = N ciclos completos, em sequência (não em paralelo), nunca reaproveitando contexto/respostas entre iterações.
 
-Cada invocação recebe:
-- `modo: multi-agente-especialidade-unica`
-- `nome_cliente: <valor>`
-- `especialidade: <nome da especialidade dessa iteração>`
+Para a especialidade da iteração atual:
 
-Instrução do prompt: "Crie a subpasta `<nome_cliente>/<especialidade>/` com `Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md` (com `TRANSFERIR_PARA_AGENT` ativo) e `Follow-Up.md`. Pergunte ao usuário TODOS os dados específicos dessa especialidade do zero (frases características, regras de qualificação, conhecimento, mídias, etc.) — não assuma contexto de chamadas anteriores. **NÃO** criar pasta `Recepcionista/`. **NÃO** criar outras especialidades."
+1. **Dispare `client-scaffold-structure`** via Agent tool com:
+   - `modo: multi-agente-especialidade-unica`
+   - `nome_cliente: <valor>`
+   - `especialidade: <nome da especialidade dessa iteração>`
 
-> Aguarde cada iteração terminar antes de iniciar a próxima — escolha sequencial preserva o foco do usuário em uma especialidade por vez.
+   Instrução do prompt: "Crie a subpasta `<nome_cliente>/<especialidade>/` com `Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md` (com `TRANSFERIR_PARA_AGENT` ativo) e `Follow-Up.md`. **NÃO** criar pasta `Recepcionista/`. **NÃO** criar outras especialidades."
+
+   Aguarde o retorno com o caminho da subpasta criada.
+
+2. **Dispare `client-scaffold-collect`** via Agent tool com:
+   - `cliente_path: <caminho retornado no passo anterior>`
+   - `modo: multi`
+   - `especialidade: <nome da especialidade dessa iteração>`
+
+   Instrução do prompt: "Pergunte ao usuário TODOS os dados específicos desta especialidade do zero (frases características, regras de qualificação, conhecimento, mídias, etc.) — não assuma contexto de iterações anteriores do loop, mesmo que outra especialidade já tenha respondido perguntas parecidas."
+
+   Aguarde o retorno com o bloco `<dados_coletados>` **desta especialidade**.
+
+3. **Invoque a subseção "Gate de Confirmação (Passo 2→3)"** acima, usando o `<dados_coletados>` desta especialidade (o texto da `question` deve identificar a especialidade atual, ex: `Campos coletados para <cliente>/<especialidade>:`).
+
+4. **Conforme o resultado do gate:**
+   - Aprovação → dispare `client-scaffold-fill` via Agent tool com `cliente_path: <mesmo caminho da subpasta>` e o bloco `<dados_coletados>` COMPLETO embutido literalmente. Registre o status desta especialidade como **preenchida**.
+   - Cancelar → **NÃO** despache `client-scaffold-fill` para esta especialidade, seguindo o comportamento não-destrutivo do Gate de Confirmação (a subpasta criada no passo 1 permanece em disco, sem preenchimento). Registre o status desta especialidade como **cancelada-e-não-preenchida**.
+
+   Em ambos os casos, **CONTINUE o loop para a próxima especialidade da lista** — o cancelamento de uma especialidade nunca aborta o restante do fluxo `/ei-cria-cliente`. Isso é um default deliberado e documentado (não um silêncio ambíguo): cada ciclo por especialidade é independente (D-03), e o status final de cada uma (preenchida ou cancelada-e-não-preenchida) é reportado no Passo 5 consolidado, nunca perdido silenciosamente.
+
+> Aguarde cada ciclo completo (estrutura → coleta → gate → preenchimento/cancelamento) terminar antes de iniciar o próximo — escolha sequencial preserva o foco do usuário em uma especialidade por vez e garante que cada uma seja perguntada do zero.
 
 **(c) Criar Recepcionista — `recepcionista-scaffolder` DEPOIS DO LOOP**
 Quando TODAS as especialidades estiverem criadas, dispare o `recepcionista-scaffolder` via Agent tool com:
@@ -160,13 +181,14 @@ Instrução: "As pastas das especialidades já existem em `<nome_cliente>/<cada_
 2. Pergunte o **nome da empresa**.
 3. Dispare via Agent tool o `recepcionista-scaffolder` com `nome_cliente`, `empresa`, `especialidades` (lista coletada).
 
-> O `client-project-scaffolder` **não é disparado** neste caminho.
+> O loop de especialidades (`client-scaffold-structure`/`client-scaffold-collect`/`client-scaffold-fill`) **não é disparado** neste caminho.
 
 ### Passo 5 — Resumo final
-Apresente ao usuário:
+Apresente ao usuário, em **um único resumo consolidado ao final de todo o fluxo** (D-04 — nunca um resumo por especialidade):
 - Estrutura criada (árvore de pastas).
-- Campos pendentes consolidados.
-- Próximos passos (revisar pendências, testar prompt etc).
+- Em modo multi-agente (4B.1), o status de cada ciclo por especialidade — **preenchida** ou **cancelada-e-não-preenchida** (ver Passo 4B.1(b)) — lado a lado com os campos pendentes.
+- Campos pendentes consolidados (de todos os agentes/especialidades preenchidos).
+- Próximos passos (revisar pendências, preencher manualmente as especialidades canceladas se desejado, testar prompt etc).
 
 > A auditoria automática (`docs-reviewer`) é disparada via hook `SubagentStop` ao fim de cada agente.
 
@@ -174,7 +196,7 @@ Apresente ao usuário:
 
 - **NUNCA** pular o Passo 1 (contexto).
 - **NUNCA** disparar `recepcionista-scaffolder` em modo single-agent.
-- **NUNCA** disparar `client-project-scaffolder` e `recepcionista-scaffolder` em paralelo no fluxo completo (4B.1) — a ordem é **especialidades → Recepcionista**, pois o Recepcionista precisa que a pasta raiz exista.
-- No bypass (4B.2), o `client-project-scaffolder` **não roda**.
+- **NUNCA** disparar o loop de especialidades (4B.1(b)) e o `recepcionista-scaffolder` em paralelo no fluxo completo (4B.1) — a ordem é **especialidades → Recepcionista**, pois o Recepcionista precisa que a pasta raiz exista.
+- No bypass (4B.2), o loop de especialidades (`client-scaffold-structure`/`client-scaffold-collect`/`client-scaffold-fill`) **não roda**.
 - Se o usuário não fornecer dados obrigatórios, peça antes de disparar os agentes.
-- **REGRA DO LOOP (4B.1):** entre uma iteração e a próxima (ex: "Consumidor criada. Iniciando especialidade 2/2: Trabalhista"), o `client-project-scaffolder` da nova iteração DEVE perguntar ao usuário **TODOS os dados específicos da nova especialidade do zero** (frases, regras de qualificação, conhecimento, mídias). NUNCA disparar a próxima iteração esperando que o agente reaproveite respostas — o prompt da chamada precisa enfatizar "pergunte tudo do zero, não assuma contexto anterior". Só avance para a próxima especialidade quando a atual estiver totalmente preenchida pelo usuário.
+- **REGRA DO LOOP (4B.1(b)):** entre uma iteração e a próxima (ex: "Consumidor preenchida. Iniciando especialidade 2/2: Trabalhista"), cada iteração executa o ciclo completo `client-scaffold-structure` → `client-scaffold-collect` → Gate de Confirmação → `client-scaffold-fill` (ou cancelamento) descrito no Passo 4B.1(b), sempre sequencial (nunca em paralelo) e sempre perguntando **TODOS os dados específicos da nova especialidade do zero** (frases, regras de qualificação, conhecimento, mídias) — NUNCA disparar a próxima iteração esperando que o agente reaproveite respostas de uma especialidade anterior. Um cancelamento no Gate de uma especialidade **não interrompe o loop**: a especialidade fica registrada como cancelada-e-não-preenchida e a próxima da lista é iniciada normalmente. Só avance para a próxima especialidade quando o ciclo da atual (preenchimento ou cancelamento) estiver concluído.
