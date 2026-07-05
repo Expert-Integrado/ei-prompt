@@ -30,7 +30,7 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
   4. The hook runs automatically when `post-ajustes-fanout.sh` (Stop) or `post-scaffolder-review.sh` (SubagentStop) fire — no manual invocation required — and the existing sentinel/anti-loop protocols in both hooks continue to work unchanged.
   5. Running the hook against a file whose valid casca wraps client content containing raw `<`/`&` that breaks the parse reports a parse failure without any auto-escaping/CDATA "correction" being applied — the blind spot is preserved, not silently patched.
 
-**Plans:** 3/3 plans complete
+**Plans:** 3/4 plans complete (gap closure plan added after verification)
 
 Plans:
 **Wave 1**
@@ -44,6 +44,10 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 01-03-PLAN.md — Bash wrapper, Stop/SubagentStop registration, manifest.json distribution, human checkpoint
+
+**Wave 4** *(gap closure — blocked on Wave 2/3 completion)*
+
+- [ ] 01-04-PLAN.md — Scope discoverTouchedFiles to the current turn (WR-02/D-06 fix) + ENOENT-safe runCli, closing the 01-VERIFICATION.md gap
 
 ### Phase 2: 3-Step Gated Client Scaffolding
 
@@ -68,7 +72,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. XML Validation Hook | 3/3 | Gaps found | - |
+| 1. XML Validation Hook | 3/4 | Gap closure plan ready (01-04) | - |
 | 2. 3-Step Gated Client Scaffolding | 0/TBD | Not started | - |
 </content>
 
