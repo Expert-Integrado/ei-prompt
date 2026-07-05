@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 01
-current_phase_name: xml-validation-hook
-status: executing
-stopped_at: Completed 01-04-PLAN.md — D-06/WR-02 gap closed, 27/27 tests passing
-last_updated: "2026-07-05T00:35:50.136Z"
+current_phase: 02
+current_phase_name: 3-step-gated-client-scaffolding
+status: planning
+stopped_at: "Phase 01 (xml-validation-hook) fully executed and verified (12/12 must-haves, D-06/WR-02 gap closed). Ready to plan Phase 2 (3-Step Gated Client Scaffolding)."
+last_updated: "2026-07-05T00:46:39.310Z"
 last_activity: 2026-07-05
-last_activity_desc: Phase 01 execution started
+last_activity_desc: Verified phase 01 — 12/12 must-haves (up from 11/12) — D-06/WR-02 gap closed by 01-04-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 1
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 01 — xml-validation-hook
+**Current focus:** Phase 01 — xml-validation-hook (complete, verified) → Phase 02 next
 
 ## Current Position
 
-Phase: 01 (xml-validation-hook) — PHASE COMPLETE
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-07-04 — Plan 01-04 executed (D-06/WR-02 gap closed, 27/27 tests passing)
+Phase: 01 (xml-validation-hook) — COMPLETE, verified (12/12 must-haves) → Phase 02 (3-Step Gated Client Scaffolding) next
+Plan: 4 of 4 (all executed)
+Status: Ready to plan Phase 2 — run `/gsd-discuss-phase 02`
+Last activity: 2026-07-05 — Verified phase 01 (12/12 must-haves, up from 11/12) — D-06/WR-02 gap closed by 01-04-PLAN.md
 
 Progress: [███░░░░░░░] 33%
 
@@ -39,7 +39,7 @@ Progress: [███░░░░░░░] 33%
 
 **Velocity:**
 
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: ~27 min
 - Total execution time: ~1h 20m
 
@@ -47,7 +47,7 @@ Progress: [███░░░░░░░] 33%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 4 | - | - |
 
 **Recent Trend:**
 
@@ -79,6 +79,7 @@ Recent decisions affecting current work:
 ### Roadmap Evolution
 
 - Phase 3 added: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
+- Corrected `current_phase` back to 02 after phase-completion tooling advanced it straight to 03 — Phase 2 has no `.planning/phases/02-*` dir yet (never discussed/planned), so the next-phase resolver skipped over it. Roadmap order (1→2→3) and Phase 3's own "Depends on: Phase 2" are unaffected; Phase 2 is still next.
 
 ### Pending Todos
 
@@ -102,7 +103,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-05T00:35:50.123Z
-Stopped at: Completed 01-04-PLAN.md — D-06/WR-02 gap closed, 27/27 tests passing
+Last session: 2026-07-05T00:46:39.310Z
+Stopped at: Phase 01 (xml-validation-hook) executed (01-04-PLAN.md, D-06/WR-02 gap closed) and verified (12/12 must-haves). Phase 2 (3-Step Gated Client Scaffolding) is next — not yet discussed or planned.
 Resume file: None
 </content>

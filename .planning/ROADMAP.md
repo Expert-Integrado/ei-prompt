@@ -72,7 +72,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. XML Validation Hook | 4/4 | Complete   | 2026-07-05 |
+| 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
 | 2. 3-Step Gated Client Scaffolding | 0/TBD | Not started | - |
 </content>
 
