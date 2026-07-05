@@ -40,12 +40,68 @@ Se `$ARGUMENTS` estiver preenchido, use como nome da pasta raiz. Caso contrário
 - **Single-agent** → Passo 4A.
 - **Multi-agente** → Passo 4B.
 
-### Passo 4A — Single-agent
-Dispare via Agent tool o `client-project-scaffolder` com:
-- `modo: single-agent`
-- `nome_cliente: <valor>`
+### Gate de Confirmação (Passo 2→3)
 
-O agente segue o fluxo padrão (Fase 0 → Fase 5). Encerre. Pular Passo 4B/5.
+Subseção reutilizável — referenciada (não duplicada) tanto pelo Passo 4A (single-agent, abaixo) quanto pelo Passo 4B.1(b) (multi-agente, loop por especialidade). Espelha **exatamente** o padrão de `.claude/commands/ei-ajustes.md` Passo 3.5 caminho [A] (D-06/D-07).
+
+**Entrada:** o bloco `<dados_coletados>` que `client-scaffold-collect` acabou de devolver para o cliente atual (ou para a especialidade atual, em modo multi).
+
+**Use OBRIGATORIAMENTE a tool `AskUserQuestion`** (não pergunte em texto solto, não imprima markdown de resumo antes). Construa o campo `question` como uma lista numerada — uma linha por `<campo>`/`<midia>` do bloco recebido, mostrando o valor coletado ou o marcador de pendência — terminando com a pergunta se deve prosseguir para o preenchimento:
+
+```json
+{
+  "questions": [{
+    "question": "Campos coletados para <cliente>[/<especialidade>]:\n\n1. Nome do Cliente: Maria Silva\n2. CNPJ: [PENDENTE - informação não fornecida]\n3. Telefone: (11) 99999-0000\n...\n\nPreencher os templates com esses dados agora?",
+    "header": "Confirmação",
+    "multiSelect": false,
+    "options": [
+      {"label": "Aprovar e preencher", "description": "Despacha o preenchimento dos templates com os dados acima."},
+      {"label": "Cancelar", "description": "Encerra sem preencher. A estrutura de pastas criada permanece em disco."}
+    ]
+  }]
+}
+```
+
+- NÃO listar `"Outro"` nas `options` — a UI da `AskUserQuestion` adiciona automaticamente.
+- Exatamente duas opções, com os labels literais acima (D-06): `"Aprovar e preencher"` / `"Cancelar"`.
+
+> **Runtime / no-TTY:** A tool `AskUserQuestion` é built-in do Claude Code >= v2.0.21. Em ambiente headless/no-TTY (SDK Python, CI, Docker sem TTY) ela auto-resolve com `answers={}` em ~37ms — a REGRA INVIOLÁVEL abaixo trata resposta vazia / não-"Aprovar e preencher" como Cancelar (fail-closed automático). Se você executar via SDK ou `--text` mode sem TTY interativo, este gate SEMPRE encerra o ciclo sem preencher — comportamento correto, não bug.
+
+**Interpretação da resposta (fail-closed, D-07):**
+- Resposta = `"Aprovar e preencher"` → prossiga para o despacho de `client-scaffold-fill`, embutindo o bloco `<dados_coletados>` COMPLETO e literal (nunca resumido ou encurtado — Pitfall 2 do RESEARCH.md) no prompt de invocação.
+- Resposta = `"Cancelar"`, resposta vazia, `answers={}`, `"Outro"`, ou qualquer coisa diferente do label exato de aprovação → tratar como Cancelar. `client-scaffold-fill` NUNCA é despachado nesse caso.
+
+**Comportamento de Cancelamento (não-destrutivo):** ao cancelar, NÃO apague nem modifique a estrutura já criada por `client-scaffold-structure` — ela permanece em disco exatamente como está, com `{{variavel}}` e marcadores de pendência ainda não preenchidos (recomendação de RESEARCH.md Open Question 1 / Pitfall 5: non-destructive default). Informe a quem chamou este gate (Passo 4A ou Passo 4B.1(b)) que este ciclo terminou sem preencher — a decisão do que fazer a seguir (encerrar, seguir para a próxima especialidade, etc.) cabe a quem chamou, não a este gate.
+
+#### ⚠️ REGRA INVIOLÁVEL DO GATE DE CONFIRMAÇÃO
+
+NUNCA invoque `client-scaffold-fill` sem que este gate tenha produzido a resposta EXATA do label de aprovação (`"Aprovar e preencher"`) primeiro.
+- Sem caminho alternativo. Sem heurística. Sem rota de exceção em erro.
+- Mesmo se `client-scaffold-collect` tiver retornado com algum campo pendente, isso NÃO dispensa o gate — pendências aparecem listadas na `question` para o humano decidir com informação completa, mas a decisão de prosseguir é sempre humana.
+
+### Passo 4A — Single-agent
+
+Fluxo em 4 etapas sequenciais, encadeando os 3 subagents do Plan 02-01 com o Gate de Confirmação no meio:
+
+1. **Dispare `client-scaffold-structure`** via Agent tool com:
+   - `modo: single-agent`
+   - `nome_cliente: <valor>`
+
+   Aguarde o retorno com o caminho da pasta criada.
+
+2. **Dispare `client-scaffold-collect`** via Agent tool com:
+   - `cliente_path: <caminho retornado no passo anterior>`
+   - `modo: single`
+
+   Aguarde o retorno com o bloco `<dados_coletados>`.
+
+3. **Invoque a subseção "Gate de Confirmação (Passo 2→3)"** acima, usando o `<dados_coletados>` recebido.
+
+4. **Conforme o resultado do gate:**
+   - Aprovação → dispare `client-scaffold-fill` via Agent tool com `cliente_path: <mesmo caminho>` e o bloco `<dados_coletados>` COMPLETO embutido literalmente no prompt de invocação.
+   - Cancelar → encerre este fluxo sem despachar `client-scaffold-fill`, seguindo o comportamento não-destrutivo documentado no Gate de Confirmação.
+
+Em ambos os casos (aprovação ou cancelamento), prossiga para o **Passo 5** (resumo final) — NUNCA pule o Passo 5, mesmo em Cancelamento, já que o resumo deve reportar a estrutura criada mesmo que ainda não preenchida.
 
 ### Passo 4B — Multi-agente
 **Use OBRIGATORIAMENTE a tool `AskUserQuestion`** para escolher fluxo completo ou bypass:
