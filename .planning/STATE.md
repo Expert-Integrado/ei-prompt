@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: xml-validation-hook
 status: gaps_found
-stopped_at: "Phase 01 (xml-validation-hook) all 3 plans executed, but verifier found a gap (discoverTouchedFiles not turn-scoped, D-06) — 01-VERIFICATION.md created. Run /gsd-plan-phase 01 --gaps."
-last_updated: "2026-07-04T23:50:00.000Z"
+stopped_at: Phase 01 (xml-validation-hook) gap-closure plan 01-04-PLAN.md created and verified (VERIFICATION PASSED) to fix discoverTouchedFiles turn-scoping (D-06). Run /gsd-execute-phase 01 to execute it.
+last_updated: "2026-07-05T00:08:02.807Z"
 last_activity: 2026-07-04
-last_activity_desc: Verified phase 01 — gaps_found (11/12 must-haves; discoverTouchedFiles turn-scoping gap, see 01-VERIFICATION.md)
+last_activity_desc: Gap closure planned — 01-04-PLAN.md created (isGenuineUserTurnStart scoping + ENOENT tolerance) and passed plan-checker verification
 progress:
   total_phases: 3
   completed_phases: 0
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 01 — xml-validation-hook (gaps found — gap closure plan needed before advancing)
+**Current focus:** Phase 01 — xml-validation-hook (gap-closure plan 01-04 ready — run `/gsd-execute-phase 01`)
 
 ## Current Position
 
-Phase: 01 (xml-validation-hook) — GAPS FOUND
-Plan: 3 of 3 executed, verification found 1 gap
-Status: Awaiting gap closure — run `/gsd-plan-phase 01 --gaps`
-Last activity: 2026-07-04 — Verifier found discoverTouchedFiles is not scoped to the current turn (D-06 violation); see 01-VERIFICATION.md
+Phase: 01 (xml-validation-hook) — GAP CLOSURE PLANNED
+Plan: 3 of 3 executed; gap-closure plan 01-04 created and plan-checker verified, not yet executed
+Status: Ready to execute — run `/gsd-execute-phase 01`
+Last activity: 2026-07-04 — Gap closure planned: 01-04-PLAN.md (turn-boundary scoping fix for discoverTouchedFiles, D-06) created and passed VERIFICATION PASSED
 
 Progress: [███░░░░░░░] 33%
 
@@ -99,7 +99,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-04T23:50:00.000Z
-Stopped at: All 3 plans of Phase 01 executed; verification found 1 gap (discoverTouchedFiles turn-scoping, D-06). Run /gsd-plan-phase 01 --gaps to close it before advancing to Phase 2.
-Resume file: .planning/phases/01-xml-validation-hook/01-VERIFICATION.md
+Last session: 2026-07-05T00:08:02.807Z
+Stopped at: Gap-closure plan 01-04-PLAN.md created for Phase 01 (fixes discoverTouchedFiles turn-scoping, D-06) and passed plan-checker VERIFICATION PASSED. Run /gsd-execute-phase 01 to execute it, then re-verify before advancing to Phase 2.
+Resume file: .planning/phases/01-xml-validation-hook/01-04-PLAN.md
 </content>
