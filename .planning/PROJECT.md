@@ -15,13 +15,10 @@ Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir ger
 - ✓ Distribuição via npx com `manifest.files` + `deprecated_files` (cleanup de `/ei-ctx`, `/ei-edit`, `/ei-review` legados) — `bin/cli.js:86-91` já loga cada remoção e conta no resumo final. Confirmado funcionando, sem trabalho pendente.
 - ✓ Pipeline `/ei-ajustes` com gate humano (`AskUserQuestion`) + fan-out paralelo de editores/reviewers — já em produção.
 - ✓ Casca XML (`<?xml ...?>` + `<agente xmlns="…/super-sdr/prompt" versao="1.0" tipo="…">`) presente nos 6 templates de `modelo/` (commit `994b16f`).
+- ✓ Hook determinístico de validação de XML roda no pipeline de review (`Stop`/`SubagentStop`), substituindo a checklist manual de `docs/regras-validacao.md` por checagem de código real — valida declaração `<?xml?>` (linha 1), atributos de `<agente>` (linha 2), `tipo` correto por arquivo, raiz única sem aninhamento, e preserva o ponto cego de `<`/`&` cru sem "corrigir" via escaping/CDATA. Inclui escopo de descoberta por turno (`discoverTouchedFiles`) e tolerância a arquivo apagado (ENOENT) sem bloquear. Validated in Phase 1: XML Validation Hook.
 
 ### Active
 
-- [ ] Hook determinístico de validação de XML que roda no pipeline de review (junto ao `docs-reviewer` / hooks `Stop`/`SubagentStop`), substituindo a checklist manual de `docs/regras-validacao.md` (seção "Validação da Casca XML") por checagem de código real.
-  - Valida: linha 1 = declaração `<?xml version="1.0" encoding="UTF-8"?>`; linha 2 = `<agente xmlns="…/super-sdr/prompt" versao="1.0" tipo="…">`; raiz única sem aninhamento; `tipo` correto por arquivo (`orchestrator`/`qualifier`/`protractor`/`scheduler`/`followup`; Recepcionista = `orchestrator` + `origem="recepcionista"`).
-  - Regra por tipo de template: a validação estrutural é a mesma casca para os 6, mas o `tipo` esperado difere por arquivo — o hook precisa mapear nome de arquivo → `tipo` esperado.
-  - Ponto cego aceito e preservado: conteúdo variável do cliente com `<`/`&` cru pode quebrar o parse — isso é esperado, não deve gerar "correção" via escaping/CDATA.
 - [ ] Refatorar a criação de cliente (`client-project-scaffolder`, hoje Fase 3→4→4.5→5 num único agente) em 3 passos distintos e auditáveis:
   1. **Passo 1** — criar pastas + copiar arquivos + compor o template (scaffold puro, sem coletar dado nenhum do cliente).
   2. **Passo 2** — levantar as informações do cliente (todos os campos obrigatórios dos templates).
@@ -74,4 +71,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-04 after initialization*
+*Last updated: 2026-07-05 after Phase 1 (XML Validation Hook) completion*
