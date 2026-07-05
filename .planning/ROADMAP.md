@@ -63,12 +63,12 @@ Plans:
   4. Running Passo 3 fills the template files with the data collected in Passo 2, preserving `{{variavel}}` placeholder syntax for anything not yet substituted and the `[PENDENTE - informação não fornecida]` marker for consciously pending fields.
   5. The full Passo 1→2→3 flow, including the hard gate, behaves identically for both `single-agent` and `multi-agente-especialidade-unica` modes.
 
-**Plans:** 5 plans
+**Plans:** 1/5 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Create the 3 scaffolding subagents (client-scaffold-structure, client-scaffold-collect, client-scaffold-fill)
+- [x] 02-01-PLAN.md — Create the 3 scaffolding subagents (client-scaffold-structure, client-scaffold-collect, client-scaffold-fill)
 - [ ] 02-02-PLAN.md — manifest.json + post-scaffolder-review.sh bookkeeping (ship new subagents, retire the old one)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -91,7 +91,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
-| 2. 3-Step Gated Client Scaffolding | 0/5 | Not started | - |
+| 2. 3-Step Gated Client Scaffolding | 1/5 | In Progress|  |
 </content>
 
 ### Phase 3: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)

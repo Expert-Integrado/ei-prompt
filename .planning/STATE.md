@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 02
 current_phase_name: three-step-gated-client-scaffolding
-status: planning
-stopped_at: "Phase 02 (3-Step Gated Client Scaffolding) planned — 5 plans created, gsd-plan-checker VERIFICATION PASSED (6/6 requirements, 7/7 CONTEXT.md decisions covered). Ready to execute — run /gsd-execute-phase 02."
-last_updated: "2026-07-05T21:03:43.000Z"
+status: executing
+stopped_at: Completed 02-01-PLAN.md (3 scaffolding subagents created) — ready for 02-02
+last_updated: "2026-07-05T21:20:34.773Z"
 last_activity: 2026-07-05
-last_activity_desc: Planned phase 02 — 5 plans (4 waves), plan-checker passed after 1 revision (RESEARCH.md open-questions + VALIDATION.md sign-off closeout)
+last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 9
+  completed_plans: 5
   percent: 33
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 01 complete, verified → Phase 02 — three-step-gated-client-scaffolding (planned, ready to execute)
+**Current focus:** Phase 02 — three-step-gated-client-scaffolding
 
 ## Current Position
 
-Phase: 02 (3-Step Gated Client Scaffolding) — PLANNED, verified (plan-checker passed) — Phase 01 complete, verified (12/12 must-haves)
-Plan: 0 of 5 (all pending execution)
-Status: Ready to execute — run `/gsd-execute-phase 02`
-Last activity: 2026-07-05 — Planned phase 02 (5 plans, 4 waves); plan-checker passed after 1 revision (RESEARCH.md open-questions + VALIDATION.md sign-off closeout)
+Phase: 02 (three-step-gated-client-scaffolding) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-07-05 — Phase 02 execution started
 
 Progress: [███░░░░░░░] 33%
 
@@ -59,6 +59,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01 P02 | 25min | 2 tasks | 2 files |
 | Phase 01 P03 | 35min | 3 tasks | 3 files |
 | Phase 01 P04 | 15min | 2 tasks | 2 files |
+| Phase 02 P01 | 20min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,7 @@ Recent decisions affecting current work:
 - [Phase 01]: Deliberately omitted stop_hook_active early-exit in validate-xml-casca.sh (D-07/Pitfall 4) — hook re-checks a stateless fact every cycle, not a one-shot instruction
 - [Phase 01]: isGenuineUserTurnStart classifies a 'type':'user' line as a turn boundary unless its content is an array composed entirely of tool_result blocks — closes D-06/WR-02 gap
 - [Phase 01]: runCli's ENOENT skip only fires when every error for a file is ENOENT-coded, preserving D-07 block-on-broken-casca for every other error shape
+- [Phase 02]: Named the three Phase 2 scaffolding subagents client-scaffold-structure/-collect/-fill (D-02 discretion), sharing the client-scaffold-* prefix so post-scaffolder-review.sh's case branches stay greppable as a family — Structural tool-scoping (Bash/Glob/Read only for structure, Read/Glob/Grep/TodoWrite only for collect) enforces the SCAF-01/SCAF-02/SCAF-04 step boundaries at the platform level, not just via prompt wording
 
 ### Roadmap Evolution
 
@@ -105,7 +107,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-05T21:03:43.000Z
-Stopped at: Phase 02 planned (5 plans, verified) — ready to execute
-Resume file: .planning/phases/02-three-step-gated-client-scaffolding/02-05-PLAN.md
+Last session: 2026-07-05T21:20:34.756Z
+Stopped at: Completed 02-01-PLAN.md (3 scaffolding subagents created) — ready for 02-02
+Resume file: .planning/phases/02-three-step-gated-client-scaffolding/02-02-PLAN.md
 </content>
