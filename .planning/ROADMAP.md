@@ -63,7 +63,7 @@ Plans:
   4. Running Passo 3 fills the template files with the data collected in Passo 2, preserving `{{variavel}}` placeholder syntax for anything not yet substituted and the `[PENDENTE - informação não fornecida]` marker for consciously pending fields.
   5. The full Passo 1→2→3 flow, including the hard gate, behaves identically for both `single-agent` and `multi-agente-especialidade-unica` modes.
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 **Wave 1**
@@ -77,7 +77,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-04-PLAN.md — Multi-agent mode: Passo 4B.1(b) loop wiring for SCAF-05 parity
+- [x] 02-04-PLAN.md — Multi-agent mode: Passo 4B.1(b) loop wiring for SCAF-05 parity
 
 **Wave 4** *(blocked on Wave 2/3 completion)*
 
@@ -91,7 +91,7 @@ Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
-| 2. 3-Step Gated Client Scaffolding | 3/5 | In Progress|  |
+| 2. 3-Step Gated Client Scaffolding | 4/5 | In Progress|  |
 </content>
 
 ### Phase 3: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
