@@ -51,7 +51,7 @@ Plans:
 
 ### Phase 2: 3-Step Gated Client Scaffolding
 
-**Goal**: Creating a client (single-agent or multi-agent specialty) never leaves required fields incomplete, because folder/template scaffolding, information gathering, and template filling are three distinct, auditable steps with a hard confirmation gate between gathering and filling.
+**Goal**: As a developer creating a client project via `/ei-cria-cliente`, I want to go through three auditable, gated steps (scaffold folders → collect all required fields incl. media → fill templates) with a hard confirmation gate before filling, so that no client is ever left with silently incomplete required fields.
 **Mode:** mvp
 **Depends on**: Nothing (independent track from Phase 1; sequenced 2nd by convention only — parallelizable with Phase 1 if desired)
 **Requirements**: SCAF-01, SCAF-02, SCAF-03, SCAF-04, SCAF-05, SCAF-06
