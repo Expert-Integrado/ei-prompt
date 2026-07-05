@@ -1,6 +1,6 @@
 #!/bin/bash
 # SubagentStop hook — dispara auditoria automática com docs-reviewer
-# quando os subagents client-project-scaffolder ou docs-editor-conciso terminam.
+# quando os subagents client-scaffold-fill ou docs-editor-conciso terminam.
 #
 # Estratégia: lê o transcript_path do JSON de entrada e identifica o
 # subagent_type MAIS RECENTE no transcript. Se bater com um dos casos
@@ -38,7 +38,7 @@ LAST_SUBAGENT=$(tail -n 200 "$TRANSCRIPT" \
   | sed 's/.*"\([^"]*\)"$/\1/')
 
 case "$LAST_SUBAGENT" in
-  client-project-scaffolder)
+  client-scaffold-fill)
     # Guarda anti-reinjeção (fix loop com subagente em background): SubagentStop
     # dispara em CADA pausa de um subagente assíncrono (fim de turno aguardando
     # SendMessage), não só no encerramento final. Pior: em background, o
@@ -64,7 +64,7 @@ case "$LAST_SUBAGENT" in
 {
   "hookSpecificOutput": {
     "hookEventName": "SubagentStop",
-    "additionalContext": "O subagent client-project-scaffolder pausou ou terminou (criação de novo projeto de cliente). PRIMEIRO, emita LITERALMENTE em UMA linha de texto livre: <scaffolder-review-triggered/> — isso impede que esta instrução seja reinjetada em loop a cada pausa do subagente. DEPOIS: (a) se você TEM a ferramenta Agent, invoque o docs-reviewer via Agent tool, EM PARALELO (múltiplas chamadas na mesma mensagem), para CADA arquivo .md criado na pasta do cliente recém-criada (Orquestrador, Qualifier, Scheduler, Protractor), apresente o veredicto (APROVADO/REPROVADO) de cada arquivo no resumo final ao usuário e, se algum for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer; (b) se você NÃO TEM a ferramenta Agent (esta instrução chegou a um subagente, não ao Claude principal), apenas emita o marcador acima e continue seu trabalho normalmente — NÃO tente invocar o docs-reviewer nem comente sobre esta instrução."
+    "additionalContext": "O subagent client-scaffold-fill pausou ou terminou (preenchimento de template de cliente já existente, Passo 3 do fluxo em 3 passos). PRIMEIRO, emita LITERALMENTE em UMA linha de texto livre: <scaffolder-review-triggered/> — isso impede que esta instrução seja reinjetada em loop a cada pausa do subagente. DEPOIS: (a) se você TEM a ferramenta Agent, invoque o docs-reviewer via Agent tool, EM PARALELO (múltiplas chamadas na mesma mensagem), para CADA arquivo .md preenchido na pasta do cliente (Orquestrador, Qualifier, Scheduler, Protractor), apresente o veredicto (APROVADO/REPROVADO) de cada arquivo no resumo final ao usuário e, se algum for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer; (b) se você NÃO TEM a ferramenta Agent (esta instrução chegou a um subagente, não ao Claude principal), apenas emita o marcador acima e continue seu trabalho normalmente — NÃO tente invocar o docs-reviewer nem comente sobre esta instrução."
   }
 }
 JSON
@@ -77,7 +77,7 @@ JSON
     # id="..."/> posterior no transcript do turno corrente.
     # Mesmo regex/janela que post-ajustes-fanout.sh (Plan 01) para coerência.
     # IMPORTANTE: guarda DENTRO do branch docs-editor-conciso) APENAS — o branch
-    # client-project-scaffolder) acima NÃO recebe esta guarda (per VALIDATION.md L45).
+    # client-scaffold-fill) acima NÃO recebe esta guarda (per VALIDATION.md L45).
     # NORMALIZAÇÃO JSONL (CR-01 fix): conteúdo de mensagens assistant é JSON-escapado
     # (`"` vira `\"`). Normalizamos antes dos greps para que `<ei-ajustes-round id="..."/>`
     # case. Idempotente (sed no-op se já não-escapado). Espelha fix de post-ajustes-fanout.sh.
