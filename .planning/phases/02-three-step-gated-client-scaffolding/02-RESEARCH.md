@@ -372,17 +372,19 @@ Note the background-pause anti-reinjection guard in the old `client-project-scaf
 | A2 | `client-scaffold-fill` runs non-interactively (no user Q&A expected during Passo 3) and therefore doesn't need the background-pause anti-reinjection guard that `client-project-scaffolder` needed | Code Examples / Pitfall 3 | Medium — if Passo 3 does end up pausing (e.g., to ask a disambiguation question about an edge case), dropping the guard could reintroduce the historical reinjection-loop bug (`cb67556`) that guard was written to fix; the planner should keep the guard defensively unless a smoke test proves Passo 3 never pauses |
 | A3 | The default Cancel-at-gate behavior (leave Passo-1 structure on disk, end that specialty's cycle) is the right default, absent an explicit CONTEXT.md decision | Pitfall 5 / Open Questions | Medium — this is genuinely undecided by CONTEXT.md; if the intended UX is "delete the half-created folder on cancel," the plan needs an explicit cleanup step instead |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What happens to a Passo-1-created folder structure when the user cancels at the gate?**
    - What we know: D-07 specifies Passo 3 must never start without approval; `/ei-ajustes.md`'s Cancel precedent is non-destructive (nothing is undone).
    - What's unclear: whether the newly created (but unfilled) client folder should be left as-is, deleted, or flagged for retry in the final summary (D-04).
    - Recommendation: default to non-destructive (leave on disk with `{{variavel}}` placeholders unfilled) per A3 above; surface this explicitly in the plan so it's a conscious choice, not an accident.
+   - **RESOLVED:** non-destructive leave-on-disk default adopted, implemented in 02-03-PLAN.md and 02-04-PLAN.md's Cancel path at the confirmation gate.
 
 2. **Should `client-scaffold-collect`'s Q&A use the exact same background-pause/`SendMessage` mechanism as today's `client-project-scaffolder`, or does splitting change anything about how many times `SubagentStop` fires during collection?**
    - What we know: today's single agent already pauses/resumes across multiple user answers within Fase 4/4.5, and `post-scaffolder-review.sh`'s existing anti-reinjection guard was built specifically for this pause pattern.
    - What's unclear: whether isolating collection into its own subagent changes the pause/resume cadence in a way that needs the guard adapted for the new subagent name too (even though this phase's audit hook branch is being retargeted to Passo 3, `SubagentStop` still fires on every Passo 2 pause — it just won't match any `case` branch, which should be a safe no-op, but should be confirmed live).
    - Recommendation: include a human-verify smoke test step (mirroring Phase 1's Task 3 precedent) that runs the full Passo1→2→gate→3 flow in a live session and confirms no spurious hook firing/errors occur during Passo 2's multi-turn Q&A.
+   - **RESOLVED:** live smoke test for spurious hook firing during Passo 2's multi-turn Q&A adopted, implemented as 02-05-PLAN.md Task 3, step 6.
 
 ## Environment Availability
 
