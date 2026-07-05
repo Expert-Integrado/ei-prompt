@@ -20,7 +20,7 @@
 - [x] **SCAF-01**: `client-project-scaffolder` dividido em 3 passos distintos e auditáveis: (1) criar pastas/arquivos/compor template, (2) levantar informações do cliente, (3) preencher o template
 - [x] **SCAF-02**: Passo 1 não coleta nenhum dado do cliente — só estrutura de pastas/arquivos, sem perguntas
 - [x] **SCAF-03**: Passo 2 coleta todos os campos obrigatórios identificados nos templates, incluindo mídias (atual Fase 4.5)
-- [ ] **SCAF-04**: Gate duro entre Passo 2 e Passo 3 — só avança pro preenchimento com confirmação explícita de que todo campo obrigatório foi coletado (ou conscientemente marcado como pendente), no mesmo padrão do gate humano já usado em `/ei-ajustes` (Passo 3.5)
+- [x] **SCAF-04**: Gate duro entre Passo 2 e Passo 3 — só avança pro preenchimento com confirmação explícita de que todo campo obrigatório foi coletado (ou conscientemente marcado como pendente), no mesmo padrão do gate humano já usado em `/ei-ajustes` (Passo 3.5)
 - [ ] **SCAF-05**: Split aplica-se aos dois modos existentes do scaffolder (`single-agent` e `multi-agente-especialidade-unica`)
 - [x] **SCAF-06**: Passo 3 preenche os arquivos com os dados coletados, preservando o padrão de placeholders `{{variavel}}` e a marcação `[PENDENTE - informação não fornecida]` já em uso
 
@@ -49,7 +49,7 @@
 | SCAF-01 | Phase 2 | Complete |
 | SCAF-02 | Phase 2 | Complete |
 | SCAF-03 | Phase 2 | Complete |
-| SCAF-04 | Phase 2 | Pending |
+| SCAF-04 | Phase 2 | Complete |
 | SCAF-05 | Phase 2 | Pending |
 | SCAF-06 | Phase 2 | Complete |
 
