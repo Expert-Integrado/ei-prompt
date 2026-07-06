@@ -126,8 +126,9 @@ Em ambos os casos (aprovação ou cancelamento), prossiga para o **Passo 5** (re
 #### Passo 4B.1 — Fluxo completo (criar especialidades + Recepcionista)
 
 **(a) Coletar quantidade e nomes das especialidades**
-1. Pergunte: **"Quantas especialidades?"** e **"Liste os nomes das especialidades, separados por vírgula"** (ex: `Consumidor, Previdenciário, Trabalhista`).
-2. Pergunte também o **nome da empresa** (usado depois pelo Recepcionista).
+1. Pergunte: **"Liste os nomes das especialidades, separados por vírgula"** (ex: `Consumidor, Previdenciário, Trabalhista`).
+2. Parseie a lista pela vírgula, remova espaços em branco nas pontas de cada nome, e derive a quantidade de especialidades (N) diretamente da CONTAGEM de nomes parseados — nunca pergunte "quantas especialidades" separadamente, pois isso cria uma segunda fonte de verdade que pode divergir da lista (ex: usuário diz "3" mas lista só 2 nomes, ou deixa uma vírgula sobrando). Confirme com o usuário a lista final antes de iniciar o loop, ex: "Vou criar N especialidades: nome1, nome2, ..., nomeN. Confirma?" — se o usuário corrigir, reparseie e repita a confirmação.
+3. Pergunte também o **nome da empresa** (usado depois pelo Recepcionista).
 
 > Não colete `descricao` nem `gatilhos` agora — o `recepcionista-scaffolder` vai pedir esses dados depois, quando os agentes especialistas já existirem.
 
