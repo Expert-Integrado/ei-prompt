@@ -13,6 +13,7 @@ Two independent hardening tracks ship this milestone: a deterministic XML-casca 
 
 - [x] **Phase 1: XML Validation Hook** - Deterministic hook catches broken/malformed XML casca in client files automatically, wired into the existing Stop/SubagentStop pipeline. (gaps found 2026-07-04 — see 01-VERIFICATION.md) (completed 2026-07-05)
 - [x] **Phase 2: 3-Step Gated Client Scaffolding** - Client creation split into scaffold → gather → fill steps with a hard gate, applied to both single-agent and multi-agent modes. (completed 2026-07-05)
+- [ ] **Phase 3: Separar CLAUDE.md distribuído (cliente via npm) do CLAUDE.md interno do repo** - Physically split the npm-distributed client payload (`client/CLAUDE.md`) from this repo's internal maintainer doc (`.claude/CLAUDE.md`), with a deterministic regression guard preventing client rules from leaking back into the internal doc.
 
 ## Phase Details
 
@@ -86,21 +87,42 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 (both are independent tracks; parallel execution is possible if desired)
+Phases execute in numeric order: 1 → 2 → 3 (Phase 3 depends on Phase 2 by convention only)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
 | 2. 3-Step Gated Client Scaffolding | 5/5 | Complete    | 2026-07-05 |
+| 3. Separar CLAUDE.md distribuído (cliente via npm) do CLAUDE.md interno | 0/5 | Planned | - |
 </content>
 
 ### Phase 3: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
 
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 2
-**Plans:** 0 plans
+**Goal:** Como mantenedor do ei-prompt, quero que o `CLAUDE.md` distribuído a cada cliente via `npx ei-prompt` e o `CLAUDE.md`/`.claude/CLAUDE.md` que carrego ao trabalhar neste repo sejam fisicamente separados — cada um só com conteúdo da audiência correta — para que uma regra de cliente (ex: "modelo/ é read-only") nunca mais apareça como se fosse regra de como eu mesmo devo editar `modelo/`, e para que essa separação seja garantida por código (hook determinístico), não por um aviso de texto.
+**Mode:** standard
+**Depends on**: Phase 2 (independent track, sequenced 3rd by convention only)
+**Requirements**: CLMD-01, CLMD-02, CLMD-03, CLMD-04, CLMD-05, CLMD-06, CLMD-07, CLMD-08
+**Success Criteria** (what must be TRUE):
+
+  1. Running `npx @expertzinhointegrado/ei-prompt@latest` (or `bin/cli.js install`) in any project fetches `client/CLAUDE.md` from GitHub and writes it as `CLAUDE.md` — content identical to the pre-migration payload (minus the "Commits" section, which was never client content).
+  2. Opening this repo in a Claude Code session no longer autoloads any client-facing rule (Mapa de Regras, Arquitetura Padrão de Agentes, Arquitetura Multi-Agente, Slash Commands, Regras Básicas) as "Project instructions" — only `.claude/CLAUDE.md`'s internal maintenance content loads, since root `CLAUDE.md` no longer exists.
+  3. Running `/ei-cria-cliente` (or any of the ~9 other distributed subagents/commands) inside this repo-fonte still resolves the correct agent-architecture rules by preferring `client/CLAUDE.md` when present, exactly as before the migration.
+  4. `bin/cli.js --help` and the install loop both handle `manifest.json`'s mixed string/`{from,to}` entries correctly — no `[object Object]`, no fetch/write failures for the CLAUDE.md entry.
+  5. Manually reintroducing a migrated heading (e.g. `## Slash Commands`) into `CLAUDE.md` or `.claude/CLAUDE.md` in this repo is automatically blocked by `check-claude-md-audience.sh` on the next `Stop`/`SubagentStop` event — and this guard is never shipped to client projects (absent from `manifest.json` and `.claude/settings.json`).
+
+**Plans:** 5 plans
 
 Plans:
+**Wave 1**
 
-- [ ] TBD (run /gsd-plan-phase 3 to break down)
+- [ ] 03-01-PLAN.md — Create `client/CLAUDE.md` source (verbatim minus Commits) + point `manifest.json`'s CLAUDE.md entry at `{from,to}`
+- [ ] 03-02-PLAN.md — `bin/cli.js` manifest-entry normalization (`normalizeEntry`/`formatManifestEntry`) + `bin/cli.test.js`
+- [ ] 03-03-PLAN.md — Apply `client/CLAUDE.md`-first fallback-read pattern across the ~9 distributed subagents/commands
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-04-PLAN.md — Remove root `CLAUDE.md` + fix `.claude/CLAUDE.md`'s commits cross-reference
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-05-PLAN.md — Regression guard (`check-claude-md-audience.sh`) wired into `.claude/settings.local.json` only + end-to-end distribution checkpoint

@@ -24,9 +24,20 @@
 - [x] **SCAF-05**: Split aplica-se aos dois modos existentes do scaffolder (`single-agent` e `multi-agente-especialidade-unica`)
 - [x] **SCAF-06**: Passo 3 preenche os arquivos com os dados coletados, preservando o padrão de placeholders `{{variavel}}` e a marcação `[PENDENTE - informação não fornecida]` já em uso
 
+### Separação CLAUDE.md Cliente/Interno
+
+- [ ] **CLMD-01**: `client/CLAUDE.md` existe como novo arquivo-fonte isolado, contendo (verbatim, exceto a seção "Commits") todo o conteúdo cliente hoje em `CLAUDE.md` raiz: banner de índice + nota v1.8.9, Mapa de Regras, Arquitetura Padrão de Agentes, Arquitetura Multi-Agente, tabela Slash Commands, Regras Básicas
+- [ ] **CLMD-02**: `manifest.json`'s `files` array usa `{"from": "client/CLAUDE.md", "to": "CLAUDE.md"}` para a entrada do CLAUDE.md; as ~28 outras entradas (incluindo `deprecated_files`, sem mudança de schema) permanecem strings simples
+- [ ] **CLMD-03**: `bin/cli.js` normaliza cada entrada de `manifest.files` (string → `{from,to}`) antes de usar; `fetchFile` usa `.from`, `writeFile` usa `.to`; `help()` renderiza corretamente ambos os formatos (sem `[object Object]`)
+- [ ] **CLMD-04**: `CLAUDE.md` raiz deste repo não contém mais nenhum conteúdo client-facing; é removido inteiramente, e `.claude/CLAUDE.md` permanece o único doc "Project instructions" funcional do repo
+- [ ] **CLMD-05**: A linha de `.claude/CLAUDE.md` que hoje cita `CLAUDE.md` raiz como fonte da regra de commits é corrigida para não referenciar mais o raiz
+- [ ] **CLMD-06**: Todo subagente/comando distribuído que hoje lê `CLAUDE.md` assumindo que ali está o payload cliente passa a preferir `client/CLAUDE.md` quando presente, com fallback para `CLAUDE.md` quando ausente — preservando o comportamento correto tanto no repo-fonte (testes do mantenedor) quanto em projetos de cliente distribuídos
+- [ ] **CLMD-07**: Um guard determinístico repo-local-only detecta, via `Stop`/`SubagentStop`, quando `CLAUDE.md` raiz ou `.claude/CLAUDE.md` são tocados no turno e sinaliza se algum dos 5 cabeçalhos migrados aparecer fora de `client/CLAUDE.md`; o registro do hook vive **apenas** em `.claude/settings.local.json` — nunca em `.claude/settings.json` nem em `manifest.json`
+- [ ] **CLMD-08**: Distribuição fim-a-fim continua funcionando: `bin/cli.js` contra o `manifest.json` atualizado busca `client/CLAUDE.md` no GitHub e grava `CLAUDE.md` na raiz do projeto instalador, com conteúdo idêntico ao anterior (sem regressão para clientes existentes)
+
 ## v2 Requirements
 
-(Nenhum — escopo enxuto, 2 frentes bem definidas para este milestone)
+(Nenhum — escopo enxuto, 2 frentes bem definidas para este milestone; Phase 3 é uma reorganização estrutural, não uma 3ª frente de produto)
 
 ## Out of Scope
 
@@ -34,6 +45,7 @@
 |---------|--------|
 | Cleanup adicional de comandos legados (`/ei-ctx`, `/ei-edit`, `/ei-review`) | Mecanismo `deprecated_files` já cobre isso, confirmado em `bin/cli.js:86-91` |
 | Escaping/CDATA para "consertar" quebra de parse por conteúdo variável do cliente | Ponto cego aceito por design (`docs/regras-validacao.md:49`) |
+| Mudar o CONTEÚDO das regras de cliente ou das regras internas | Phase 3 é reorganização estrutural (onde cada regra mora), não revisão do que cada regra diz (CONTEXT.md `<domain>`) |
 
 ## Traceability
 
@@ -52,14 +64,22 @@
 | SCAF-04 | Phase 2 | Complete |
 | SCAF-05 | Phase 2 | Complete |
 | SCAF-06 | Phase 2 | Complete |
+| CLMD-01 | Phase 3 | Planned |
+| CLMD-02 | Phase 3 | Planned |
+| CLMD-03 | Phase 3 | Planned |
+| CLMD-04 | Phase 3 | Planned |
+| CLMD-05 | Phase 3 | Planned |
+| CLMD-06 | Phase 3 | Planned |
+| CLMD-07 | Phase 3 | Planned |
+| CLMD-08 | Phase 3 | Planned |
 
 **Coverage:**
 
-- v1 requirements: 13 total
-- Mapped to phases: 13
+- v1 requirements: 21 total
+- Mapped to phases: 21
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-04*
-*Last updated: 2026-07-04 after roadmap creation (13/13 requirements mapped across 2 phases)*
+*Last updated: 2026-07-06 after Phase 3 research (21/21 requirements mapped across 3 phases; CLMD-01..08 added per 03-RESEARCH.md `<phase_requirements>`)*
 </content>
