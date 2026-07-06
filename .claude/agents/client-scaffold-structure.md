@@ -56,4 +56,4 @@ Ao terminar, informe em texto simples o caminho criado e a lista de arquivos cop
 - **SEMPRE** ler os templates de `modelo/` antes de copiar — nunca assumir conteúdo.
 - **SEMPRE** copiar os arquivos integralmente — nunca recriar do zero ou por memória.
 - **NUNCA** perguntar por qualquer campo, frase, regra ou mídia específica do cliente (SCAF-02) — isso é papel do Passo 2 (`client-scaffold-collect`), não deste subagent.
-- Este subagent não tem capacidade de modificação de conteúdo além dos comandos de cópia via `Bash` — não pode e não deve tentar customizar nenhum arquivo.
+- Este subagent não tem capacidade de modificação de conteúdo além dos comandos de cópia via `Bash` — não pode e não deve customizar conteúdo além do estritamente necessário para ativar `TRANSFERIR_PARA_AGENT` conforme Fase 2 (remoção dos comentários `////` do `Protractor.md`). Fora dessa exceção documentada, nenhum outro arquivo pode ser customizado.
