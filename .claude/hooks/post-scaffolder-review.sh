@@ -46,28 +46,59 @@ case "$LAST_SUBAGENT" in
     # tool Agent no toolset — e não ao main Claude. Resultado sem guarda: loop
     # infinito de reinjeções idênticas ("não tenho essa ferramenta" → idle →
     # SubagentStop → reinjeta).
-    # Correção no mesmo padrão sentinela do branch docs-editor-conciso abaixo:
-    # o texto injetado manda o receptor emitir <scaffolder-review-triggered/> em
-    # texto livre ANTES de qualquer coisa. Mensagens de sidechain vivem no MESMO
-    # transcript JSONL ("isSidechain":true, "type":"assistant"), então o próximo
-    # disparo encontra o marcador e sai exit 0 — quebra o loop mesmo quando quem
-    # recebeu a instrução foi o subagente.
-    # Janela larga (2000 linhas) para não re-disparar em execuções longas do
-    # scaffolder. Efeito colateral aceito: um 2º cliente criado logo em seguida
-    # na MESMA sessão pode não receber o trigger automático — a auditoria via
-    # docs-reviewer prevista no /ei-cria-cliente cobre esse caso como fallback.
+    #
+    # CR-03 fix: o sentinela ERA global e sem id (`<scaffolder-review-triggered/>`),
+    # então bastava UMA invocação de client-scaffold-fill emitir o marcador para
+    # que TODAS as invocações seguintes na mesma janela de 2000 linhas (ex: a 2ª..Nª
+    # especialidade do loop multi-agente de ei-cria-cliente.md Passo 4B.1(b), que
+    # dispara client-scaffold-fill uma vez POR especialidade na MESMA sessão)
+    # fossem silenciosamente puladas — só a 1ª especialidade acabava sendo
+    # auditada. Correção: espelha o padrão round-id já usado no branch
+    # docs-editor-conciso logo abaixo (<ei-ajustes-round id="round-...">).
+    # ei-cria-cliente.md agora emite, em texto livre, ANTES de CADA dispatch de
+    # client-scaffold-fill: <scaffolder-fill-round id="fill-<UNIX_TS>-<3_ALFANUM>"/>
+    # — um id NOVO por invocação (cada especialidade do loop gera o seu). Aqui
+    # extraímos o id MAIS RECENTE (= desta invocação que acabou de pausar/terminar)
+    # e só suprimimos a reinjeção se o marcador de conclusão já tiver sido emitido
+    # PARA ESSE id específico — nunca para um id de uma invocação anterior.
     TAIL_SCAFF=$(tail -n 2000 "$TRANSCRIPT" | grep '"type":"assistant"' | sed 's/\\"/"/g')
-    if printf '%s' "$TAIL_SCAFF" | grep -q '<scaffolder-review-triggered'; then
-      exit 0  # sentinela presente — trigger já disparado para esta execução
+    ROUND_ID_SCAFF=$(printf '%s' "$TAIL_SCAFF" \
+      | grep -oE '<scaffolder-fill-round id="fill-[0-9]+-[a-z0-9]{3}"' \
+      | tail -1 \
+      | sed 's/.*id="\([^"]*\)"/\1/')
+    if [ -n "$ROUND_ID_SCAFF" ]; then
+      if printf '%s' "$TAIL_SCAFF" | grep -qF "<scaffolder-review-triggered id=\"$ROUND_ID_SCAFF\""; then
+        exit 0  # trigger já disparado para ESTA invocação específica (id bate)
+      fi
+    else
+      # Fallback de compatibilidade: nenhum round-id encontrado no transcript
+      # (comando invocador desatualizado, ou turno atípico fora do fluxo
+      # /ei-cria-cliente). Volta ao comportamento antigo (sentinela global sem
+      # id) só para preservar o anti-loop dentro de UMA ÚNICA invocação com
+      # múltiplas pausas — aceita o mesmo risco documentado que existia antes
+      # desta correção (pode suprimir a auditoria de invocações seguintes sem
+      # id na mesma sessão); o caminho feliz documentado sempre emite o id.
+      if printf '%s' "$TAIL_SCAFF" | grep -q '<scaffolder-review-triggered/>'; then
+        exit 0
+      fi
     fi
-    cat <<'JSON'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "SubagentStop",
-    "additionalContext": "O subagent client-scaffold-fill pausou ou terminou (preenchimento de template de cliente já existente, Passo 3 do fluxo em 3 passos). PRIMEIRO, emita LITERALMENTE em UMA linha de texto livre: <scaffolder-review-triggered/> — isso impede que esta instrução seja reinjetada em loop a cada pausa do subagente. DEPOIS: (a) se você TEM a ferramenta Agent, invoque o docs-reviewer via Agent tool, EM PARALELO (múltiplas chamadas na mesma mensagem), para CADA arquivo .md preenchido na pasta do cliente (Orquestrador, Qualifier, Scheduler, Protractor), apresente o veredicto (APROVADO/REPROVADO) de cada arquivo no resumo final ao usuário e, se algum for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer; (b) se você NÃO TEM a ferramenta Agent (esta instrução chegou a um subagente, não ao Claude principal), apenas emita o marcador acima e continue seu trabalho normalmente — NÃO tente invocar o docs-reviewer nem comente sobre esta instrução."
-  }
-}
-JSON
+    # JSON construído via `node -e` (não heredoc estático): o texto injetado
+    # precisa embutir o id extraído acima dentro de um atributo XML, por sua vez
+    # dentro de uma string JSON — escapar aspas-dentro-de-aspas-dentro-de-JSON à
+    # mão em sed/heredoc é frágil. `JSON.stringify` garante o escaping correto.
+    node -e '
+      const roundId = process.argv[1] || "";
+      const marker = roundId
+        ? `<scaffolder-review-triggered id="${roundId}"/>`
+        : "<scaffolder-review-triggered/>";
+      const text = "O subagent client-scaffold-fill pausou ou terminou (preenchimento de template de cliente já existente, Passo 3 do fluxo em 3 passos). PRIMEIRO, emita LITERALMENTE em UMA linha de texto livre: " + marker + " — isso impede que esta instrução seja reinjetada em loop a cada pausa do subagente E garante que cada invocação de client-scaffold-fill (uma por especialidade, no loop multi-especialidade) seja auditada individualmente, mesmo que uma invocação anterior na MESMA sessão já tenha emitido o seu próprio marcador. DEPOIS: (a) se você TEM a ferramenta Agent, invoque o docs-reviewer via Agent tool, EM PARALELO (múltiplas chamadas na mesma mensagem), para CADA arquivo .md preenchido na pasta do cliente (Orquestrador, Qualifier, Scheduler, Protractor), apresente o veredicto (APROVADO/REPROVADO) de cada arquivo no resumo final ao usuário e, se algum for REPROVADO, siga o fluxo anti-loop do próprio docs-reviewer; (b) se você NÃO TEM a ferramenta Agent (esta instrução chegou a um subagente, não ao Claude principal), apenas emita o marcador acima e continue seu trabalho normalmente — NÃO tente invocar o docs-reviewer nem comente sobre esta instrução.";
+      process.stdout.write(JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "SubagentStop",
+          additionalContext: text
+        }
+      }));
+    ' "$ROUND_ID_SCAFF"
     ;;
   docs-editor-conciso)
     # Guarda silenciosa D-11 (Phase 5): durante /ei-ajustes fan-out, deixar o

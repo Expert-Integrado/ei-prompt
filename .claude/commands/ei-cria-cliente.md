@@ -98,8 +98,8 @@ Fluxo em 4 etapas sequenciais, encadeando os 3 subagents do Plan 02-01 com o Gat
 3. **Invoque a subseção "Gate de Confirmação (Passo 2→3)"** acima, usando o `<dados_coletados>` recebido.
 
 4. **Conforme o resultado do gate:**
-   - Aprovação → dispare `client-scaffold-fill` via Agent tool com `cliente_path: <mesmo caminho>` e o bloco `<dados_coletados>` COMPLETO embutido literalmente no prompt de invocação.
-   - Cancelar → encerre este fluxo sem despachar `client-scaffold-fill`, seguindo o comportamento não-destrutivo documentado no Gate de Confirmação.
+   - Aprovação → **ANTES** de disparar `client-scaffold-fill`, emita em UMA linha de texto livre o sentinela `<scaffolder-fill-round id="fill-<UNIX_TIMESTAMP>-<3_ALFANUM>"/>` (gere um `<UNIX_TIMESTAMP>` e `<3_ALFANUM>` novos agora — mesma convenção de id de `.claude/commands/ei-ajustes.md` Passo 5, ver hook `post-scaffolder-review.sh`). Só então dispare `client-scaffold-fill` via Agent tool com `cliente_path: <mesmo caminho>` e o bloco `<dados_coletados>` COMPLETO embutido literalmente no prompt de invocação.
+   - Cancelar → encerre este fluxo sem despachar `client-scaffold-fill` (e sem emitir o sentinela acima), seguindo o comportamento não-destrutivo documentado no Gate de Confirmação.
 
 Em ambos os casos (aprovação ou cancelamento), prossiga para o **Passo 5** (resumo final) — NUNCA pule o Passo 5, mesmo em Cancelamento, já que o resumo deve reportar a estrutura criada mesmo que ainda não preenchida.
 
@@ -157,8 +157,8 @@ Para a especialidade da iteração atual:
 3. **Invoque a subseção "Gate de Confirmação (Passo 2→3)"** acima, usando o `<dados_coletados>` desta especialidade (o texto da `question` deve identificar a especialidade atual, ex: `Campos coletados para <cliente>/<especialidade>:`).
 
 4. **Conforme o resultado do gate:**
-   - Aprovação → dispare `client-scaffold-fill` via Agent tool com `cliente_path: <mesmo caminho da subpasta>` e o bloco `<dados_coletados>` COMPLETO embutido literalmente. Registre o status desta especialidade como **preenchida**.
-   - Cancelar → **NÃO** despache `client-scaffold-fill` para esta especialidade, seguindo o comportamento não-destrutivo do Gate de Confirmação (a subpasta criada no passo 1 permanece em disco, sem preenchimento). Registre o status desta especialidade como **cancelada-e-não-preenchida**.
+   - Aprovação → **ANTES** de disparar `client-scaffold-fill`, emita em UMA linha de texto livre o sentinela `<scaffolder-fill-round id="fill-<UNIX_TIMESTAMP>-<3_ALFANUM>"/>` com um `id` NOVO para ESTA especialidade (nunca reuse o id de uma especialidade anterior do loop — mesma convenção de `.claude/commands/ei-ajustes.md` Passo 5, ver hook `post-scaffolder-review.sh`; isso garante que o hook audite cada especialidade individualmente em vez de suprimir a auditoria das especialidades seguintes). Só então dispare `client-scaffold-fill` via Agent tool com `cliente_path: <mesmo caminho da subpasta>` e o bloco `<dados_coletados>` COMPLETO embutido literalmente. Registre o status desta especialidade como **preenchida**.
+   - Cancelar → **NÃO** despache `client-scaffold-fill` para esta especialidade (e não emita o sentinela acima), seguindo o comportamento não-destrutivo do Gate de Confirmação (a subpasta criada no passo 1 permanece em disco, sem preenchimento). Registre o status desta especialidade como **cancelada-e-não-preenchida**.
 
    Em ambos os casos, **CONTINUE o loop para a próxima especialidade da lista** — o cancelamento de uma especialidade nunca aborta o restante do fluxo `/ei-cria-cliente`. Isso é um default deliberado e documentado (não um silêncio ambíguo): cada ciclo por especialidade é independente (D-03), e o status final de cada uma (preenchida ou cancelada-e-não-preenchida) é reportado no Passo 5 consolidado, nunca perdido silenciosamente.
 
