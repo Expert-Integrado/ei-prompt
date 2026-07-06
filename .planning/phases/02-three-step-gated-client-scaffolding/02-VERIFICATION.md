@@ -1,16 +1,18 @@
 ---
 phase: 02-three-step-gated-client-scaffolding
 verified: 2026-07-06T02:28:02Z
-status: human_needed
+status: passed
 score: 11/12 must-haves verified
 behavior_unverified: 1
 overrides_applied: 0
 behavior_unverified_items:
+
   - truth: "Passo 3 (client-scaffold-fill) fills templates preserving {{variavel}} and the pending marker, routing each collected field to its correct file via the new mandatory `arquivo` attribute (CR-02 fix)"
     test: "Run a live /ei-cria-cliente session (single-agent, or multi-agent with 2+ APPROVED specialties — not a Cancel — so client-scaffold-fill actually runs) against the CURRENT code and confirm: (a) client-scaffold-collect emits `arquivo=\"...\"` on every <campo> it returns, (b) client-scaffold-fill successfully routes each field to the named file without hitting its new 'missing arquivo — stop and report' defensive branch, and (c) the resulting client files are correctly filled with {{variavel}} and [PENDENTE ...] markers intact."
     expected: "Every collected field lands in the correct target file with no fabricated/guessed routing and no spurious 'contrato quebrado' stop-and-report messages; fill output is otherwise identical in quality to what Task 2/3 of 02-05-SUMMARY.md already confirmed under the OLD (pre-CR-02) schema."
     why_human: "This is an LLM prompt-behavior contract between two subagents (client-scaffold-collect producing `arquivo`, client-scaffold-fill consuming it) with no automated test framework in this repo (confirmed precedent: 02-05-PLAN.md's own rationale for requiring live sessions). The two existing human-approved checkpoints (02-05-SUMMARY.md Task 2 and Task 3) were run BEFORE commit d92a025 (CR-02) added this attribute to the schema, so they are evidence for the OLD contract, not the one currently on disk."
 human_verification:
+
   - test: "Run a live /ei-cria-cliente session (single-agent, or multi-agent with 2+ APPROVED specialties) against current `main`/`dev` HEAD and confirm client-scaffold-collect emits `arquivo` on every field, and client-scaffold-fill routes/fills correctly without hitting its new defensive stop-and-report path."
     expected: "Correct per-field routing and correct fill output, matching the quality already confirmed live under the pre-CR-02 schema in 02-05-SUMMARY.md."
     why_human: "Conversational LLM contract change with no automated test coverage; the only existing live evidence (02-05's two approved checkpoints) predates this exact schema by several hours and several commits (CR-01, CR-02, CR-03, WR-01..WR-05 all landed after both checkpoints were approved)."

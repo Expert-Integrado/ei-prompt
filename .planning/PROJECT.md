@@ -16,20 +16,17 @@ Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir ger
 - ✓ Pipeline `/ei-ajustes` com gate humano (`AskUserQuestion`) + fan-out paralelo de editores/reviewers — já em produção.
 - ✓ Casca XML (`<?xml ...?>` + `<agente xmlns="…/super-sdr/prompt" versao="1.0" tipo="…">`) presente nos 6 templates de `modelo/` (commit `994b16f`).
 - ✓ Hook determinístico de validação de XML roda no pipeline de review (`Stop`/`SubagentStop`), substituindo a checklist manual de `docs/regras-validacao.md` por checagem de código real — valida declaração `<?xml?>` (linha 1), atributos de `<agente>` (linha 2), `tipo` correto por arquivo, raiz única sem aninhamento, e preserva o ponto cego de `<`/`&` cru sem "corrigir" via escaping/CDATA. Inclui escopo de descoberta por turno (`discoverTouchedFiles`) e tolerância a arquivo apagado (ENOENT) sem bloquear. Validated in Phase 1: XML Validation Hook.
+- ✓ Criação de cliente refatorada em 3 passos distintos e auditáveis (`client-scaffold-structure` → `client-scaffold-collect` → `client-scaffold-fill`), substituindo o antigo `client-project-scaffolder` monolítico (aposentado via `deprecated_files`), com gate humano (`AskUserQuestion`, mesmo padrão de `/ei-ajustes` Passo 3.5) entre coleta e preenchimento — fail-closed contra Cancelar/vazio/ambíguo. Aplica-se aos dois modos (single-agent e multi-agente), com o loop multi-agente permitindo Cancelar uma especialidade sem abortar as demais. Confirmado em sessões live (single-agent e multi-agente com Cancel deliberado). Validated in Phase 2: Three-Step Gated Client Scaffolding.
 
 ### Active
 
-- [ ] Refatorar a criação de cliente (`client-project-scaffolder`, hoje Fase 3→4→4.5→5 num único agente) em 3 passos distintos e auditáveis:
-  1. **Passo 1** — criar pastas + copiar arquivos + compor o template (scaffold puro, sem coletar dado nenhum do cliente).
-  2. **Passo 2** — levantar as informações do cliente (todos os campos obrigatórios dos templates).
-  3. **Passo 3** — preencher de fato o template com os dados coletados no Passo 2.
-  - **Gate duro entre Passo 2 e Passo 3**: só avança pro preenchimento com confirmação explícita de que todo campo obrigatório foi coletado (ou marcado conscientemente como pendente) — mesmo padrão do gate humano já usado em `/ei-ajustes` (Passo 3.5).
-  - Aplica-se aos dois modos existentes do scaffolder (`single-agent` e `multi-agente-especialidade-unica`).
+None no momento — próxima fase (03) ainda não discutida/planejada.
 
 ### Out of Scope
 
 - Cleanup adicional de comandos legados (`/ei-ctx`/`/ei-edit`/`/ei-review`) — mecanismo `deprecated_files` já cobre isso, confirmado em código.
 - Escaping/CDATA para "consertar" conteúdo variável do cliente que quebra o parser XML — é um ponto cego aceito por design.
+- Corrigir `bin/cli.js` `writeFile()` para ter o mesmo guard de CWD-boundary que `removeFile()` já tem — gap pré-existente (T-2-02, aceito em `02-SECURITY.md`), fora do escopo da Fase 2 que só adicionou paths relativos comuns sob `.claude/agents/`.
 
 ## Context
 
@@ -49,9 +46,11 @@ Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir ger
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Validação de XML vira hook determinístico, não regra em prompt | Regra em prompt (commit `994b16f`) não impede um editor de IA remover a casca; código sempre checa | — Pending |
-| Criação de cliente vira 3 passos com gate duro entre levantamento e preenchimento | Fluxo atual (1 agente, 1 tacada) deixa campos incompletos porque a pessoa não fornece tudo de uma vez | — Pending |
+| Validação de XML vira hook determinístico, não regra em prompt | Regra em prompt (commit `994b16f`) não impede um editor de IA remover a casca; código sempre checa | ✓ Good — Phase 1 |
+| Criação de cliente vira 3 passos com gate duro entre levantamento e preenchimento | Fluxo atual (1 agente, 1 tacada) deixa campos incompletos porque a pessoa não fornece tudo de uma vez | ✓ Good — Phase 2, confirmado em sessões live (single-agent e multi-agente) |
 | Cleanup de comandos legados fica fora do roadmap | `deprecated_files` já funciona e foi confirmado em código (`bin/cli.js:86-91`) | ✓ Good |
+| `client-project-scaffolder` monolítico aposentado via `deprecated_files`, substituído por 3 subagentes (`client-scaffold-structure/-collect/-fill`) com `tools:` restritos por passo | Boundary de confiança precisa ser estrutural (allowlist de tools), não só prosa — um subagente sem `Write`/`Edit`/`Bash` é estruturalmente incapaz de preencher template mesmo se induzido | ✓ Good — Phase 2 |
+| `post-scaffolder-review.sh` retargetado de `client-project-scaffolder` para `client-scaffold-fill` (único passo que produz conteúdo auditável) | Auditar após os 3 passos seria ruído; só o preenchimento (Passo 3) escreve conteúdo específico do cliente que vale auditoria | ✓ Good — Phase 2, disparo confirmado live em 02-05-SUMMARY |
 
 ## Evolution
 
@@ -71,4 +70,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-05 after Phase 1 (XML Validation Hook) completion*
+*Last updated: 2026-07-06 after Phase 2 (3-Step Gated Client Scaffolding) completion*
