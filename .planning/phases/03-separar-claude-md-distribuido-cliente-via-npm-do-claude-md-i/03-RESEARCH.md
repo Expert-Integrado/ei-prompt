@@ -375,17 +375,19 @@ Segue o mesmo "wrapper fino delega ao Node" que `validate-xml-casca.sh` usa, ou 
 
 **Risco geral:** nenhum destes é uma claim de compliance/segurança — são decisões de ergonomia de projeto, com fallback documentado em cada linha.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **O script do guard deve ser bash puro ou delegar a um `.js` (como `validate-xml-casca.sh` faz)?**
    - What we know: a checagem é um grep simples sobre 5 strings fixas — não precisa de parsing complexo como a validação de casca XML.
    - What's unclear: se o projeto prefere manter TODOS os hooks decisórios delegando a Node (consistência de padrão) mesmo quando bash puro bastaria.
    - Recommendation: bash puro é suficiente e mais simples; delegar a Node só se a lógica crescer (ex: parsing de diff estruturado). Deixar para o planner decidir na criação da task.
+   - **RESOLVED:** Plan 03-05 Task 1 implementa `check-claude-md-audience.sh` em bash puro (mirrando `validate-xml-casca.sh`), seguindo exatamente a recomendação acima — sem delegação a `.js`.
 
 2. **`docs-reviewer.md` e outros arquivos com MENÇÕES de prosa a "CLAUDE.md" (não instruções de leitura, ex: "seguir CLAUDE.md" dentro de um lembrete) precisam do mesmo tratamento de fallback?**
    - What we know: essas menções aparecem DEPOIS do Passo 0 (que já fez a leitura correta, com ou sem fallback) — são só lembretes textuais, não uma segunda leitura de arquivo.
    - What's unclear: se vale a pena trocá-las por "siga as regras carregadas no Passo 0" para não fixar o nome do arquivo em múltiplos lugares.
    - Recommendation: fora de escopo — não são leituras de arquivo, não quebram funcionalmente; ajuste cosmético opcional, não crítico para CLMD-06.
+   - **RESOLVED:** Nenhuma das plans desta fase altera essas menções de prosa — permanece fora de escopo/cosmético, sem impacto em CLMD-06, conforme a recomendação original.
 
 ## Environment Availability
 
