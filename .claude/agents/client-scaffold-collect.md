@@ -32,7 +32,7 @@ O prompt invocador fornece:
 ## Fluxo de Coleta
 
 1. `Glob` em `<cliente_path>/*.md` e `Read` cada arquivo retornado.
-2. Identifique todo placeholder entre colchetes e todo campo que os templates exigem: mensagem de abertura, perfil do lead, perguntas de qualificação, objeções, campos de `<regras_do_cliente>` (FRASES_CARACTERISTICAS, REGRAS_CRITICAS, PODE_INFORMAR, NAO_PODE_INFORMAR), bullets de produto/serviço do `<conhecimento>`.
+2. Identifique todo placeholder entre colchetes e todo campo que os templates exigem: mensagem de abertura, perfil do lead, perguntas de qualificação, objeções, campos de `<regras_do_cliente>` (FRASES_CARACTERISTICAS, REGRAS_CRITICAS, PODE_INFORMAR, NAO_PODE_INFORMAR), bullets de produto/serviço do `<conhecimento>`. Para cada placeholder, anote também de qual arquivo (`Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md` ou `Follow-Up.md`) ele veio — você vai precisar disso no atributo `arquivo` do `<campo>` no retorno final.
 3. Pergunte ao usuário sobre cada campo identificado — um por vez ou em bloco, como for mais natural na conversa. Quando o usuário disser que não tem a informação, marque o valor desse campo com o texto literal `[PENDENTE - informação não fornecida]`.
 4. Nunca prossiga para o retorno final até ter perguntado sobre TODOS os campos identificados no Passo 2.
 
@@ -53,9 +53,9 @@ Ao terminar de perguntar sobre todos os campos, devolva LITERALMENTE este shape:
 
 ```xml
 <dados_coletados>
-  <campo nome="nome_cliente" valor="Maria Silva" pendente="false"/>
-  <campo nome="cnpj" valor="" pendente="true"/>
-  <campo nome="telefone" valor="(11) 99999-0000" pendente="false"/>
+  <campo nome="nome_cliente" arquivo="Orquestrador.md" valor="Maria Silva" pendente="false"/>
+  <campo nome="cnpj" arquivo="Orquestrador.md" valor="" pendente="true"/>
+  <campo nome="telefone" arquivo="Orquestrador.md" valor="(11) 99999-0000" pendente="false"/>
   <!-- um <campo> por informação obrigatória encontrada nos templates -->
   <midias>
     <midia nome="Apresentação institucional" gatilho="quando pedir detalhes"
@@ -68,6 +68,7 @@ Ao terminar de perguntar sobre todos os campos, devolva LITERALMENTE este shape:
 ### Regras do schema
 
 - Um `<campo>` por campo obrigatório REALMENTE encontrado nos templates lidos — nunca invente um `nome` que não corresponda a um placeholder real.
+- `arquivo` é OBRIGATÓRIO em todo `<campo>` — o nome literal do arquivo de template onde o placeholder correspondente foi encontrado (`Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md` ou `Follow-Up.md`). Sem este atributo, `client-scaffold-fill` (que não tem memória desta conversa) não tem como saber onde aplicar o valor — nunca omita.
 - `pendente="true"` exatamente quando o valor usado foi o marcador `[PENDENTE - informação não fornecida]`; caso contrário `pendente="false"` e `valor` traz a resposta do usuário.
 - `<midias>` sempre presente no bloco, mesmo que vazio (zero `<midia>` filhos) quando o usuário confirmou não haver mídia.
 - Cada `<midia>` traz `nome`, `gatilho`, `mediaUrl` e `mediaType` — `mediaUrl` usa `[PENDENTE - link do Banco de Mídia]` quando o link ainda não existir.
