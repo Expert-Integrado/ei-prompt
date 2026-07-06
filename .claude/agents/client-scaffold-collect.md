@@ -45,7 +45,7 @@ O prompt invocador fornece:
 
 ## Regra Multi-Agente
 
-Em modo `multi-agente-especialidade-unica`, colete dados SÓ da especialidade recebida, do zero, em TODA invocação — nunca assuma ou reaproveite respostas de uma especialidade anterior, mesmo dentro da mesma sessão.
+Em modo `multi`, colete dados SÓ da especialidade recebida, do zero, em TODA invocação — nunca assuma ou reaproveite respostas de uma especialidade anterior, mesmo dentro da mesma sessão.
 
 ## Formato de Resposta
 
