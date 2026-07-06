@@ -6,7 +6,7 @@ description: |
   Exemplos:
   - Entrada: cliente_path=Maria Silva, modo=single → lê Orquestrador.md/Qualifier.md/Scheduler.md/Protractor.md/Follow-Up.md, identifica cada placeholder, pergunta um a um (ou em bloco), pergunta sobre mídia, e devolve `<dados_coletados>` com um `<campo>` por informação e um `<midias>` com zero ou mais `<midia>`.
   - Entrada: cliente_path=Brunno Brandi/Consumidor, modo=multi, especialidade=Consumidor → coleta dados SÓ dessa especialidade, do zero, mesmo que outra especialidade já tenha sido coletada antes nesta sessão.
-tools: Read, Glob, Grep, TodoWrite
+tools: Read, Glob
 model: opus
 color: blue
 ---
