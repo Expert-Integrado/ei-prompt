@@ -1,5 +1,7 @@
 # ei-prompt
 
+**[→ Como funciona o EiPrompt](https://expert-integrado.github.io/ei-prompt/)** — a página do projeto, com o sistema explicado visualmente.
+
 CLI que instala o conjunto de agentes **EiPrompt** (Orquestrador, Qualifier, Scheduler, Protractor) no seu projeto, direto do repositório oficial no GitHub.
 
 ## Uso
