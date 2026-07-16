@@ -26,8 +26,8 @@
 
 ### Separação CLAUDE.md Cliente/Interno
 
-- [ ] **CLMD-01**: `client/CLAUDE.md` existe como novo arquivo-fonte isolado, contendo (verbatim, exceto a seção "Commits") todo o conteúdo cliente hoje em `CLAUDE.md` raiz: banner de índice + nota v1.8.9, Mapa de Regras, Arquitetura Padrão de Agentes, Arquitetura Multi-Agente, tabela Slash Commands, Regras Básicas
-- [ ] **CLMD-02**: `manifest.json`'s `files` array usa `{"from": "client/CLAUDE.md", "to": "CLAUDE.md"}` para a entrada do CLAUDE.md; as ~28 outras entradas (incluindo `deprecated_files`, sem mudança de schema) permanecem strings simples
+- [x] **CLMD-01**: `client/CLAUDE.md` existe como novo arquivo-fonte isolado, contendo (verbatim, exceto a seção "Commits") todo o conteúdo cliente hoje em `CLAUDE.md` raiz: banner de índice + nota v1.8.9, Mapa de Regras, Arquitetura Padrão de Agentes, Arquitetura Multi-Agente, tabela Slash Commands, Regras Básicas
+- [x] **CLMD-02**: `manifest.json`'s `files` array usa `{"from": "client/CLAUDE.md", "to": "CLAUDE.md"}` para a entrada do CLAUDE.md; as ~28 outras entradas (incluindo `deprecated_files`, sem mudança de schema) permanecem strings simples
 - [ ] **CLMD-03**: `bin/cli.js` normaliza cada entrada de `manifest.files` (string → `{from,to}`) antes de usar; `fetchFile` usa `.from`, `writeFile` usa `.to`; `help()` renderiza corretamente ambos os formatos (sem `[object Object]`)
 - [ ] **CLMD-04**: `CLAUDE.md` raiz deste repo não contém mais nenhum conteúdo client-facing; é removido inteiramente, e `.claude/CLAUDE.md` permanece o único doc "Project instructions" funcional do repo
 - [ ] **CLMD-05**: A linha de `.claude/CLAUDE.md` que hoje cita `CLAUDE.md` raiz como fonte da regra de commits é corrigida para não referenciar mais o raiz
