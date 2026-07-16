@@ -46,8 +46,14 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 # Descobrir arquivos CLAUDE.md tocados (Edit/Write tool_use) nas últimas 400
 # linhas do transcript, excluindo client/CLAUDE.md (fonte real do payload
 # distribuído — espera-se legitimamente conter os cabeçalhos migrados).
+# CR-01 fix: restringir a chamadas de tool_use cujo "name" seja Edit ou
+# Write — sem este filtro, uma chamada Read (ou qualquer outra tool_use)
+# sobre um CLAUDE.md não relacionado (ex.: de outro repo, via
+# Read(//root/**)) dispara falso-positivo de block, contradizendo o
+# comentário de cabeçalho deste script e 03-05-PLAN.md.
 mapfile -t TOUCHED < <(
   tail -n 400 "$TRANSCRIPT" \
+    | grep -oE '"name"[[:space:]]*:[[:space:]]*"(Edit|Write)"[^}]*"file_path"[[:space:]]*:[[:space:]]*"[^"]*CLAUDE\.md"' \
     | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*CLAUDE\.md"' \
     | sed 's/.*"\([^"]*\)"$/\1/' \
     | sort -u \

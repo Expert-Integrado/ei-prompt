@@ -17,12 +17,12 @@ function jsonlLine(obj) {
   return JSON.stringify(obj);
 }
 
-function buildTranscript(tempDir, filePath) {
+function buildTranscript(tempDir, filePath, toolName = "Edit") {
   const transcriptPath = path.join(tempDir, "transcript.jsonl");
   const assistantLine = jsonlLine({
     type: "assistant",
     message: {
-      content: [{ type: "tool_use", name: "Edit", input: { file_path: filePath } }],
+      content: [{ type: "tool_use", name: toolName, input: { file_path: filePath } }],
     },
   });
   fs.writeFileSync(transcriptPath, assistantLine);
@@ -72,6 +72,17 @@ test("excludes client/CLAUDE.md from being flagged even when it contains a banne
   fs.writeFileSync(filePath, `# Preferências\n\n${BANNED_HEADING}\n`);
 
   const transcriptPath = buildTranscript(tempDir, filePath);
+  const stdout = runHook(transcriptPath);
+
+  assert.strictEqual(stdout, "");
+});
+
+test("CR-01 regression: a Read-only tool_use on a CLAUDE.md with a banned heading does NOT block", () => {
+  const tempDir = makeTempDir();
+  const filePath = path.join(tempDir, "CLAUDE.md");
+  fs.writeFileSync(filePath, `# Preferências\n\n${BANNED_HEADING}\n\n| Comando | Uso |\n`);
+
+  const transcriptPath = buildTranscript(tempDir, filePath, "Read");
   const stdout = runHook(transcriptPath);
 
   assert.strictEqual(stdout, "");
