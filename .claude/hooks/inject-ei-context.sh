@@ -10,7 +10,13 @@
 
 MODE="${1:-full}"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-CLAUDE_MD="$PROJECT_DIR/CLAUDE.md"
+CLIENT_CLAUDE_MD="$PROJECT_DIR/client/CLAUDE.md"
+ROOT_CLAUDE_MD="$PROJECT_DIR/CLAUDE.md"
+if [ -f "$CLIENT_CLAUDE_MD" ]; then
+  CLAUDE_MD="$CLIENT_CLAUDE_MD"
+else
+  CLAUDE_MD="$ROOT_CLAUDE_MD"
+fi
 DOCS_DIR="$PROJECT_DIR/docs"
 MODELO_DIR="$PROJECT_DIR/modelo"
 
@@ -37,7 +43,7 @@ if [ -f "$CLAUDE_MD" ]; then
   cat "$CLAUDE_MD"
   echo
 else
-  echo "[aviso] CLAUDE.md não encontrado em $CLAUDE_MD" >&2
+  echo "[aviso] CLAUDE.md não encontrado em $CLIENT_CLAUDE_MD nem em $ROOT_CLAUDE_MD" >&2
 fi
 
 if [ -d "$DOCS_DIR" ]; then
