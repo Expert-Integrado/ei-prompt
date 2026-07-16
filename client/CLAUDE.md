@@ -78,3 +78,18 @@ Cliente Multi/
 - **`modelo/` é read-only.** Detalhes em [`docs/proibido-fazer.md`](docs/proibido-fazer.md).
 - **Princípios de edição:** ver [`docs/regras-edicao.md`](docs/regras-edicao.md).
 - **Validação pós-edição:** ver [`docs/regras-validacao.md`](docs/regras-validacao.md).
+
+## Onboarding assistido (instruções para o Claude)
+
+**Oferta ativa:** se o usuário chegar a uma pasta sem os arquivos do EiPrompt (sem `modelo/`, sem `.claude/commands/ei-cria-cliente.md`) ou com instalação incompleta, ofereça conduzir a instalação antes de qualquer outra tarefa. Não espere ele pedir.
+
+### Protocolo de instalação assistida
+
+1. **Pré-requisitos (verificar com comandos reais, nunca assumir):** `node --version` (Node.js 18 ou superior, exigência do `engines` no `package.json` do CLI) e `npx --version`. Faltando algo: oriente a instalação do Node.js e só continue depois de resolvido.
+2. **Pasta de destino:** o CLI escreve na pasta atual. Confirme com o usuário onde instalar antes de rodar.
+3. **Instalação:** rode `npx @expertzinhointegrado/ei-prompt@latest`. O CLI baixa os arquivos listados em `manifest.json` da branch `main` de `https://github.com/Expert-Integrado/ei-prompt` (via `raw.githubusercontent.com`), sobrescreve os existentes e remove legados listados em `deprecated_files`. O mesmo comando serve para atualizar (ou `/ei-update` quando os comandos já estão instalados).
+4. **Validação:** o CLI encerra com resumo (`pronto: N adicionados, N atualizados, ..., N falhas`). Qualquer falha precisa ser investigada (causa comum: rede bloqueando `raw.githubusercontent.com`). Confirme que existem: `CLAUDE.md`, `CHANGELOG.md`, `modelo/*.md` (Orquestrador, Qualifier, Scheduler, Protractor, Follow-Up, Recepcionista), `docs/*.md`, `.claude/agents/*.md`, `.claude/settings.json`, `.claude/hooks/*.sh` e `.claude/commands/ei-*.md`.
+5. **Etapas de navegador:** para cada etapa que acontecer em navegador (abrir a página do projeto `https://expert-integrado.github.io/ei-prompt/`, consultar o repositório no GitHub), pergunte com botões (AskUserQuestion) se o usuário quer que o Claude faça por ele. Rota padrão: Playwright MCP; se não estiver instalado, ofereça `claude mcp add playwright -- npx -y @playwright/mcp@latest`. Alternativas: extensão Claude in Chrome, ou o usuário faz manualmente. Login é sempre do usuário: o Claude nunca digita nem recebe senhas.
+6. **Segredos:** este projeto não exige chaves de API nem variáveis de ambiente. Se algum segredo surgir em fluxo futuro, ele nunca aparece no chat: vai direto para o destino (arquivo ou cofre) e é validado com uma chamada real ao serviço, sem exibir o valor.
+7. **Teste ponta a ponta:** avise que os slash commands podem exigir reiniciar a sessão do Claude Code na pasta para carregar. Confirme que `/ei-cria-cliente`, `/ei-ajustes` e `/ei-update` estão disponíveis e, com aprovação do usuário, crie um cliente de teste com `/ei-cria-cliente` (a pasta pode ser apagada depois).
+8. **Encerramento:** resumo final com o que foi instalado, o que foi testado e os próximos passos (criar o primeiro cliente com `/ei-cria-cliente <nome>`, ajustar com `/ei-ajustes <cliente> <descrição>`).
