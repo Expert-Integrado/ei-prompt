@@ -117,3 +117,19 @@ None.
 ---
 *Phase: 03-separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i*
 *Completed: 2026-07-16*
+
+## Self-Check: PASSED
+
+- FOUND: .claude/agents/client-scaffold-structure.md
+- FOUND: .claude/agents/client-scaffold-collect.md
+- FOUND: .claude/agents/client-scaffold-fill.md
+- FOUND: .claude/agents/docs-analyzer.md
+- FOUND: .claude/agents/docs-editor-conciso.md
+- FOUND: .claude/agents/docs-reviewer.md
+- FOUND: .claude/agents/recepcionista-scaffolder.md
+- FOUND: .claude/commands/ei-cria-cliente.md
+- FOUND: .claude/commands/ei-ajustes.md
+- FOUND: c5ac236 (Task 1 commit)
+- FOUND: 99612b2 (Task 2 commit)
+- FOUND: b74c1fe (Task 3 commit)
+- FOUND: 79af758 (SUMMARY commit)
