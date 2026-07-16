@@ -6,7 +6,7 @@ CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes
 
 ## Core Value
 
-Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado (casca removida, invertida ou malformada) sem que isso seja pego automaticamente — hoje isso só é "pego" se o `docs-reviewer` (LLM) lembrar de checar a checklist manual do `docs/regras-validacao.md`.
+Um `docs-editor-conciso` ou `client-scaffold-fill` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado (casca removida, invertida ou malformada) sem que isso seja pego automaticamente — hoje isso só é "pego" se o `docs-reviewer` (LLM) lembrar de checar a checklist manual do `docs/regras-validacao.md`.
 
 ## Requirements
 
