@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 03.1
+current_phase_name: corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e
 status: executing
-stopped_at: Completed 03-05-PLAN.md — Phase 3 complete (CLMD-08 checkpoint approved)
-last_updated: "2026-07-16T14:39:55.038Z"
+stopped_at: Completed 03.1-01-PLAN.md
+last_updated: "2026-07-16T14:53:33.326Z"
 last_activity: 2026-07-16
-last_activity_desc: Phase 03 complete
+last_activity_desc: Phase 03.1 execution started
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 16
+  completed_plans: 15
   percent: 75
-current_phase_name: separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
 ---
 
 # Project State
@@ -24,14 +24,14 @@ current_phase_name: separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
 See: .planning/PROJECT.md (updated 2026-07-06)
 
 **Core value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado sem que isso seja pego automaticamente por código.
-**Current focus:** Phase 03 — separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
+**Current focus:** Phase 03.1 — corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e
 
 ## Current Position
 
-Phase: 03.1
-Plan: Not started
+Phase: 03.1 (corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-16 — Phase 03 complete
+Last activity: 2026-07-16 — Phase 03.1 execution started
 
 Progress: [████████████████████] 14/14 plans (100%)
 
@@ -71,6 +71,7 @@ Progress: [████████████████████] 14/14 p
 | Phase 03 P03 | 5min | 3 tasks | 9 files |
 | Phase 03 P04 | 5min | 2 tasks | 2 files |
 | Phase 03 P05 | 20min | 2 tasks | 4 files |
+| Phase 03.1 P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Plan 03-05 Task 1: resolved plan-internal tension — mirrored validate-xml-casca.sh header rationale verbatim (contains 'stop_hook_active' in prose) but implemented the acceptance-criteria check as a functional guard-absence assertion, not a literal string grep
 - [Phase 03]: Observed tooling quirk: STATE.md frontmatter progress auto-recalculates from disk SUMMARY.md file existence (ignores the SUMMARY's own 'status: in-progress' field) on every state.* read-modify-write call — creating 03-05-SUMMARY.md while Task 3 was still a pending checkpoint caused progress to jump to a false 14/14 (100%) after an unrelated add-decision call; manually corrected frontmatter back to 13/14 (67%) and stopped_at to reflect the true checkpoint-paused state. Continuation agent will get the correct 100% once Task 3 truly completes via the normal state.advance-plan/update-progress calls.
 - [Phase 03]: Phase 3 complete: CLMD-08 human checkpoint approved — end-to-end distribution verified (npm test 41/41, --help sanity, content-diff/install check, live guard sanity trigger+revert). check-claude-md-audience.sh regression guard closes the phase, registered only in gitignored .claude/settings.local.json.
+- [Phase ?]: Phase 03.1 Plan 01: Followed PLAN.md's 4 exact edit targets verbatim in recepcionista-scaffolder.md (3 mechanical renames + 1 factual rewrite) — no additional lines touched
+- [Phase ?]: Phase 03.1 Plan 01: inject-ei-context.sh remains unregistered in .claude/settings.json — this is a latent-risk-only fix, not a re-enablement, per CONTEXT.md Deferred scope
 
 ### Roadmap Evolution
 
@@ -128,8 +131,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T13:35:32.063Z
-Stopped at: Completed 03-05-PLAN.md — Phase 3 complete (CLMD-08 checkpoint approved)
+Last session: 2026-07-16T14:53:33.313Z
+Stopped at: Completed 03.1-01-PLAN.md
 Resume file: None
 
 Last activity: 2026-07-06 - Phase 02 UAT passed (1/1), security threat-secure (02-SECURITY.md, threats_open: 0), transitioned to Phase 03
