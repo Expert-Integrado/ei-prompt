@@ -141,3 +141,11 @@ The plan's Task 2 `<verify>` automated command greps for TAP-format `^# (pass|fa
 ---
 *Phase: 03-separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i*
 *Completed: 2026-07-16*
+
+## Self-Check: PASSED
+
+- FOUND: bin/cli.test.js
+- FOUND: .planning/phases/03-separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i/03-02-SUMMARY.md
+- FOUND: 1dc3256 (Task 1 commit)
+- FOUND: e804d5c (Task 2 commit)
+- FOUND: 4273ed2 (SUMMARY commit)
