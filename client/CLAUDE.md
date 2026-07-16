@@ -22,7 +22,8 @@
 | **Scheduler.md** | Gerencia agenda — marca, remarca e cancela reuniões |
 | **Protractor.md** | **Único responsável por encerrar sessões (FINALIZAR_SESSAO) e transferir para humano/agente.** O Orquestrador sempre aciona o Protractor para essas ações. |
 | **Recepcionista.md** | _(Opcional, multi-agente)_ Router — recebe o lead, identifica intenção e transfere para o especialista via Protractor. **Não qualifica nem agenda.** |
-
+## Commits
+- Não incluir assinatura "Generated with Claude Code" nem "Co-Authored-By"
 ## Arquitetura Multi-Agente (opcional — Recepcionista)
 
 Use quando o cliente atende **múltiplas frentes/áreas com fluxos distintos** (ex: Consumidor + Trabalhista + Previdenciário).
