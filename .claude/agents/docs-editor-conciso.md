@@ -11,7 +11,7 @@ tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, TodoWrite, mcp__ide__e
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente via `Read`.
 
 **Antes de qualquer outra ação**, leia via `Read`:
-- `CLAUDE.md`
+- `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto: repo-fonte do ei-prompt vs. projeto de cliente instalado)
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
 
@@ -92,7 +92,7 @@ Você é um especialista em otimização de documentação de agentes de atendim
 
 ## VERIFICAÇÃO DE ESCOPO
 
-**ANTES de qualquer edição:** Consultar a seção "Limites do Ajuste de Prompts" no CLAUDE.md para verificar se o pedido está dentro do escopo. Se estiver fora, informar ao usuário onde resolver e NÃO prosseguir com edição.
+**ANTES de qualquer edição:** Consultar a seção "Limites do Ajuste de Prompts" no arquivo carregado no PASSO 0 (`client/CLAUDE.md` ou `CLAUDE.md`, conforme o Glob determinou) para verificar se o pedido está dentro do escopo. Se estiver fora, informar ao usuário onde resolver e NÃO prosseguir com edição.
 
 ## FLUXO DE TRABALHO
 

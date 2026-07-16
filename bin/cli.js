@@ -20,6 +20,17 @@ function log(color, prefix, msg) {
   console.log(`${COLORS[color]}${prefix}${COLORS.reset} ${msg}`);
 }
 
+function normalizeEntry(entry) {
+  if (typeof entry === "string") return { from: entry, to: entry };
+  if (entry && typeof entry.from === "string" && typeof entry.to === "string") return entry;
+  throw new Error(`entrada de manifest inválida: ${JSON.stringify(entry)}`);
+}
+
+function formatManifestEntry(entry) {
+  if (typeof entry === "string") return entry;
+  return entry.to;
+}
+
 async function fetchFile(relPath) {
   const url = `${RAW_BASE}/${relPath}`;
   const res = await fetch(url);
@@ -84,19 +95,28 @@ async function run({ overwrite }) {
   const results = { added: 0, updated: 0, unchanged: 0, skipped: 0, failed: 0, removed: 0 };
 
   const deprecated = Array.isArray(manifest.deprecated_files) ? manifest.deprecated_files : [];
-  for (const file of deprecated) {
-    const status = removeFile(file);
-    if (status === "removed") results.removed++;
-    // status === "absent" ou "warn" não conta no agregador (silencioso ou já logou warning)
+  for (const rawEntry of deprecated) {
+    try {
+      const { to } = normalizeEntry(rawEntry);
+      const status = removeFile(to);
+      if (status === "removed") results.removed++;
+      // status === "absent" ou "warn" não conta no agregador (silencioso ou já logou warning)
+    } catch (err) {
+      const label = typeof rawEntry === "string" ? rawEntry : JSON.stringify(rawEntry);
+      log("red", "fail  ", `deprecated: ${label} — ${err.message}`);
+      results.failed++;
+    }
   }
 
-  for (const file of manifest.files) {
+  for (const rawEntry of manifest.files) {
     try {
-      const content = await fetchFile(file);
-      const result = await writeFile(file, content, { overwrite });
+      const { from, to } = normalizeEntry(rawEntry);
+      const content = await fetchFile(from);
+      const result = await writeFile(to, content, { overwrite });
       results[result]++;
     } catch (err) {
-      log("red", "fail  ", `${file} — ${err.message}`);
+      const label = typeof rawEntry === "string" ? rawEntry : (rawEntry && rawEntry.to) || JSON.stringify(rawEntry);
+      log("red", "fail  ", `${label} — ${err.message}`);
       results.failed++;
     }
   }
@@ -120,24 +140,28 @@ ${COLORS.yellow}Uso:${COLORS.reset}
   npx @expertzinhointegrado/ei-prompt@latest --help    Mostra esta ajuda
 
 ${COLORS.yellow}Arquivos instalados/atualizados:${COLORS.reset}
-${manifest.files.map((f) => `  - ${f}`).join("\n")}
+${manifest.files.map((f) => `  - ${formatManifestEntry(f)}`).join("\n")}
 ${manifest.deprecated_files && manifest.deprecated_files.length ? `
 ${COLORS.yellow}Arquivos removidos (legados):${COLORS.reset}
-${manifest.deprecated_files.map((f) => `  - ${f}`).join("\n")}
+${manifest.deprecated_files.map((f) => `  - ${formatManifestEntry(f)}`).join("\n")}
 ` : ""}`);
 }
 
-const cmd = process.argv[2];
+module.exports = { normalizeEntry, formatManifestEntry, fetchFile, writeFile, removeFile, run, help };
 
-if (cmd === "--help" || cmd === "-h" || cmd === "help") {
-  help();
-} else if (!cmd || cmd === "install" || cmd === "update") {
-  run({ overwrite: true }).catch((err) => {
-    log("red", "erro", err.message);
+if (require.main === module) {
+  const cmd = process.argv[2];
+
+  if (cmd === "--help" || cmd === "-h" || cmd === "help") {
+    help();
+  } else if (!cmd || cmd === "install" || cmd === "update") {
+    run({ overwrite: true }).catch((err) => {
+      log("red", "erro", err.message);
+      process.exit(1);
+    });
+  } else {
+    log("red", "erro", `comando desconhecido: ${cmd}`);
+    help();
     process.exit(1);
-  });
-} else {
-  log("red", "erro", `comando desconhecido: ${cmd}`);
-  help();
-  process.exit(1);
+  }
 }

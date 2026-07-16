@@ -16,7 +16,7 @@ Auditar **o que foi alterado** em arquivos de agentes (Orquestrador, Qualifier, 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente via `Read`.
 
 1. **Ler via `Read`** (fonte da verdade — mudam com frequência: Base de Conhecimento, Envio de Mídia, modelo/ read-only, multi-agente, etc. NÃO confiar em memória):
-   - `CLAUDE.md`
+   - `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto)
    - `docs/regras-validacao.md`
    - `docs/proibido-fazer.md`
 2. **Ler o arquivo alvo completo**.

@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.0] - 2026-07-16
+
+**Criação de cliente mais segura e arquivos de agente protegidos contra corrupção.**
+
+- **Nenhum cliente fica mais com informações faltando sem avisar.** Antes, criar um cliente novo acontecia tudo de uma vez só, e era fácil esquecer de preencher algum dado. Agora o processo tem 3 etapas claras — primeiro monta a estrutura, depois recolhe todas as informações do cliente (incluindo mídias), e só parte para o preenchimento final depois de uma confirmação explícita de que nada ficou pra trás. Isso vale tanto para clientes de um agente só quanto para clientes com vários agentes especializados.
+- **Arquivos de agente não podem mais ficar corrompidos sem ninguém perceber.** Todo arquivo de agente de cliente tem uma estrutura interna que precisa estar sempre correta. Antes, essa checagem dependia de alguém lembrar de revisar manualmente. Agora ela é automática: qualquer tentativa de editar um agente que deixe essa estrutura quebrada é detectada e bloqueada na hora, sem depender de revisão humana.
+- **Separação entre o material que vai para o cliente e o material interno da equipe.** As instruções que são enviadas para os projetos dos clientes agora ficam guardadas separadamente das instruções internas usadas pela equipe para manter este projeto — reduzindo o risco de uma regra interna vazar para um cliente, ou vice-versa.
+- Diversos ajustes de documentação para manter tudo consistente após essas mudanças.
+
 ## [2.0.7] - 2026-07-04
 
 **Hotfix: loop infinito do hook `post-scaffolder-review.sh` com subagente em background.**

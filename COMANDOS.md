@@ -22,15 +22,17 @@ Cria um novo projeto de cliente a partir dos templates em `modelo/`.
 ```
 
 **Fluxo:**
-1. Dispara o agente `client-project-scaffolder`
-2. **Fase 0:** carrega `CLAUDE.md` + lê todos os templates em `modelo/`
-3. **Fase 1:** valida/pergunta nome do cliente
-4. **Fase 2:** copia `modelo/*.md` para `<cliente>/`
-5. **Fase 3:** identifica campos `{{variavel}}` nos templates
-6. **Fase 4:** coleta dados do usuário (um a um ou em bloco)
-7. **Fase 5:** personaliza os arquivos copiados; campos sem info ficam marcados `[PENDENTE]`
+1. Pergunta o modo via `AskUserQuestion`: **single-agent** (1 frente) ou **multi-agente** (2+ frentes com fluxos distintos).
+2. **Single-agent:**
+   1. `client-scaffold-structure` cria a pasta `<cliente>/` e copia `modelo/*.md` verbatim.
+   2. `client-scaffold-collect` coleta todos os campos obrigatórios (incl. mídia) via conversa e devolve `<dados_coletados>`.
+   3. **Gate de Confirmação** (`AskUserQuestion`: "Aprovar e preencher" / "Cancelar") — só avança para o preenchimento com aprovação explícita.
+   4. `client-scaffold-fill` preenche os templates com os dados aprovados.
+3. **Multi-agente (fluxo completo):** repete o ciclo estrutura → coleta → gate → preenchimento (item 2 acima) uma vez por especialidade, sempre sequencial, nunca em paralelo. Depois que todas as especialidades foram criadas (preenchidas ou canceladas), dispara `recepcionista-scaffolder` uma única vez para montar `Recepcionista/`.
+4. **Multi-agente (bypass):** pula o loop de especialidades inteiro — dispara só o `recepcionista-scaffolder`, que pede nome/descrição/gatilhos de cada especialidade já existente.
+5. **Resumo final:** um único resumo consolidado ao fim de todo o fluxo (não por especialidade), com o status de cada ciclo (**preenchida** ou **cancelada-e-não-preenchida**) e os campos pendentes.
 
-**Saída:** nova pasta `<cliente>/` na raiz com os 4 agentes personalizados.
+**Saída:** nova pasta `<cliente>/` (single-agent) ou `<cliente>/<especialidade>/` + `<cliente>/Recepcionista/` (multi-agente) com os agentes preenchidos (ou marcados como pendentes/cancelados).
 
 ---
 
@@ -71,7 +73,7 @@ Re-executa `npx @expertzinhointegrado/ei-prompt@latest` na pasta atual e mostra 
 | Evento | Quando dispara | Ação |
 |--------|----------------|------|
 | `Stop` | Ao fim do fan-out de editores no `/ei-ajustes` Passo 5 | `post-ajustes-fanout.sh` detecta sentinela `<ei-ajustes-round id=...>` e injeta `reason` para o main Claude prosseguir ao Passo 6 |
-| `SubagentStop` | Quando um subagente encerra | `post-scaffolder-review.sh` revisa scaffolding do `client-project-scaffolder` automaticamente; guarda silenciosa (D-11) para coexistência com o pipeline `/ei-ajustes` |
+| `SubagentStop` | Quando um subagente encerra | `post-scaffolder-review.sh` revisa scaffolding do `client-scaffold-fill` automaticamente; guarda silenciosa (D-11) para coexistência com o pipeline `/ei-ajustes` |
 
 > ⚠️ **v1.8.9:** Hooks de injeção de contexto (`SessionStart`, `UserPromptSubmit`, `PreToolUse` em `modelo/*.md`) estão **desativados** em `.claude/settings.json` durante a manutenção. Scripts mantidos no disco para reativação futura: `inject-ei-context.sh`, `prompt-matches-agent.sh`.
 
@@ -99,7 +101,9 @@ Re-executa `npx @expertzinhointegrado/ei-prompt@latest` na pasta atual e mostra 
 
 | Agente | Papel |
 |--------|-------|
-| `client-project-scaffolder` | Cria novos projetos de cliente (Fase 0 carrega contexto) |
+| `client-scaffold-structure` | Passo 1 — cria a pasta do cliente e copia os templates de `modelo/` verbatim, sem perguntar nada |
+| `client-scaffold-collect` | Passo 2 — lê os templates copiados e coleta todo campo obrigatório (incl. mídia) via conversa; read-only |
+| `client-scaffold-fill` | Passo 3 — preenche os templates com os dados coletados, preservando `{{variavel}}` e o marcador `[PENDENTE]`; não-interativo |
 | `recepcionista-scaffolder` | (Multi-agente) Cria a pasta `Recepcionista/` (router) |
 | `docs-analyzer` | (Opus, read-only) Identifica arquivo+seção a partir de descrição livre |
 | `docs-editor-conciso` | Edita arquivos `.md` de agentes, preserva `<response_format>` |
