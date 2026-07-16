@@ -27,7 +27,9 @@ EiPrompt/
 │   │   ├── ei-ajustes.md
 │   │   └── ei-update.md
 │   ├── agents/                      # Subagent definitions (isolated-context tasks)
-│   │   ├── client-project-scaffolder.md
+│   │   ├── client-scaffold-structure.md
+│   │   ├── client-scaffold-collect.md
+│   │   ├── client-scaffold-fill.md
 │   │   ├── recepcionista-scaffolder.md
 │   │   ├── docs-analyzer.md
 │   │   ├── docs-editor-conciso.md
@@ -119,7 +121,7 @@ EiPrompt/
 **Files:**
 - Agent persona templates: PascalCase Portuguese role names — `Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md`, `Recepcionista.md`, `Follow-Up.md`
 - Slash commands: kebab-case with `ei-` prefix — `ei-cria-cliente.md`, `ei-ajustes.md`, `ei-update.md`
-- Subagents: kebab-case, descriptive of role — `client-project-scaffolder.md`, `docs-analyzer.md`, `docs-editor-conciso.md`, `docs-reviewer.md`
+- Subagents: kebab-case, descriptive of role — `client-scaffold-fill.md`, `docs-analyzer.md`, `docs-editor-conciso.md`, `docs-reviewer.md`
 - Hooks: kebab-case, `<trigger-context>-<action>.sh` — `post-scaffolder-review.sh`, `post-ajustes-fanout.sh`, `prompt-matches-agent.sh`
 - Docs: kebab-case Portuguese descriptive names — `regras-edicao.md`, `proibido-fazer.md`
 
@@ -132,7 +134,7 @@ EiPrompt/
 **New agent persona template:**
 - Add to `modelo/<NovoNome>.md`
 - Register the path in `manifest.json`'s `files` array so it ships via the CLI
-- Reference it from any relevant scaffolder subagent (`.claude/agents/client-project-scaffolder.md` or `recepcionista-scaffolder.md`)
+- Reference it from any relevant scaffolder subagent (`.claude/agents/client-scaffold-structure.md` or `recepcionista-scaffolder.md`)
 
 **New slash command:**
 - Add `.claude/commands/<nome-comando>.md` following the "Passo N" numbered structure seen in `ei-ajustes.md`/`ei-cria-cliente.md`

@@ -76,10 +76,10 @@
 ## Claude Code Integration (project tooling, not shipped runtime dependency)
 
 This repo is itself developed using Claude Code, and its `.claude/` directory (agents, hooks, slash commands) is one of the artifact sets distributed to end-user "client" projects via `manifest.json`. Notable pieces:
-- `.claude/hooks/post-scaffolder-review.sh` — `SubagentStop` hook guarding against loops after the `client-project-scaffolder` subagent.
+- `.claude/hooks/post-scaffolder-review.sh` — `SubagentStop` hook guarding against loops after the `client-scaffold-fill` subagent.
 - `.claude/hooks/post-ajustes-fanout.sh` — `Stop` hook driving the `/ei-ajustes` multi-step pipeline (parallel edit/review fan-out) via the `reason` field of the Stop event schema.
 - `.claude/hooks/inject-ei-context.sh` — currently disabled (per `.claude/settings.json` `_disabled_note`), previously injected `CLAUDE.md`/`docs/*` context automatically.
-- Subagents with `model:` frontmatter (opus, etc.): `.claude/agents/client-project-scaffolder.md`, `docs-editor-conciso.md`, `docs-reviewer.md`, `docs-analyzer.md`, `recepcionista-scaffolder.md` — these run under the Claude API via Claude Code's own agent orchestration, not called directly by any code in this repo.
+- Subagents with `model:` frontmatter (opus, etc.): `.claude/agents/client-scaffold-structure.md`, `.claude/agents/client-scaffold-collect.md`, `.claude/agents/client-scaffold-fill.md`, `docs-editor-conciso.md`, `docs-reviewer.md`, `docs-analyzer.md`, `recepcionista-scaffolder.md` — these run under the Claude API via Claude Code's own agent orchestration, not called directly by any code in this repo.
 
 ---
 

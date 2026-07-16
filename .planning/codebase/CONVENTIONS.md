@@ -15,7 +15,7 @@ Conventions below cover both layers. There is no `.eslintrc`, `.prettierrc`, `ts
 **Files:**
 - CLI code: lowercase-dash-free single file, `bin/cli.js`.
 - Agent/prompt templates: PascalCase Portuguese role names — `modelo/Orquestrador.md`, `modelo/Qualifier.md`, `modelo/Scheduler.md`, `modelo/Protractor.md`, `modelo/Recepcionista.md`, `modelo/Follow-Up.md`.
-- Claude subagents: kebab-case, function-first — `.claude/agents/docs-editor-conciso.md`, `.claude/agents/docs-analyzer.md`, `.claude/agents/docs-reviewer.md`, `.claude/agents/client-project-scaffolder.md`, `.claude/agents/recepcionista-scaffolder.md`.
+- Claude subagents: kebab-case, function-first — `.claude/agents/docs-editor-conciso.md`, `.claude/agents/docs-analyzer.md`, `.claude/agents/docs-reviewer.md`, `.claude/agents/client-scaffold-fill.md`, `.claude/agents/recepcionista-scaffolder.md`.
 - Slash commands: kebab-case with `ei-` prefix — `.claude/commands/ei-ajustes.md`, `.claude/commands/ei-cria-cliente.md`, `.claude/commands/ei-update.md`.
 - Shell hooks: kebab-case, verb/context descriptive — `.claude/hooks/inject-ei-context.sh`, `.claude/hooks/post-ajustes-fanout.sh`, `.claude/hooks/post-scaffolder-review.sh`, `.claude/hooks/prompt-matches-agent.sh`.
 - Reference docs: lowercase-kebab in `docs/` — `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`, `docs/multi-agente-recepcionista.md`.
