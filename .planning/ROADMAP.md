@@ -132,10 +132,14 @@ Plans:
 **Goal:** Como mantenedor do ei-prompt, quero que toda referência à arquitetura de scaffolding retirada (`client-project-scaffolder`) seja corrigida para os 3 subagents atuais (`client-scaffold-structure` / `client-scaffold-collect` / `client-scaffold-fill`) em toda a documentação e prompts do repositório, e que `inject-ei-context.sh` tenha o mesmo fallback dual-context CLAUDE.md dos demais consumidores, para que nenhum agente (humano ou LLM) seja guiado por instruções que descrevem um fluxo que não existe mais.
 **Requirements**: TBD (post-hoc tech-debt phase — left unmapped rather than retrofitting REQ-IDs into the closed v1.0 traceability table; see 03.1-CONTEXT.md Deferred)
 **Depends on:** Phase 3
-**Plans:** 2/2 plans complete
+**Plans:** 2/3 plans complete (gap closure: 03.1-VERIFICATION.md found truth #7 partial — 1 closure plan added)
 
 Plans:
 **Wave 1**
 
 - [x] 03.1-01-PLAN.md — Fix stale client-project-scaffolder references in recepcionista-scaffolder.md + add dual-context CLAUDE.md fallback to inject-ei-context.sh
 - [x] 03.1-02-PLAN.md — Fix 5 stale references in .claude/CLAUDE.md + rewrite COMANDOS.md's Fluxo section and agent tables
+
+**Wave 2** *(gap closure — blocked on Wave 1 completion)*
+
+- [ ] 03.1-03-PLAN.md — Fix client/CLAUDE.md (npm-distributed payload) + PROJECT.md + STATE.md Core Value lines + sweep .planning/codebase/{ARCHITECTURE,STRUCTURE,CONVENTIONS,INTEGRATIONS}.md, closing 03.1-VERIFICATION.md's remaining gap
