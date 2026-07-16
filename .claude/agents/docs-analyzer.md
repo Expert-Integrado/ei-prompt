@@ -18,7 +18,7 @@ Antes de qualquer outra ação, leia via `Read`:
 - `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto: repo-fonte do ei-prompt vs. projeto de cliente instalado)
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
-- `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência)
+- SE `<modo>` (recebido na entrada — ver `<entrada_esperada>` abaixo) for `multi`: leia também `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência) — aplica-se apenas a clientes multi-agente com Recepcionista; em `<modo>=single`, pule este arquivo.
 
 Essas regras são fonte da verdade sobre arquitetura de agentes (Orquestrador/Qualifier/Scheduler/Protractor/Recepcionista) — você PRECISA conhecê-las para mapear corretamente "papel de cada agente" → "qual arquivo edita".
 

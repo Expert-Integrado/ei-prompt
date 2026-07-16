@@ -501,8 +501,6 @@ O hook `.claude/hooks/post-ajustes-fanout.sh` (Stop event, registrado em `.claud
 - **Se você NÃO recebeu reason do hook** (turno anterior terminou silenciosamente; hook desabilitado em `settings.json`; hook com bug; ou turno atípico fora do fluxo `/ei-ajustes`): prossiga ao Passo 6 normalmente como Phase 4 vigente. O hook é REINFORCEMENT da automação, não GATE — sem ele, o pipeline continua manual igual Phase 4. NÃO trave aguardando trigger.
 - **HOOK-02b — fallback puro num único turno (consumed inline):** quando você rodar Passos 5→6 num único turno SEM nunca receber `reason` do hook (fallback puro: dispatch dos N editores no Passo 5 + bloco pós-Tasks + dispatch dos M reviewers no Passo 6 + Apresentação final, tudo na MESMA resposta ou em turnos consecutivos sem `reason` chegar), emita `<ei-ajustes-round-consumed id="<ROUND_ID>"/>` em UMA linha de texto livre **imediatamente antes do bloco de Apresentação final** — onde `<ROUND_ID>` é o id do sentinela emitido no início do Passo 5 (que você manteve em memória per REGRA INVIOLÁVEL HOOK-02 do Passo 5). Sem essa emissão inline, o sentinela fica ATIVO no transcript quando o turno final fecha; o hook `post-ajustes-fanout.sh` então varre no evento `Stop` e injeta `decision:block + reason` retroativamente no próximo turno do main Claude, produzindo um "Stop hook blocking error" cosmético + 1 turno extra desnecessário só para fechar o ciclo. A emissão inline de `consumed` em fallback puro elimina esse disparo retroativo. **Emissão é idempotente:** o hook usa `grep -qF "<ei-ajustes-round-consumed id=\"<ROUND_ID>\"/>"` (idempotência via [post-ajustes-fanout.sh:63]) — emitir `consumed` em fallback puro é seguro mesmo no race teórico em que o hook detectaria o sentinela simultaneamente (o anti-loop `stop_hook_active` cobre o resto).
 
-Se a rodada inteira do `/ei-ajustes` rodou em modo fallback (nenhum reason recebido em nenhum round de Passo 5 / retry / correção), inclua a nota literal na Apresentação final estendida (D-17): `"Nota: rodada em modo fallback — hook post-ajustes-fanout não acionou (D-09). Verifique \`.claude/settings.json\` se transição automática editor→reviewer for esperada."`
-
 #### ⚠️ REGRA INVIOLÁVEL DO PASSO 6 (HOOK-02 — consumed pós-trigger)
 
 Quando você receber um `reason` injetado pelo hook (formato descrito acima) contendo um `ROUND_ID` da forma `round-<UNIX>-<3_ALFANUM>`, ANTES de fazer QUALQUER outra coisa (parsing dos `<resultado>` do Passo 5, gate PARL-04, REGRA INVIOLÁVEL REVW-01, dispatch dos M reviewers), emita em UMA linha de texto livre, no MESMO turno em que vai começar o Passo 6:
@@ -741,12 +739,6 @@ Resumo final do /ei-ajustes (M={M} arquivos auditados, rodadas={N'}):
 - ✗ `<path7>` — FALHO no Passo 5 (não auditado)
 - ⊘ `<path8>` — CANCELADO no Passo 5 (não auditado)
 ```
-
-**Nota opcional (D-17 — fallback):** se TODAS as rodadas desta execução (inicial, retry PARL-04, correção REVW-04) rodaram em modo fallback (nenhum `reason` do hook recebido em nenhum turno), adicione ao final do resumo a linha literal:
-
-> `"Nota: rodada em modo fallback — hook post-ajustes-fanout não acionou (D-09). Verifique \`.claude/settings.json\` se transição automática editor→reviewer for esperada."`
-
-Se pelo menos uma rodada recebeu trigger do hook (qualquer round), NÃO inclua esta nota (rodada normal).
 
 Mapeamento dos ícones:
 - `✓` = `status_final_reviewer` em {OK, OK_APOS_CORRECAO}

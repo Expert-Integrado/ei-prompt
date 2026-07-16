@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 Phase: Milestone v1.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-16 - Completed quick task 260716-mhh: Release prep v2.1.1 (RELEASE.md fix, CHANGELOG, CLAUDE.md xref), PR #15 opened dev->main (not merged)
+Last activity: 2026-07-16 - Completed quick task 260716-on3: removed internal fallback note from /ei-ajustes summary, gated docs-analyzer's multi-agente-recepcionista.md read on modo=multi
 
 ## Performance Metrics
 
@@ -129,6 +129,7 @@ None yet.
 | 260705-pgq | Adicionar LICENSE proprietario (all rights reserved) e atualizar package.json license para UNLICENSED | 2026-07-05 | a753f94 | [260705-pgq-adicionar-license-proprietario-all-right](./quick/260705-pgq-adicionar-license-proprietario-all-right/) |
 | 260716-lv5 | Hotfix: post-ajustes-fanout.sh loop bug - idempotency check now scans full transcript instead of a 400-line window that could scroll past an already-emitted consumed sentinel | 2026-07-16 | 3ca876a | [260716-lv5-hotfix-post-ajustes-fanout-sh-loop-bug-h](./quick/260716-lv5-hotfix-post-ajustes-fanout-sh-loop-bug-h/) |
 | 260716-mhh | Release prep: corrigido RELEASE.md (push-to-main dispara publish, nao tag), bump v2.1.1 + CHANGELOG do hotfix post-ajustes-fanout, cross-ref RELEASE.md em ambos CLAUDE.md, PR #15 aberto (dev->main, NAO mergeado) | 2026-07-16 | 0ebd682 | [260716-mhh-release-prep-fix-stale-release-md-says-t](./quick/260716-mhh-release-prep-fix-stale-release-md-says-t/) |
+| 260716-on3 | UX ei-ajustes: removida nota interna "modo fallback" do resumo final ao usuario (ruido, nao acionavel); leitura de docs/multi-agente-recepcionista.md no docs-analyzer agora condicional a modo=multi | 2026-07-16 | fc66ec3 | [260716-on3-two-ei-ajustes-ux-fixes-1-remove-the-int](./quick/260716-on3-two-ei-ajustes-ux-fixes-1-remove-the-int/) |
 
 ## Deferred Items
 
