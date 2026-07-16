@@ -13,7 +13,7 @@ Crie um novo projeto de cliente. **Você (Claude principal) é o orquestrador** 
 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
 
-1. Leia `CLAUDE.md` integralmente — atenção à seção "Arquitetura Multi-Agente (opcional — Recepcionista)".
+1. Verifique se `client/CLAUDE.md` existe (Glob). Se existir, leia-o via Read — atenção à seção "Arquitetura Multi-Agente (opcional — Recepcionista)". Se NÃO existir, leia `CLAUDE.md` integralmente.
 2. Leia `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`.
 3. Liste `modelo/*.md` para saber quais templates estão disponíveis.
 
