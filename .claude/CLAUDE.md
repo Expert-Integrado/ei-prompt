@@ -6,7 +6,7 @@
 
 CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes Claude Code (Orquestrador, Qualifier, Scheduler, Protractor, Recepcionista, Follow-Up) para pastas de clientes de atendimento automatizado. Os 6 templates em `modelo/` têm uma "casca" XML (`<?xml version="1.0" encoding="UTF-8"?>` + `<agente tipo="...">`) desde o commit `994b16f`. Este milestone endurece essa casca com validação de código (não só regra em prompt) e conserta o fluxo de criação de cliente, que hoje deixa campos incompletos porque tudo acontece numa única tacada.
 
-**Core Value:** Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado (casca removida, invertida ou malformada) sem que isso seja pego automaticamente — hoje isso só é "pego" se o `docs-reviewer` (LLM) lembrar de checar a checklist manual do `docs/regras-validacao.md`.
+**Core Value:** Um `docs-editor-conciso` ou `client-scaffold-fill` nunca deve conseguir gerar/deixar um arquivo de cliente com XML quebrado (casca removida, invertida ou malformada) sem que isso seja pego automaticamente — hoje isso só é "pego" se o `docs-reviewer` (LLM) lembrar de checar a checklist manual do `docs/regras-validacao.md`.
 
 ### Constraints
 
@@ -70,7 +70,7 @@ CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes
 
 - CLI code: lowercase-dash-free single file, `bin/cli.js`.
 - Agent/prompt templates: PascalCase Portuguese role names — `modelo/Orquestrador.md`, `modelo/Qualifier.md`, `modelo/Scheduler.md`, `modelo/Protractor.md`, `modelo/Recepcionista.md`, `modelo/Follow-Up.md`.
-- Claude subagents: kebab-case, function-first — `.claude/agents/docs-editor-conciso.md`, `.claude/agents/docs-analyzer.md`, `.claude/agents/docs-reviewer.md`, `.claude/agents/client-project-scaffolder.md`, `.claude/agents/recepcionista-scaffolder.md`.
+- Claude subagents: kebab-case, function-first — `.claude/agents/docs-editor-conciso.md`, `.claude/agents/docs-analyzer.md`, `.claude/agents/docs-reviewer.md`, `.claude/agents/client-scaffold-fill.md`, `.claude/agents/recepcionista-scaffolder.md`.
 - Slash commands: kebab-case with `ei-` prefix — `.claude/commands/ei-ajustes.md`, `.claude/commands/ei-cria-cliente.md`, `.claude/commands/ei-update.md`.
 - Shell hooks: kebab-case, verb/context descriptive — `.claude/hooks/inject-ei-context.sh`, `.claude/hooks/post-ajustes-fanout.sh`, `.claude/hooks/post-scaffolder-review.sh`, `.claude/hooks/prompt-matches-agent.sh`.
 - Reference docs: lowercase-kebab in `docs/` — `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`, `docs/multi-agente-recepcionista.md`.
@@ -142,12 +142,14 @@ CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes
 | `/ei-cria-cliente` command | Creates a new client project (single- or multi-agent) by invoking scaffolder subagents | `.claude/commands/ei-cria-cliente.md` |
 | `/ei-ajustes` command | Applies a targeted adjustment to an existing client agent via analyze→approve→edit→review pipeline | `.claude/commands/ei-ajustes.md` |
 | `/ei-update` command | Re-runs the npx installer in the current folder and surfaces the changelog | `.claude/commands/ei-update.md` |
-| `client-project-scaffolder` subagent | Generates a full single-agent client stack from `modelo/` | `.claude/agents/client-project-scaffolder.md` |
+| `client-scaffold-structure` subagent | Creates the client folder skeleton and copies `modelo/*.md` templates verbatim, asking no questions | `.claude/agents/client-scaffold-structure.md` |
+| `client-scaffold-collect` subagent | Reads the copied templates, collects every required field (including media) conversationally, returns a structured `<dados_coletados>` block; read-only, never writes files | `.claude/agents/client-scaffold-collect.md` |
+| `client-scaffold-fill` subagent | Fills the copied templates' placeholders with the collected data, preserving `{{variavel}}` syntax and the pending marker for anything unanswered; non-interactive | `.claude/agents/client-scaffold-fill.md` |
 | `recepcionista-scaffolder` subagent | Generates the Recepcionista (router) stack for multi-agent clients | `.claude/agents/recepcionista-scaffolder.md` |
 | `docs-analyzer` subagent | Read-only, opus-model analysis of which client file/section an adjustment description targets | `.claude/agents/docs-analyzer.md` |
 | `docs-editor-conciso` subagent | Performs the actual concise edit to a client agent file | `.claude/agents/docs-editor-conciso.md` |
 | `docs-reviewer` subagent | Cross-context audit of an edit, emits OK/CORRECAO/BLOQUEAR verdict | `.claude/agents/docs-reviewer.md` |
-| `post-scaffolder-review.sh` hook | `SubagentStop` hook that reacts after `client-project-scaffolder` runs; has an anti-loop sentinel guard | `.claude/hooks/post-scaffolder-review.sh` |
+| `post-scaffolder-review.sh` hook | `SubagentStop` hook that reacts after `client-scaffold-fill` runs; has an anti-loop sentinel guard | `.claude/hooks/post-scaffolder-review.sh` |
 | `post-ajustes-fanout.sh` hook | `Stop` hook that detects an in-flight `/ei-ajustes` editor fan-out sentinel and injects a `reason` to drive the main agent into the review step | `.claude/hooks/post-ajustes-fanout.sh` |
 | `prompt-matches-agent.sh` hook | Utility hook for prompt/agent matching (supporting logic for the pipeline) | `.claude/hooks/prompt-matches-agent.sh` |
 | `inject-ei-context.sh` hook | Disabled context-injection hook (see CLAUDE.md v1.8.9 note); kept for potential restoration from git history | `.claude/hooks/inject-ei-context.sh` |
@@ -172,7 +174,7 @@ CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes
 - Location: `modelo/*.md`
 - Contains: prompt text defining each agent's role (Orquestrador, Qualifier, Scheduler, Protractor, Recepcionista, Follow-Up)
 - Depends on: nothing (leaf layer)
-- Used by: `client-project-scaffolder`, `recepcionista-scaffolder` subagents
+- Used by: `client-scaffold-structure`, `recepcionista-scaffolder` subagents
 - Purpose: implements the create-client and adjust-client workflows as Claude Code slash commands, subagents, and hooks
 - Location: `.claude/commands/`, `.claude/agents/`, `.claude/hooks/`, `.claude/settings.json`
 - Contains: command markdown (multi-step procedural instructions for the main Claude agent), subagent markdown (isolated-context task definitions), hook shell scripts (lifecycle event handlers)
