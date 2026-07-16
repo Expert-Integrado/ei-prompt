@@ -2,7 +2,7 @@
   "repo": "Expert-Integrado/ei-prompt",
   "branch": "main",
   "files": [
-    "CLAUDE.md",
+    { "from": "client/CLAUDE.md", "to": "CLAUDE.md" },
     "CHANGELOG.md",
     "docs/regras-edicao.md",
     "docs/regras-validacao.md",
