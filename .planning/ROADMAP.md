@@ -93,7 +93,7 @@ Phases execute in numeric order: 1 → 2 → 3 (Phase 3 depends on Phase 2 by co
 |-------|----------------|--------|-----------|
 | 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
 | 2. 3-Step Gated Client Scaffolding | 5/5 | Complete    | 2026-07-05 |
-| 3. Separar CLAUDE.md distribuído (cliente via npm) do CLAUDE.md interno | 3/5 | In Progress|  |
+| 3. Separar CLAUDE.md distribuído (cliente via npm) do CLAUDE.md interno | 4/5 | In Progress|  |
 </content>
 
 ### Phase 3: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
@@ -110,7 +110,7 @@ Phases execute in numeric order: 1 → 2 → 3 (Phase 3 depends on Phase 2 by co
   4. `bin/cli.js --help` and the install loop both handle `manifest.json`'s mixed string/`{from,to}` entries correctly — no `[object Object]`, no fetch/write failures for the CLAUDE.md entry.
   5. Manually reintroducing a migrated heading (e.g. `## Slash Commands`) into `CLAUDE.md` or `.claude/CLAUDE.md` in this repo is automatically blocked by `check-claude-md-audience.sh` on the next `Stop`/`SubagentStop` event — and this guard is never shipped to client projects (absent from `manifest.json` and `.claude/settings.json`).
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 **Wave 1**
@@ -121,7 +121,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-04-PLAN.md — Remove root `CLAUDE.md` + fix `.claude/CLAUDE.md`'s commits cross-reference
+- [x] 03-04-PLAN.md — Remove root `CLAUDE.md` + fix `.claude/CLAUDE.md`'s commits cross-reference
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-07-16T13:12:18.104Z"
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-07-16T13:17:56.424Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 14
-  completed_plans: 12
+  completed_plans: 13
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 ## Current Position
 
 Phase: 03 (separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-07-16 — Phase 03 execution started
 
@@ -68,6 +68,7 @@ Progress: [████████████████████] 9/9 pla
 | Phase 03 P01 | 8min | 2 tasks | 2 files |
 | Phase 03 P02 | 10min | 2 tasks | 3 files |
 | Phase 03 P03 | 5min | 3 tasks | 9 files |
+| Phase 03 P04 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - Phase 1 (para referência): validação de XML virou hook determinístico (Node built-in), substituindo checklist manual — ver detalhes completos em PROJECT.md.
 - [Phase 03]: Followed RESEARCH.md Pattern 1/2 verbatim for normalizeEntry()/formatManifestEntry() — no deviation from documented shape or error message text
 - [Phase 03]: Applied RESEARCH.md Pattern 3 (dual-context CLAUDE.md fallback: Glob-check client/CLAUDE.md, fall back to CLAUDE.md) verbatim across 9 files / 11 edit points; included client-scaffold-fill.md as a 9th file missed by RESEARCH.md's own table and added Glob to its tools frontmatter.
+- [Phase 03]: D-07: root CLAUDE.md removido por completo (full removal), sem stub/pointer, per RESEARCH.md
+- [Phase 03]: D-08: unica linha de cross-reference corrigida em .claude/CLAUDE.md (commits rule), demais mencoes de 'root CLAUDE.md' no bloco Architecture auto-gerado ficam de fora do escopo (T-03-09, risco aceito)
 
 ### Roadmap Evolution
 
@@ -119,8 +122,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T13:11:39.190Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-07-16T13:17:56.404Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
 
 Last activity: 2026-07-06 - Phase 02 UAT passed (1/1), security threat-secure (02-SECURITY.md, threats_open: 0), transitioned to Phase 03
