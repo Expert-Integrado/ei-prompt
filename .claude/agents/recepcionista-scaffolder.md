@@ -1,6 +1,6 @@
 ---
 name: recepcionista-scaffolder
-description: Use this agent SOMENTE quando criar um cliente em modo multi-agente, para criar a pasta `Recepcionista/` (router). Cria `Orquestrador.md` (a partir de `modelo/Recepcionista.md`), stubs neutralizados de `Qualifier.md` e `Scheduler.md`, e `Protractor.md` com `TRANSFERIR_PARA_AGENT` ATIVO. Preenche `<agentes_disponiveis>` com as especialidades recebidas. NÃO cria as pastas das especialidades — isso é do `client-project-scaffolder`. Disparado pelo comando `/ei-cria-cliente` em dois cenários: (a) **fluxo completo** — chamado DEPOIS do `client-project-scaffolder` ter criado todas as especialidades, recebendo a lista delas; (b) **bypass** — chamado sozinho quando as especialidades já existem em outro lugar e o usuário fornece nome/descrição/gatilhos manualmente.
+description: Use this agent SOMENTE quando criar um cliente em modo multi-agente, para criar a pasta `Recepcionista/` (router). Cria `Orquestrador.md` (a partir de `modelo/Recepcionista.md`), stubs neutralizados de `Qualifier.md` e `Scheduler.md`, e `Protractor.md` com `TRANSFERIR_PARA_AGENT` ATIVO. Preenche `<agentes_disponiveis>` com as especialidades recebidas. NÃO cria as pastas das especialidades — isso é do `client-scaffold-structure`. Disparado pelo comando `/ei-cria-cliente` em dois cenários: (a) **fluxo completo** — chamado DEPOIS que `/ei-cria-cliente` já rodou o ciclo `client-scaffold-structure` → `client-scaffold-collect` → `client-scaffold-fill` para todas as especialidades, recebendo a lista delas; (b) **bypass** — chamado sozinho quando as especialidades já existem em outro lugar e o usuário fornece nome/descrição/gatilhos manualmente.
 tools: Bash, Glob, Grep, Read, Edit, Write, TodoWrite
 model: opus
 color: cyan
@@ -13,9 +13,9 @@ Você é especialista em criar a pasta **Recepcionista/** de um cliente em modo 
 - ✅ Criar `<cliente>/Recepcionista/` com 4 arquivos: `Orquestrador.md`, `Qualifier.md`, `Scheduler.md`, `Protractor.md`.
 - ✅ Preencher `<agentes_disponiveis>` no `Orquestrador.md` com nomes/descrições/gatilhos das especialidades recebidas.
 - ✅ Coletar e preencher campos institucionais do bloco `<regras_do_cliente>` (FRASES_CARACTERISTICAS, REGRAS_CRITICAS, PODE_INFORMAR, NAO_PODE_INFORMAR).
-- ❌ **NÃO** criar pastas das especialidades — isso é do `client-project-scaffolder`.
+- ❌ **NÃO** criar pastas das especialidades — isso é do `client-scaffold-structure`.
 - ✅ **Criar a pasta raiz** via `mkdir -p "<cliente>/Recepcionista"` no início. Cobre os dois cenários:
-  - **Fluxo completo:** o `client-project-scaffolder` já criou a raiz ao montar as especialidades — `mkdir -p` é idempotente, segue tranquilo.
+  - **Fluxo completo:** o `client-scaffold-structure` já criou a raiz ao montar as especialidades — `mkdir -p` é idempotente, segue tranquilo.
   - **Bypass:** as especialidades já existem em outro lugar e a raiz pode não existir ainda — `mkdir -p` cria.
 
 ## ENTRADAS ESPERADAS (do prompt do comando)
@@ -144,7 +144,7 @@ Se você for invocado neste contexto, NÃO atue. Retorne:
 Apresente ao usuário:
 - Caminho dos 4 arquivos criados.
 - Lista de campos PENDENTE (se houver).
-- Confirme que o `client-project-scaffolder` ainda precisa rodar para criar as pastas das especialidades (o comando `/ei-cria-cliente` faz isso na sequência).
+- Confirme que todas as pastas das especialidades já foram criadas e preenchidas pelo ciclo `client-scaffold-structure` → `client-scaffold-collect` → `client-scaffold-fill` que o `/ei-cria-cliente` executou antes desta etapa (Passo 4B.1(b)) — não há nenhum passo de scaffolding pendente.
 
 ## REGRAS CRÍTICAS
 
