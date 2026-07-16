@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 Phase: Milestone v1.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-16 — Milestone v1.0 completed and archived
+Last activity: 2026-07-16 - Completed quick task 260716-lv5: Hotfix post-ajustes-fanout.sh idempotency loop bug
 
 ## Performance Metrics
 
@@ -124,6 +124,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260705-pgq | Adicionar LICENSE proprietario (all rights reserved) e atualizar package.json license para UNLICENSED | 2026-07-05 | a753f94 | [260705-pgq-adicionar-license-proprietario-all-right](./quick/260705-pgq-adicionar-license-proprietario-all-right/) |
+| 260716-lv5 | Hotfix: post-ajustes-fanout.sh loop bug - idempotency check now scans full transcript instead of a 400-line window that could scroll past an already-emitted consumed sentinel | 2026-07-16 | 3ca876a | [260716-lv5-hotfix-post-ajustes-fanout-sh-loop-bug-h](./quick/260716-lv5-hotfix-post-ajustes-fanout-sh-loop-bug-h/) |
 
 ## Deferred Items
 
