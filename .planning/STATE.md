@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 03
-status: completed
+current_phase: 03.1
+status: executing
 stopped_at: Completed 03-05-PLAN.md — Phase 3 complete (CLMD-08 checkpoint approved)
-last_updated: "2026-07-16T14:02:35.274Z"
+last_updated: "2026-07-16T14:39:55.038Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 03 complete
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
   total_plans: 14
   completed_plans: 14
-  percent: 100
+  percent: 75
 current_phase_name: separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 
 ## Current Position
 
-Phase: 03
+Phase: 03.1
 Plan: Not started
-Status: Phase 03 complete
+Status: Ready to execute
 Last activity: 2026-07-16 — Phase 03 complete
 
 Progress: [████████████████████] 14/14 plans (100%)
@@ -98,6 +98,7 @@ Recent decisions affecting current work:
 - Corrected `current_phase` back to 02 after phase-completion tooling advanced it straight to 03 — Phase 2 has no `.planning/phases/02-*` dir yet (never discussed/planned), so the next-phase resolver skipped over it. Roadmap order (1→2→3) and Phase 3's own "Depends on: Phase 2" are unaffected; Phase 2 is still next.
 - Renamed `.planning/phases/02-3-step-gated-client-scaffolding/` → `02-three-step-gated-client-scaffolding/` — gsd-tools' phase-token matcher folds leading numeric slug segments into the phase token, so the digit-leading slug ("3-step-...") resolved to token "02-3" instead of "02", making every `/gsd-*` command targeting phase 02 blind to the existing CONTEXT.md. Same collision would recur for any phase whose name starts with a digit — worth remembering if a future phase name starts with a number.
 - Reworded Phase 2's ROADMAP.md `**Goal:**` line into canonical "As a / I want to / so that" user-story form — the original outcome-statement phrasing blocked the planner under MVP mode (`planner-mvp-mode.md` requires the story form to derive vertical slices). No scope change, wording only.
+- Phase 03.1 inserted after Phase 3: Corrigir referências obsoletas a client-project-scaffolder em recepcionista-scaffolder.md e fallback CLAUDE.md ausente em inject-ei-context.sh (achados do audit de milestone v1.0) (URGENT)
 
 ### Pending Todos
 
