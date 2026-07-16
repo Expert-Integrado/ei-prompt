@@ -6,15 +6,15 @@ current_phase: 03.1
 current_phase_name: corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e
 status: executing
 stopped_at: Completed 03.1-01-PLAN.md
-last_updated: "2026-07-16T16:38:23.545Z"
+last_updated: "2026-07-16T16:44:05.888Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 03.1 execution started
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 17
-  completed_plans: 16
-  percent: 75
+  completed_plans: 17
+  percent: 100
 ---
 
 # Project State
@@ -73,6 +73,7 @@ Progress: [████████████████████] 14/14 p
 | Phase 03 P05 | 20min | 2 tasks | 4 files |
 | Phase 03.1 P01 | 2min | 2 tasks | 2 files |
 | Phase 03.1 P02 | 5min | 2 tasks | 2 files |
+| Phase 03.1 P03 | 6min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03.1 Plan 01: Followed PLAN.md's 4 exact edit targets verbatim in recepcionista-scaffolder.md (3 mechanical renames + 1 factual rewrite) — no additional lines touched
 - [Phase ?]: Phase 03.1 Plan 01: inject-ei-context.sh remains unregistered in .claude/settings.json — this is a latent-risk-only fix, not a re-enablement, per CONTEXT.md Deferred scope
 - [Phase ?]: Phase 03.1 Plan 02: Followed PLAN.md's exact edit targets verbatim in .claude/CLAUDE.md (5 corrections) and COMANDOS.md (3 corrections, incl. full Fluxo section rewrite) -- no additional lines touched
+- [Phase ?]: Phase 03.1 Plan 03: Followed PLAN.md's exact edit targets verbatim across 7 files (10 edit points) fixing stale client-project-scaffolder refs in client/CLAUDE.md, PROJECT.md, STATE.md, and 4 codebase-mapping docs -- no additional lines touched
+- [Phase ?]: Phase 03.1 Plan 03: Closed 03.1-VERIFICATION.md truth #7 -- scoped repo-wide regression grep now returns empty, confirming zero remaining current-state stale references to the retired client-project-scaffolder subagent
 
 ### Roadmap Evolution
 
