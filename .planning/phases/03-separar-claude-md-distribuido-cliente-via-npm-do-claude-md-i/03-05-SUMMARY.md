@@ -33,7 +33,7 @@ key-decisions:
   - "Kept the exact BANNED_HEADINGS regex from the plan (5 migrated H2 headings only, never generic keywords)"
   - "Dropped the plan's literal 'grep confirms zero occurrences of stop_hook_active' acceptance check in favor of a functional guard-absence check, because the plan's own <action> instructs mirroring validate-xml-casca.sh's header prose verbatim, which itself contains the string 4 times in comments explaining the deliberate omission — a literal zero-occurrence grep would fail against the very reference file the plan says to mirror"
 
-requirements-completed: [CLMD-07]  # CLMD-08 pending human checkpoint (Task 3)
+requirements-completed: [CLMD-07, CLMD-08]
 
 coverage:
   - id: D1
@@ -55,24 +55,28 @@ coverage:
   - id: D3
     description: "Full end-to-end distribution (bin/cli.js against updated manifest.json) still produces a correct CLAUDE.md in an installed client project, plus live guard sanity check"
     requirement: "CLMD-08"
-    verification: []
+    verification:
+      - kind: manual
+        ref: "Task 3 checkpoint how-to-verify steps 1-5 (npm test 41/41, --help sanity, content-diff/install check, guard live sanity trigger+revert)"
+        status: pass
     human_judgment: true
-    rationale: "RESEARCH.md/03-VALIDATION.md explicitly mark CLMD-08 as manual-only in this zero-dependency project (no network-fetch mock exists or should be built). Requires human-run npx install / content diff and a live Stop-event guard sanity check — Task 3 checkpoint, not yet approved."
+    rationale: "RESEARCH.md/03-VALIDATION.md explicitly mark CLMD-08 as manual-only in this zero-dependency project (no network-fetch mock exists or should be built). Human ran the checkpoint's how-to-verify steps and responded 'approved', confirming end-to-end distribution content-correctness and the live guard sanity check."
 
 # Metrics
-duration: pending (in progress — Tasks 1-2 of 3 complete)
-completed: pending
-status: in-progress
+duration: ~20min
+completed: 2026-07-16
+status: complete
 ---
 
-# Phase 03 Plan 05: Repo-Local Regression Guard + End-to-End Verification (IN PROGRESS)
+# Phase 03 Plan 05: Repo-Local Regression Guard + End-to-End Verification
 
-**check-claude-md-audience.sh: deterministic Stop/SubagentStop guard blocking migrated headings from leaking back into CLAUDE.md/.claude/CLAUDE.md, wired only into gitignored settings.local.json — Tasks 1-2 done, Task 3 human checkpoint pending**
+**check-claude-md-audience.sh: deterministic Stop/SubagentStop guard blocking migrated headings from leaking back into CLAUDE.md/.claude/CLAUDE.md, wired only into gitignored settings.local.json — human-approved end-to-end distribution checkpoint closes the phase**
 
 ## Performance
 
 - **Started:** 2026-07-16 (session start)
-- **Tasks completed:** 2 of 3 (Task 3 is a blocking human-verify checkpoint)
+- **Completed:** 2026-07-16
+- **Tasks completed:** 3 of 3
 - **Files modified:** 4 (2 created, 2 modified)
 
 ## Accomplishments
@@ -88,9 +92,9 @@ status: in-progress
 
 1. **Task 1: Create check-claude-md-audience.sh + check-claude-md-audience.test.js** - `9d09822` (feat)
 2. **Task 2: Register the guard in .claude/settings.local.json only, add .gitignore defense-in-depth** - `71b4648` (chore)
-3. **Task 3: Confirm the full separation pipeline and end-to-end distribution (CLMD-08)** - PENDING (checkpoint:human-verify, gate=blocking)
+3. **Task 3: Confirm the full separation pipeline and end-to-end distribution (CLMD-08)** - human checkpoint, no code changes to commit; human responded "approved" after running the how-to-verify steps
 
-**Plan metadata commit:** not yet created — will follow Task 3 approval.
+**Plan metadata commit:** created after checkpoint approval (this SUMMARY.md finalization, STATE.md, ROADMAP.md, REQUIREMENTS.md).
 
 ## Files Created/Modified
 
@@ -130,12 +134,36 @@ None beyond the deviation above.
 
 None - no external service configuration required.
 
+## Checkpoint Resolution (Task 3, CLMD-08)
+
+Task 3's `checkpoint:human-verify` (`gate="blocking"`) required a human to run the 5 `how-to-verify` steps (full automated regression, `--help` sanity, end-to-end distribution content-diff/install check, optional `/ei-cria-cliente` throwaway scaffold test, and a live Stop-event guard sanity trigger+revert). The orchestrator independently spot-checked the automated portions ahead of presenting the checkpoint (`npm test` 41/41, clean `--help` output, `.claude/settings.local.json` hooks block present and git-ignored, zero `check-claude-md-audience.sh` references in `manifest.json`, clean working tree) before the human confirmed.
+
+**Human response:** "approved" — all how-to-verify steps passed, including the end-to-end distribution content check and the live guard sanity check (banned heading insertion blocked, revert left the repo clean).
+
+This closes CLMD-08, the last open requirement of Phase 3. The plan and the phase are both complete as of this finalization.
+
 ## Next Phase Readiness
 
-**Plan is NOT complete.** Task 3 is a `checkpoint:human-verify` with `gate="blocking"` (CLMD-08) — full end-to-end distribution verification and a live guard sanity check require human judgment and cannot be automated in this zero-dependency project. Tasks 1-2's automatable prep steps (from Task 3's `how-to-verify`) were run ahead of the checkpoint: `npm test` (41/41 green), `node bin/cli.js --help` output sanity, and `manifest.json` schema/isolation checks. Steps 3-5 (real `npx install` content diff or equivalent, optional `/ei-cria-cliente` throwaway test, and live Stop-event guard trigger) await the human's "approved" response.
+Plan 03-05 is the final plan of Phase 3 (Wave 3, no downstream plans depend on it beyond phase completion). Phase 3's success criteria (all 5 in ROADMAP.md) are now fully met:
+1. `bin/cli.js`/`manifest.json` distribute `client/CLAUDE.md` correctly — verified across Plans 03-01/03-02 and reconfirmed here.
+2. Root `CLAUDE.md` removed (Plan 03-04); no client-facing rule autoloads in this repo's own Claude Code session.
+3. All ~9 distributed subagents/commands correctly fall back to `client/CLAUDE.md` (Plan 03-03).
+4. `bin/cli.js --help` and install loop handle mixed string/`{from,to}` manifest entries with no `[object Object]` (Plan 03-02, reconfirmed here).
+5. `check-claude-md-audience.sh` deterministically blocks reintroduction of migrated headings and is invisible to every distributed client (this plan, Tasks 1-2, human-confirmed in Task 3).
 
-This SUMMARY.md will be updated (frontmatter `status: complete`, metrics finalized, plan-metadata commit created) once the checkpoint is resolved by a continuation agent, per `checkpoints.md` convention.
+No further work is queued for Phase 3. Milestone-level next steps (if any) are tracked outside this plan.
 
 ---
 *Phase: 03-separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i*
-*Status: in-progress — awaiting Task 3 human checkpoint approval*
+*Status: complete*
+
+## Self-Check: PASSED
+
+- FOUND: `.claude/hooks/check-claude-md-audience.sh`
+- FOUND: `.claude/hooks/check-claude-md-audience.test.js`
+- FOUND: `.claude/settings.local.json`
+- FOUND: `.gitignore` entry `.claude/settings.local.json`
+- FOUND commit: `9d09822`
+- FOUND commit: `71b4648`
+- FOUND commit: `7fa973a`
+- FOUND commit: `5e62941`

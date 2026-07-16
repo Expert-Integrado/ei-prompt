@@ -32,8 +32,8 @@
 - [x] **CLMD-04**: `CLAUDE.md` raiz deste repo não contém mais nenhum conteúdo client-facing; é removido inteiramente, e `.claude/CLAUDE.md` permanece o único doc "Project instructions" funcional do repo
 - [x] **CLMD-05**: A linha de `.claude/CLAUDE.md` que hoje cita `CLAUDE.md` raiz como fonte da regra de commits é corrigida para não referenciar mais o raiz
 - [x] **CLMD-06**: Todo subagente/comando distribuído que hoje lê `CLAUDE.md` assumindo que ali está o payload cliente passa a preferir `client/CLAUDE.md` quando presente, com fallback para `CLAUDE.md` quando ausente — preservando o comportamento correto tanto no repo-fonte (testes do mantenedor) quanto em projetos de cliente distribuídos
-- [ ] **CLMD-07**: Um guard determinístico repo-local-only detecta, via `Stop`/`SubagentStop`, quando `CLAUDE.md` raiz ou `.claude/CLAUDE.md` são tocados no turno e sinaliza se algum dos 5 cabeçalhos migrados aparecer fora de `client/CLAUDE.md`; o registro do hook vive **apenas** em `.claude/settings.local.json` — nunca em `.claude/settings.json` nem em `manifest.json`
-- [ ] **CLMD-08**: Distribuição fim-a-fim continua funcionando: `bin/cli.js` contra o `manifest.json` atualizado busca `client/CLAUDE.md` no GitHub e grava `CLAUDE.md` na raiz do projeto instalador, com conteúdo idêntico ao anterior (sem regressão para clientes existentes)
+- [x] **CLMD-07**: Um guard determinístico repo-local-only detecta, via `Stop`/`SubagentStop`, quando `CLAUDE.md` raiz ou `.claude/CLAUDE.md` são tocados no turno e sinaliza se algum dos 5 cabeçalhos migrados aparecer fora de `client/CLAUDE.md`; o registro do hook vive **apenas** em `.claude/settings.local.json` — nunca em `.claude/settings.json` nem em `manifest.json`
+- [x] **CLMD-08**: Distribuição fim-a-fim continua funcionando: `bin/cli.js` contra o `manifest.json` atualizado busca `client/CLAUDE.md` no GitHub e grava `CLAUDE.md` na raiz do projeto instalador, com conteúdo idêntico ao anterior (sem regressão para clientes existentes)
 
 ## v2 Requirements
 
@@ -64,14 +64,14 @@
 | SCAF-04 | Phase 2 | Complete |
 | SCAF-05 | Phase 2 | Complete |
 | SCAF-06 | Phase 2 | Complete |
-| CLMD-01 | Phase 3 | Planned |
-| CLMD-02 | Phase 3 | Planned |
-| CLMD-03 | Phase 3 | Planned |
-| CLMD-04 | Phase 3 | Planned |
-| CLMD-05 | Phase 3 | Planned |
-| CLMD-06 | Phase 3 | Planned |
-| CLMD-07 | Phase 3 | Planned |
-| CLMD-08 | Phase 3 | Planned |
+| CLMD-01 | Phase 3 | Complete |
+| CLMD-02 | Phase 3 | Complete |
+| CLMD-03 | Phase 3 | Complete |
+| CLMD-04 | Phase 3 | Complete |
+| CLMD-05 | Phase 3 | Complete |
+| CLMD-06 | Phase 3 | Complete |
+| CLMD-07 | Phase 3 | Complete |
+| CLMD-08 | Phase 3 | Complete |
 
 **Coverage:**
 
