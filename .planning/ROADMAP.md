@@ -93,7 +93,7 @@ Phases execute in numeric order: 1 → 2 → 3 (Phase 3 depends on Phase 2 by co
 |-------|----------------|--------|-----------|
 | 1. XML Validation Hook | 4/4 | Complete    | 2026-07-05 |
 | 2. 3-Step Gated Client Scaffolding | 5/5 | Complete    | 2026-07-05 |
-| 3. Separar CLAUDE.md distribuído (cliente via npm) do CLAUDE.md interno | 5/5 | Complete   | 2026-07-16 |
+| 3. Separar CLAUDE.md distribuído (cliente via npm) do CLAUDE.md interno | 5/5 | Complete    | 2026-07-16 |
 </content>
 
 ### Phase 3: Separar CLAUDE.md distribuido (cliente via npm) do CLAUDE.md interno do repo (padrao GSD para .planning e agentes)
