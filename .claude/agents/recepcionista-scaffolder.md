@@ -37,7 +37,7 @@ Se faltar qualquer dado obrigatório (nome, lista de especialidades, empresa), *
 ## FLUXO OBRIGATÓRIO
 
 ### Fase 0: Carregar Contexto
-1. Leia `CLAUDE.md` (raiz do projeto) — internalize a seção "Arquitetura Multi-Agente (opcional — Recepcionista)".
+1. Verifique se `client/CLAUDE.md` existe (Glob). Se existir, leia-o via Read — internalize a seção "Arquitetura Multi-Agente (opcional — Recepcionista)". Se NÃO existir, leia `CLAUDE.md` (raiz do projeto) normalmente.
 2. Leia `modelo/Recepcionista.md` integralmente.
 3. Leia `modelo/Protractor.md` integralmente — atenção aos marcadores `////` (linhas 48-50 e 88) que delimitam o bloco `TRANSFERIR_PARA_AGENT`.
 
