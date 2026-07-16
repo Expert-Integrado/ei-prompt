@@ -126,3 +126,16 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 03-05-PLAN.md — Regression guard (`check-claude-md-audience.sh`) wired into `.claude/settings.local.json` only + end-to-end distribution checkpoint
+
+### Phase 03.1: Corrigir referências obsoletas a client-project-scaffolder e fallback CLAUDE.md em inject-ei-context.sh (INSERTED)
+
+**Goal:** Como mantenedor do ei-prompt, quero que toda referência à arquitetura de scaffolding retirada (`client-project-scaffolder`) seja corrigida para os 3 subagents atuais (`client-scaffold-structure` / `client-scaffold-collect` / `client-scaffold-fill`) em toda a documentação e prompts do repositório, e que `inject-ei-context.sh` tenha o mesmo fallback dual-context CLAUDE.md dos demais consumidores, para que nenhum agente (humano ou LLM) seja guiado por instruções que descrevem um fluxo que não existe mais.
+**Requirements**: TBD (post-hoc tech-debt phase — left unmapped rather than retrofitting REQ-IDs into the closed v1.0 traceability table; see 03.1-CONTEXT.md Deferred)
+**Depends on:** Phase 3
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 03.1-01-PLAN.md — Fix stale client-project-scaffolder references in recepcionista-scaffolder.md + add dual-context CLAUDE.md fallback to inject-ei-context.sh
+- [ ] 03.1-02-PLAN.md — Fix 5 stale references in .claude/CLAUDE.md + rewrite COMANDOS.md's Fluxo section and agent tables
