@@ -2,7 +2,7 @@
 
 ## What This Is
 
-CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes Claude Code (Orquestrador, Qualifier, Scheduler, Protractor, Recepcionista, Follow-Up) para pastas de clientes de atendimento automatizado. Os 6 templates em `modelo/` têm uma "casca" XML (`<?xml version="1.0" encoding="UTF-8"?>` + `<agente tipo="...">`) desde o commit `994b16f`. Este milestone endurece essa casca com validação de código (não só regra em prompt) e conserta o fluxo de criação de cliente, que hoje deixa campos incompletos porque tudo acontece numa única tacada.
+CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes Claude Code (Orquestrador, Qualifier, Scheduler, Protractor, Recepcionista, Follow-Up) para pastas de clientes de atendimento automatizado. Os 6 templates em `modelo/` têm uma "casca" XML (`<?xml version="1.0" encoding="UTF-8"?>` + `<agente tipo="...">`) desde o commit `994b16f`. Este milestone endurece essa casca com validação de código (não só regra em prompt), conserta o fluxo de criação de cliente (que deixava campos incompletos porque tudo acontecia numa única tacada), e separa fisicamente o `CLAUDE.md` distribuído ao cliente via npm do `CLAUDE.md`/`.claude/CLAUDE.md` interno do próprio repo-fonte.
 
 ## Core Value
 
@@ -17,10 +17,11 @@ Um `docs-editor-conciso` ou `client-project-scaffolder` nunca deve conseguir ger
 - ✓ Casca XML (`<?xml ...?>` + `<agente xmlns="…/super-sdr/prompt" versao="1.0" tipo="…">`) presente nos 6 templates de `modelo/` (commit `994b16f`).
 - ✓ Hook determinístico de validação de XML roda no pipeline de review (`Stop`/`SubagentStop`), substituindo a checklist manual de `docs/regras-validacao.md` por checagem de código real — valida declaração `<?xml?>` (linha 1), atributos de `<agente>` (linha 2), `tipo` correto por arquivo, raiz única sem aninhamento, e preserva o ponto cego de `<`/`&` cru sem "corrigir" via escaping/CDATA. Inclui escopo de descoberta por turno (`discoverTouchedFiles`) e tolerância a arquivo apagado (ENOENT) sem bloquear. Validated in Phase 1: XML Validation Hook.
 - ✓ Criação de cliente refatorada em 3 passos distintos e auditáveis (`client-scaffold-structure` → `client-scaffold-collect` → `client-scaffold-fill`), substituindo o antigo `client-project-scaffolder` monolítico (aposentado via `deprecated_files`), com gate humano (`AskUserQuestion`, mesmo padrão de `/ei-ajustes` Passo 3.5) entre coleta e preenchimento — fail-closed contra Cancelar/vazio/ambíguo. Aplica-se aos dois modos (single-agent e multi-agente), com o loop multi-agente permitindo Cancelar uma especialidade sem abortar as demais. Confirmado em sessões live (single-agent e multi-agente com Cancel deliberado). Validated in Phase 2: Three-Step Gated Client Scaffolding.
+- ✓ `CLAUDE.md` distribuído ao cliente (`client/CLAUDE.md`) fisicamente separado do `CLAUDE.md`/`.claude/CLAUDE.md` interno do repo-fonte — `manifest.json` usa o novo shape `{from,to}` (`bin/cli.js`'s `normalizeEntry()`/`formatManifestEntry()`, cobrindo tanto o loop de install quanto `deprecated_files` quanto `help()`) para apontar o entry de `CLAUDE.md` a `client/CLAUDE.md`; os 9 arquivos distribuídos (subagentes/comandos) preferem `client/CLAUDE.md` com fallback para `CLAUDE.md`; a raiz `CLAUDE.md` foi removida; `check-claude-md-audience.sh` (hook `Stop`/`SubagentStop`, repo-local-only via `.claude/settings.local.json`, nunca listado em `manifest.json`) bloqueia deterministicamente a reintrodução de conteúdo de cliente em `CLAUDE.md`/`.claude/CLAUDE.md`, restrito a operações `Edit`/`Write` (não dispara em `Read`). Verificado por `gsd-verifier` independentemente do SUMMARY (8/8 must-haves). Validated in Phase 3: Separar CLAUDE.md distribuído do CLAUDE.md interno.
 
 ### Active
 
-None no momento — próxima fase (03) ainda não discutida/planejada.
+None no momento — Phase 3 foi a última fase do milestone v1.0 (`is_last_phase: true`); próximo passo é `/gsd-complete-milestone` ou iniciar um novo milestone.
 
 ### Out of Scope
 
@@ -51,6 +52,9 @@ None no momento — próxima fase (03) ainda não discutida/planejada.
 | Cleanup de comandos legados fica fora do roadmap | `deprecated_files` já funciona e foi confirmado em código (`bin/cli.js:86-91`) | ✓ Good |
 | `client-project-scaffolder` monolítico aposentado via `deprecated_files`, substituído por 3 subagentes (`client-scaffold-structure/-collect/-fill`) com `tools:` restritos por passo | Boundary de confiança precisa ser estrutural (allowlist de tools), não só prosa — um subagente sem `Write`/`Edit`/`Bash` é estruturalmente incapaz de preencher template mesmo se induzido | ✓ Good — Phase 2 |
 | `post-scaffolder-review.sh` retargetado de `client-project-scaffolder` para `client-scaffold-fill` (único passo que produz conteúdo auditável) | Auditar após os 3 passos seria ruído; só o preenchimento (Passo 3) escreve conteúdo específico do cliente que vale auditoria | ✓ Good — Phase 2, disparo confirmado live em 02-05-SUMMARY |
+| `client/CLAUDE.md` isolado num folder próprio (não um arquivo solto na raiz de um subdiretório) | Evita que o autoload de "Project instructions" do Claude Code capture o payload de cliente como se fosse instrução de como trabalhar neste repo — a separação física é o mecanismo, não um comentário/aviso | ✓ Good — Phase 3 |
+| `check-claude-md-audience.sh` distribuído SOMENTE via `.claude/settings.local.json` (nunca `manifest.json`/`.claude/settings.json`) | O guard é uma proteção interna deste repo-fonte contra regressão; se fosse distribuído, viraria um hook rodando (e potencialmente bloqueando) em todo projeto-cliente sem motivo | ✓ Good — Phase 3, confirmado ausente de `manifest.json` por `gsd-verifier` |
+| Code review pego ANTES da conclusão da fase encontrou 2 bugs críticos reais (hook bloqueando em `Read`, `deprecated_files` sem `normalizeEntry()`) que o SUMMARY não capturou | Reforça que o gate de code-review/verificação não pode ser pulado mesmo quando a execução "parece" ter ido bem — um executor marcou a fase como completa prematuramente antes desses gates rodarem, e ambos os bugs eram reais e reproduzíveis | ✓ Good — Phase 3, fixes em `fix(03): CR-01`/`CR-02` |
 
 ## Evolution
 
@@ -70,4 +74,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-06 after Phase 2 (3-Step Gated Client Scaffolding) completion*
+*Last updated: 2026-07-16 after Phase 3 (Separar CLAUDE.md distribuído do CLAUDE.md interno) completion — last phase of milestone v1.0*
