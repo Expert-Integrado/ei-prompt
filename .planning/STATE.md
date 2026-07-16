@@ -6,14 +6,14 @@ current_phase: 03
 current_phase_name: separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
 status: executing
 stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-07-16T12:59:43.922Z"
+last_updated: "2026-07-16T13:07:12.459Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 14
-  completed_plans: 10
+  completed_plans: 11
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 ## Current Position
 
 Phase: 03 (separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-07-16 — Phase 03 execution started
 
@@ -66,6 +66,7 @@ Progress: [████████████████████] 9/9 pla
 | Phase 02 P04 | 4min | 1 tasks | 1 files |
 | Phase 02 P05 | ~10min | 3 tasks | 0 files |
 | Phase 03 P01 | 8min | 2 tasks | 2 files |
+| Phase 03 P02 | 10min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,7 @@ Recent decisions affecting current work:
 - `post-scaffolder-review.sh` retargetado para disparar em `client-scaffold-fill` (não nos outros 2 passos) — confirmado disparando ao vivo em 02-05-SUMMARY.
 - Risco aceito (T-2-02, `02-SECURITY.md`): gap pré-existente em `bin/cli.js` `writeFile()` (sem CWD-boundary guard) não foi corrigido nesta fase — fora de escopo, documentado como accepted risk.
 - Phase 1 (para referência): validação de XML virou hook determinístico (Node built-in), substituindo checklist manual — ver detalhes completos em PROJECT.md.
+- [Phase 03]: Followed RESEARCH.md Pattern 1/2 verbatim for normalizeEntry()/formatManifestEntry() — no deviation from documented shape or error message text
 
 ### Roadmap Evolution
 
@@ -115,7 +117,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T12:59:43.908Z
+Last session: 2026-07-16T13:06:28.533Z
 Stopped at: Completed 03-01-PLAN.md
 Resume file: None
 
