@@ -95,10 +95,17 @@ async function run({ overwrite }) {
   const results = { added: 0, updated: 0, unchanged: 0, skipped: 0, failed: 0, removed: 0 };
 
   const deprecated = Array.isArray(manifest.deprecated_files) ? manifest.deprecated_files : [];
-  for (const file of deprecated) {
-    const status = removeFile(file);
-    if (status === "removed") results.removed++;
-    // status === "absent" ou "warn" não conta no agregador (silencioso ou já logou warning)
+  for (const rawEntry of deprecated) {
+    try {
+      const { to } = normalizeEntry(rawEntry);
+      const status = removeFile(to);
+      if (status === "removed") results.removed++;
+      // status === "absent" ou "warn" não conta no agregador (silencioso ou já logou warning)
+    } catch (err) {
+      const label = typeof rawEntry === "string" ? rawEntry : JSON.stringify(rawEntry);
+      log("red", "fail  ", `deprecated: ${label} — ${err.message}`);
+      results.failed++;
+    }
   }
 
   for (const rawEntry of manifest.files) {
