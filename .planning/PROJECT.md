@@ -22,7 +22,7 @@ Um `docs-editor-conciso` ou `client-scaffold-fill` nunca deve conseguir gerar/de
 
 ### Active
 
-None no momento — Phase 03.1 foi a última fase do milestone v1.0 (`is_last_phase: true`); próximo passo é `/gsd-complete-milestone` ou iniciar um novo milestone.
+None no momento — milestone v1.0 concluído e arquivado (`.planning/milestones/v1.0-*`); próximo passo é iniciar um novo milestone com `/gsd-new-milestone`.
 
 ### Out of Scope
 
@@ -77,4 +77,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-16 after Phase 03.1 (Corrigir referências obsoletas a client-project-scaffolder) completion — last phase of milestone v1.0*
+*Last updated: 2026-07-16 after v1.0 milestone (Validação XML e Scaffolding em 3 Passos) completion*
