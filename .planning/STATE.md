@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 0
 status: Awaiting next milestone
 stopped_at: Completed 03.1-01-PLAN.md
-last_updated: "2026-07-16T17:21:17.279Z"
+last_updated: "2026-07-16T19:30:14.368Z"
 last_activity: 2026-07-16
-last_activity_desc: Milestone v1.0 completed and archived
+last_activity_desc: "Completed quick task 260716-lv5: Hotfix post-ajustes-fanout.sh idempotency loop bug"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 Phase: Milestone v1.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-16 - Completed quick task 260716-lv5: Hotfix post-ajustes-fanout.sh idempotency loop bug
+Last activity: 2026-07-16 - Completed quick task 260716-mhh: Release prep v2.1.1 (RELEASE.md fix, CHANGELOG, CLAUDE.md xref), PR #15 opened dev->main (not merged)
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Last activity: 2026-07-16 - Completed quick task 260716-lv5: Hotfix post-ajustes
 | Phase 03.1 P01 | 2min | 2 tasks | 2 files |
 | Phase 03.1 P02 | 5min | 2 tasks | 2 files |
 | Phase 03.1 P03 | 6min | 2 tasks | 7 files |
+| Phase quick-260716-mhh P01 | 20min | 4 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03.1 Plan 02: Followed PLAN.md's exact edit targets verbatim in .claude/CLAUDE.md (5 corrections) and COMANDOS.md (3 corrections, incl. full Fluxo section rewrite) -- no additional lines touched
 - [Phase ?]: Phase 03.1 Plan 03: Followed PLAN.md's exact edit targets verbatim across 7 files (10 edit points) fixing stale client-project-scaffolder refs in client/CLAUDE.md, PROJECT.md, STATE.md, and 4 codebase-mapping docs -- no additional lines touched
 - [Phase ?]: Phase 03.1 Plan 03: Closed 03.1-VERIFICATION.md truth #7 -- scoped repo-wide regression grep now returns empty, confirming zero remaining current-state stale references to the retired client-project-scaffolder subagent
+- [Phase ?]: Executado release-prep (RELEASE.md fix, v2.1.1 bump, CLAUDE.md xref) diretamente no checkout principal (dev) em vez do worktree isolado, pois o worktree estava 4 commits atras de dev e a Task 4 exige operar em dev diretamente (push origin dev + PR dev->main).
+- [Phase ?]: PR #15 (dev -> main) aberto e deixado OPEN de proposito -- merge dispara npm publish real e irreversivel; requer decisao humana deliberada.
 
 ### Roadmap Evolution
 
@@ -125,6 +128,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260705-pgq | Adicionar LICENSE proprietario (all rights reserved) e atualizar package.json license para UNLICENSED | 2026-07-05 | a753f94 | [260705-pgq-adicionar-license-proprietario-all-right](./quick/260705-pgq-adicionar-license-proprietario-all-right/) |
 | 260716-lv5 | Hotfix: post-ajustes-fanout.sh loop bug - idempotency check now scans full transcript instead of a 400-line window that could scroll past an already-emitted consumed sentinel | 2026-07-16 | 3ca876a | [260716-lv5-hotfix-post-ajustes-fanout-sh-loop-bug-h](./quick/260716-lv5-hotfix-post-ajustes-fanout-sh-loop-bug-h/) |
+| 260716-mhh | Release prep: corrigido RELEASE.md (push-to-main dispara publish, nao tag), bump v2.1.1 + CHANGELOG do hotfix post-ajustes-fanout, cross-ref RELEASE.md em ambos CLAUDE.md, PR #15 aberto (dev->main, NAO mergeado) | 2026-07-16 | 0ebd682 | [260716-mhh-release-prep-fix-stale-release-md-says-t](./quick/260716-mhh-release-prep-fix-stale-release-md-says-t/) |
 
 ## Deferred Items
 
@@ -136,7 +140,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T14:57:11.455Z
+Last session: 2026-07-16T19:27:20.254Z
 Stopped at: Completed 03.1-01-PLAN.md
 Resume file: None
 
