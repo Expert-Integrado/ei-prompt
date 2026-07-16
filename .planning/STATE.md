@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03.1
 current_phase_name: corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e
-status: executing
+status: verifying
 stopped_at: Completed 03.1-01-PLAN.md
-last_updated: "2026-07-16T14:53:33.326Z"
+last_updated: "2026-07-16T15:00:22.301Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 03.1 execution started
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 16
-  completed_plans: 15
-  percent: 75
+  completed_plans: 16
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 
 Phase: 03.1 (corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-16 — Phase 03.1 execution started
 
 Progress: [████████████████████] 14/14 plans (100%)
@@ -72,6 +72,7 @@ Progress: [████████████████████] 14/14 p
 | Phase 03 P04 | 5min | 2 tasks | 2 files |
 | Phase 03 P05 | 20min | 2 tasks | 4 files |
 | Phase 03.1 P01 | 2min | 2 tasks | 2 files |
+| Phase 03.1 P02 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,7 @@ Recent decisions affecting current work:
 - [Phase 03]: Phase 3 complete: CLMD-08 human checkpoint approved — end-to-end distribution verified (npm test 41/41, --help sanity, content-diff/install check, live guard sanity trigger+revert). check-claude-md-audience.sh regression guard closes the phase, registered only in gitignored .claude/settings.local.json.
 - [Phase ?]: Phase 03.1 Plan 01: Followed PLAN.md's 4 exact edit targets verbatim in recepcionista-scaffolder.md (3 mechanical renames + 1 factual rewrite) — no additional lines touched
 - [Phase ?]: Phase 03.1 Plan 01: inject-ei-context.sh remains unregistered in .claude/settings.json — this is a latent-risk-only fix, not a re-enablement, per CONTEXT.md Deferred scope
+- [Phase ?]: Phase 03.1 Plan 02: Followed PLAN.md's exact edit targets verbatim in .claude/CLAUDE.md (5 corrections) and COMANDOS.md (3 corrections, incl. full Fluxo section rewrite) -- no additional lines touched
 
 ### Roadmap Evolution
 
@@ -131,7 +133,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T14:53:33.313Z
+Last session: 2026-07-16T14:57:11.455Z
 Stopped at: Completed 03.1-01-PLAN.md
 Resume file: None
 
