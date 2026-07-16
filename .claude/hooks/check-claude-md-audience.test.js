@@ -88,6 +88,22 @@ test("CR-01 regression: a Read-only tool_use on a CLAUDE.md with a banned headin
   assert.strictEqual(stdout, "");
 });
 
+test("WR-02 regression: a CLAUDE.md nested under a directory merely containing '/client/' as a substring (e.g. api-client/) is NOT excluded and still blocks", () => {
+  const tempDir = makeTempDir();
+  const nestedDir = path.join(tempDir, "api-client");
+  fs.mkdirSync(nestedDir);
+  const filePath = path.join(nestedDir, "CLAUDE.md");
+  fs.writeFileSync(filePath, `# Preferências\n\n${BANNED_HEADING}\n`);
+
+  const transcriptPath = buildTranscript(tempDir, filePath);
+  const stdout = runHook(transcriptPath);
+
+  const lines = stdout.trim().split("\n").filter(Boolean);
+  assert.strictEqual(lines.length, 1, `expected exactly one line of stdout, got: ${stdout}`);
+  const parsed = JSON.parse(lines[0]);
+  assert.strictEqual(parsed.decision, "block");
+});
+
 test("emits nothing when no CLAUDE.md-named file was touched at all", () => {
   const tempDir = makeTempDir();
   const filePath = path.join(tempDir, "README.md");

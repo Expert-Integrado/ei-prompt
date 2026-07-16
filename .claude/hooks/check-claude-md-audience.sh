@@ -51,13 +51,16 @@ TRANSCRIPT=$(printf '%s' "$INPUT" | grep -o '"transcript_path"[[:space:]]*:[[:sp
 # sobre um CLAUDE.md não relacionado (ex.: de outro repo, via
 # Read(//root/**)) dispara falso-positivo de block, contradizendo o
 # comentário de cabeçalho deste script e 03-05-PLAN.md.
+# WR-02 fix: anchorar a exclusão de client/CLAUDE.md ao final do path
+# (segmento de diretório exato, não substring livre) — evita excluir
+# falsamente algo como '.../api-client/CLAUDE.md'.
 mapfile -t TOUCHED < <(
   tail -n 400 "$TRANSCRIPT" \
     | grep -oE '"name"[[:space:]]*:[[:space:]]*"(Edit|Write)"[^}]*"file_path"[[:space:]]*:[[:space:]]*"[^"]*CLAUDE\.md"' \
     | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*CLAUDE\.md"' \
     | sed 's/.*"\([^"]*\)"$/\1/' \
     | sort -u \
-    | grep -v '/client/'
+    | grep -vE '(^|/)client/CLAUDE\.md$'
 )
 
 [ "${#TOUCHED[@]}" -eq 0 ] && exit 0
