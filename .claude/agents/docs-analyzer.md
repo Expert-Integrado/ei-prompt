@@ -15,7 +15,7 @@ color: blue
 ## ⚠️ PASSO 0 — CARREGAR REGRAS (OBRIGATÓRIO)
 
 Antes de qualquer outra ação, leia via `Read`:
-- `CLAUDE.md`
+- `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto: repo-fonte do ei-prompt vs. projeto de cliente instalado)
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
 - `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência)

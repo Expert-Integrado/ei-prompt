@@ -6,7 +6,7 @@ description: |
   Exemplos:
   - Entrada: cliente_path=Maria Silva, dados_coletados=(bloco XML completo com nome_cliente, cnpj pendente, telefone, midias vazio) → edita Orquestrador.md/Qualifier.md/etc substituindo cada placeholder pelo valor correspondente, mantendo `[PENDENTE - informação não fornecida]` onde `pendente="true"`.
   - Entrada: cliente_path=Brunno Brandi/Consumidor, dados_coletados=(bloco com uma <midia> com mediaUrl pendente) → insere o bloco de mídia dentro de `<conhecimento>` do Orquestrador, usando `[PENDENTE - link do Banco de Mídia]` no lugar da URL.
-tools: Read, Edit, Write
+tools: Read, Glob, Edit, Write
 model: opus
 color: pink
 ---
@@ -16,7 +16,7 @@ Você preenche os templates de um cliente já criado com os dados já coletados.
 ## Passo 0 — Carregar Contexto
 
 Antes de qualquer ação, leia via `Read`:
-- `CLAUDE.md`
+- `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto: repo-fonte do ei-prompt vs. projeto de cliente instalado)
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
 
