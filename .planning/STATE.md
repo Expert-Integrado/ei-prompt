@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i
 status: executing
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-07-16T13:17:56.424Z"
+stopped_at: 03-05-PLAN.md Tasks 1-2 committed (9d09822, 71b4648); paused at Task 3 blocking human-verify checkpoint (CLMD-08)
+last_updated: "2026-07-16T13:28:47.303Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 03 execution started
 progress:
@@ -30,8 +30,8 @@ See: .planning/PROJECT.md (updated 2026-07-06)
 
 Phase: 03 (separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-07-16 — Phase 03 execution started
+Status: Paused at Task 3 blocking human-verify checkpoint (CLMD-08) — Tasks 1-2 committed
+Last activity: 2026-07-16 — Plan 03-05 Tasks 1-2 committed, awaiting checkpoint approval
 
 Progress: [████████████████████] 9/9 plans (100%)
 
@@ -86,6 +86,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Applied RESEARCH.md Pattern 3 (dual-context CLAUDE.md fallback: Glob-check client/CLAUDE.md, fall back to CLAUDE.md) verbatim across 9 files / 11 edit points; included client-scaffold-fill.md as a 9th file missed by RESEARCH.md's own table and added Glob to its tools frontmatter.
 - [Phase 03]: D-07: root CLAUDE.md removido por completo (full removal), sem stub/pointer, per RESEARCH.md
 - [Phase 03]: D-08: unica linha de cross-reference corrigida em .claude/CLAUDE.md (commits rule), demais mencoes de 'root CLAUDE.md' no bloco Architecture auto-gerado ficam de fora do escopo (T-03-09, risco aceito)
+- [Phase 03]: Plan 03-05 Task 1: resolved plan-internal tension — mirrored validate-xml-casca.sh header rationale verbatim (contains 'stop_hook_active' in prose) but implemented the acceptance-criteria check as a functional guard-absence assertion, not a literal string grep
+- [Phase 03]: Observed tooling quirk: STATE.md frontmatter progress auto-recalculates from disk SUMMARY.md file existence (ignores the SUMMARY's own 'status: in-progress' field) on every state.* read-modify-write call — creating 03-05-SUMMARY.md while Task 3 was still a pending checkpoint caused progress to jump to a false 14/14 (100%) after an unrelated add-decision call; manually corrected frontmatter back to 13/14 (67%) and stopped_at to reflect the true checkpoint-paused state. Continuation agent will get the correct 100% once Task 3 truly completes via the normal state.advance-plan/update-progress calls.
 
 ### Roadmap Evolution
 
@@ -122,9 +124,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T13:17:56.404Z
-Stopped at: Completed 03-04-PLAN.md
-Resume file: None
+Last session: 2026-07-16T13:28:47.289Z
+Stopped at: 03-05-PLAN.md Tasks 1-2 committed (9d09822, 71b4648); paused at Task 3 blocking human-verify checkpoint (CLMD-08)
+Resume file: .planning/phases/03-separar-claude-md-distribuido-cliente-via-npm-do-claude-md-i/03-05-PLAN.md
 
 Last activity: 2026-07-06 - Phase 02 UAT passed (1/1), security threat-secure (02-SECURITY.md, threats_open: 0), transitioned to Phase 03
 </content>
