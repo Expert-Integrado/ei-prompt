@@ -58,9 +58,24 @@ ROUND_ID=$(printf '%s' "$TAIL" \
 [ -z "$ROUND_ID" ] && exit 0
 
 # 5) Idempotência (protocolo sentinela ↔ consumed — D-06 do CONTEXT.md):
-#    se já existe <ei-ajustes-round-consumed id="$ROUND_ID"/> no tail, este round já foi tratado.
-#    (TAIL já foi normalizado no passo 3 — busca por aspas literais funciona.)
-if printf '%s' "$TAIL" | grep -qF "<ei-ajustes-round-consumed id=\"$ROUND_ID\""; then
+#    se já existe <ei-ajustes-round-consumed id="$ROUND_ID"/> em algum ponto do
+#    transcript, este round já foi tratado.
+#    HOTFIX 260716-lv5 (loop bug): esta checagem varre o $TRANSCRIPT INTEIRO
+#    (FULL_ASSISTANT, sem tail -n 400) — DIFERENTE do $TAIL windowed usado no
+#    passo 4 só para extrair o $ROUND_ID. Motivo: o Passo 6 do /ei-ajustes
+#    dispara fan-out de M reviewers em paralelo, cada um gerando várias linhas
+#    JSONL grandes de tool_use/tool_result. Essas linhas não-assistant diluem
+#    a janela de 400 linhas rapidamente, e alguns Stop events depois a janela
+#    pode já ter varrido para além da mensagem assistant que contém o
+#    marcador consumed — mesmo que ele já tenha sido emitido de fato — fazendo
+#    o hook re-bloquear a MESMA rodada repetidamente até estourar o cap de
+#    retries. A extração do $ROUND_ID no passo 4 PODE continuar restrita à
+#    janela porque só precisa responder "existe uma rodada aberta
+#    recentemente?"; é só a checagem de idempotência que precisa enxergar o
+#    histórico completo. Reverter esta checagem de volta para usar $TAIL
+#    reintroduz o bug — ver .claude/hooks/post-ajustes-fanout.test.js.
+FULL_ASSISTANT=$(grep '"type":"assistant"' "$TRANSCRIPT" | sed 's/\\"/"/g')
+if printf '%s' "$FULL_ASSISTANT" | grep -qF "<ei-ajustes-round-consumed id=\"$ROUND_ID\""; then
   exit 0
 fi
 

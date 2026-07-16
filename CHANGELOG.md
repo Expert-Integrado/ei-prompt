@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.1] - 2026-07-16
+
+**Hotfix: o `/ei-ajustes` podia re-bloquear uma rodada de ajustes que já tinha sido concluída.**
+
+- **A checagem de "isso já foi concluído?" olhava só uma fatia recente do histórico da conversa.** Quando o fan-out paralelo de revisores (Passo 6) gerava bastante atividade intermediária, essa fatia recente podia "rolar" para além do marcador que provava que a rodada já tinha sido finalizada — fazendo o hook achar, por engano, que a rodada ainda estava em aberto e travar o fluxo de novo. Isso não acontece mais: essa checagem agora olha o histórico inteiro da conversa, não só a fatia recente (a extração do id da rodada continua olhando só a fatia recente, sem mudança).
+- **`.claude/hooks/post-ajustes-fanout.sh`**: a checagem de idempotência do Passo 5 agora varre o transcript inteiro através de uma nova variável `FULL_ASSISTANT`, em vez da janela de 400 linhas (`$TAIL`) usada apenas para a extração do `ROUND_ID` no Passo 4.
+- **`.claude/hooks/post-ajustes-fanout.test.js`**: nova suíte de regressão (4 casos, `node:test` + `execFileSync`, seguindo as convenções de `check-claude-md-audience.test.js`), confirmada falhando contra o código pré-fix e passando contra o fix.
+- **`package.json`**: version `2.1.0` → `2.1.1`.
+
 ## [2.1.0] - 2026-07-16
 
 **Criação de cliente mais segura e arquivos de agente protegidos contra corrupção.**

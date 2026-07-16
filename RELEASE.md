@@ -7,31 +7,33 @@ Como publicar uma nova versão do `@expertzinhointegrado/ei-prompt` no npm.
 ```bash
 # 1. bump versão no package.json
 # 2. atualizar CHANGELOG.md
-# 3. commit + push
-# 4. criar e empurrar a tag (← isso dispara o publish)
-git tag v1.8.5
-git push origin v1.8.5
+# 3. commit na branch de trabalho (dev)
+# 4. push da dev + abrir PR para main
+git push origin dev
+gh pr create --base main --head dev
+
+# 5. merge do PR (← isso dispara o publish, não existe passo de tag)
 ```
 
-O push da tag dispara o workflow [`Publish to npm`](.github/workflows/publish.yml), que roda `npm publish` automaticamente em ~10-25s.
+Merge do PR em `main` dispara o workflow [`Publish to npm`](.github/workflows/publish.yml), que roda `npm publish` automaticamente em ~10-25s. Não há passo de tag no fluxo atual — qualquer push que chegue em `main` (via merge de PR ou push direto) já é o gatilho.
 
 ## Como o CI/CD funciona
 
-O workflow está em [`.github/workflows/publish.yml`](.github/workflows/publish.yml) e dispara **apenas** em push de tag no formato `v*`:
+O workflow está em [`.github/workflows/publish.yml`](.github/workflows/publish.yml) e dispara em qualquer push que chegue na branch `main`, além de permitir disparo manual:
 
 ```yaml
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
   workflow_dispatch:
 ```
 
-> ⚠️ **Push em `main` NÃO publica.** Só a tag dispara. Esquecer a tag = código no GitHub, mas npm desatualizado.
+> ⚠️ **Qualquer push em `main` publica automaticamente.** Não existe passo de tag — merge de PR em `main` já é a ação de publish, sem etapa manual separada depois. Por isso o bump de versão (`package.json`) e a entrada no `CHANGELOG.md` são obrigatórios ANTES do merge: mergear sem bumpar a versão falha com `403 Forbidden` (versão já publicada no npm).
 
 O job:
 
-1. Faz checkout do repo na ref da tag.
+1. Faz checkout do repo no commit mergeado em `main`.
 2. Setup do Node 20 com registry `https://registry.npmjs.org`.
 3. Roda `npm publish --access public` usando o secret `NPM_TOKEN`.
 
@@ -70,22 +72,22 @@ chore: release v1.8.5 — <resumo curto>
 <descrição opcional em 2-4 linhas>
 ```
 
+O commit acontece na branch de trabalho (`dev`), antes de abrir o PR para `main`.
+
 > Não incluir assinaturas `Generated with Claude Code` nem `Co-Authored-By` (regra do `CLAUDE.md`).
 
-### 4. Push do commit (opcional, mas recomendado antes da tag)
+### 4. Push da `dev` e abertura do PR
 
 ```bash
-git push origin main
+git push origin dev
+gh pr create --base main --head dev
 ```
 
-### 5. Criar e empurrar a tag
+Este passo é obrigatório — é o único jeito de levar o commit até `main` neste fluxo baseado em PR.
 
-```bash
-git tag v1.8.5
-git push origin v1.8.5
-```
+### 5. Merge do PR (dispara o publish)
 
-A partir daqui o GitHub Action assume.
+Mergear o PR em `main` é o que faz a GitHub Action rodar. Como essa ação é irreversível e pública (publica de verdade no npm), trate-a como uma decisão humana deliberada e revisada — não como algo para automatizar.
 
 ### 6. Acompanhar o run
 
@@ -110,16 +112,16 @@ Se o token expirar, o run falha com `401 Unauthorized` no passo `Publish`. Renov
 npm view @expertzinhointegrado/ei-prompt version
 ```
 
-Deve retornar a versão da tag recém-publicada.
+Deve retornar a versão recém-publicada.
 
 ## Erros comuns
 
 | Sintoma | Causa | Fix |
 |---------|-------|-----|
-| Push em `main` não publica | Workflow só roda em tag | Criar `git tag vX.Y.Z && git push origin vX.Y.Z` |
-| `403 Forbidden` no publish | Versão já existe no npm | Bumpar versão no `package.json` e refazer tag |
+| Merge em `main` publica versão antiga/duplicada | PR foi mergeado sem bumpar a versão em `package.json` antes | Bumpar versão e atualizar `CHANGELOG.md` ANTES de abrir/mergear o PR |
+| `403 Forbidden` no publish | Versão já existe no npm | Bumpar versão no `package.json` e refazer commit/PR |
 | `401 Unauthorized` | `NPM_TOKEN` expirou | Renovar token e atualizar secret |
-| Tag empurrada com versão diferente da do `package.json` | Esqueceu de commitar o bump antes da tag | Deletar tag (`git tag -d v1.8.5 && git push origin :v1.8.5`), corrigir, refazer |
+| PR mergeado com versão diferente da esperada em `package.json` | Esqueceu de commitar o bump antes do merge | A versão anterior já está publicada e não pode ser reutilizada; bumpar a versão de novo e abrir um novo commit/PR — não dá pra "desfazer" o merge |
 
 ## Rollback
 
@@ -133,4 +135,4 @@ npm unpublish @expertzinhointegrado/ei-prompt@1.8.5
 npm deprecate @expertzinhointegrado/ei-prompt@1.8.5 "use 1.8.6+"
 ```
 
-E na sequência: bump + tag nova com a correção.
+E na sequência: bump de versão + novo commit + novo PR para `main` (sem tag) — o merge desse PR é o que republica a versão corrigida.

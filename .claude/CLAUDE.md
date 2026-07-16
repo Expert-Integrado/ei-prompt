@@ -57,6 +57,7 @@ CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes
 - Claude Code CLI (this repo's own `.claude/` directory — agents, hooks, commands — is used to develop/maintain the project itself, and is also one of the artifact sets shipped to end-user client projects via `manifest.json`)
 - End users run `npx @expertzinhointegrado/ei-prompt@latest` in any Node >= 18 environment; the CLI has no server component and no persistent runtime — it downloads files from GitHub raw content into the invoking project's working directory (`bin/cli.js` `writeFile`/`fetchFile`).
 - Publishing target: npm registry (`https://registry.npmjs.org`), automated via GitHub Actions (`.github/workflows/publish.yml`), Node 20 runner.
+- Release process is documented in `RELEASE.md`: any push landing on `main` triggers `npm publish` automatically via that workflow, so the version bump (`package.json`) and the `CHANGELOG.md` entry must happen BEFORE a PR is merged into `main`.
 
 <!-- GSD:stack-end -->
 
