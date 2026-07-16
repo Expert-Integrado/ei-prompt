@@ -5,6 +5,9 @@
   "bin": {
     "ei-prompt": "bin/cli.js"
   },
+  "scripts": {
+    "test": "node --test bin/*.test.js .claude/hooks/*.test.js"
+  },
   "files": [
     "bin",
     "manifest.json"
