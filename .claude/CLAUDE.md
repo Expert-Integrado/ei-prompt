@@ -118,7 +118,7 @@ CLI npm (`@expertzinhointegrado/ei-prompt`) que distribui um conjunto de agentes
 - **Never add new fields to `<formato_resposta>`** — only reuse existing fields (hard rule enforced by `docs-reviewer`).
 - **Never duplicate a rule across sections** — consolidate into the single most-appropriate section and cross-reference by name instead of repeating text (`docs/regras-edicao.md`).
 - **Action keywords in the `resume` field** follow a fixed vocabulary: `IR_PARA_AGENDAMENTO`, `ACIONAR_PROTRACTOR:FINALIZAR_SESSAO`, `ACIONAR_PROTRACTOR:TRANSFERIR_PARA_HUMANO`, `ACIONAR_PROTRACTOR:TRANSFERIR_PARA_AGENT:[nome]`, `COLETAR:[campo]` — do not invent new keywords.
-- **Commits never include "Generated with Claude Code" or "Co-Authored-By"** signatures (explicit project rule in `CLAUDE.md` and `docs/proibido-fazer.md`).
+- **Commits never include "Generated with Claude Code" or "Co-Authored-By"** signatures (explicit project rule — see `docs/proibido-fazer.md`).
 
 <!-- GSD:conventions-end -->
 
