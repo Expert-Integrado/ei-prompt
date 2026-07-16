@@ -9,8 +9,13 @@ const { execFileSync } = require("child_process");
 
 const HOOK_PATH = path.join(__dirname, "check-claude-md-audience.sh");
 
-function makeTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "claude-md-audience-test-"));
+// WR-03 fix: register cleanup on the test context so each temp dir created
+// via mkdtempSync is removed after its test runs, instead of leaking into
+// the OS temp directory across repeated `npm test` runs.
+function makeTempDir(t) {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "claude-md-audience-test-"));
+  t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+  return tempDir;
 }
 
 function jsonlLine(obj) {
@@ -38,8 +43,8 @@ function runHook(transcriptPath) {
 
 const BANNED_HEADING = "## Slash Commands";
 
-test("blocks when a touched CLAUDE.md (not under /client/) contains a banned heading", () => {
-  const tempDir = makeTempDir();
+test("blocks when a touched CLAUDE.md (not under /client/) contains a banned heading", (t) => {
+  const tempDir = makeTempDir(t);
   const filePath = path.join(tempDir, "CLAUDE.md");
   fs.writeFileSync(filePath, `# Preferências\n\n${BANNED_HEADING}\n\n| Comando | Uso |\n`);
 
@@ -53,8 +58,8 @@ test("blocks when a touched CLAUDE.md (not under /client/) contains a banned hea
   assert.ok(typeof parsed.reason === "string" && parsed.reason.includes(filePath), `reason should mention ${filePath}, got: ${parsed.reason}`);
 });
 
-test("emits nothing when the touched CLAUDE.md content has no banned heading", () => {
-  const tempDir = makeTempDir();
+test("emits nothing when the touched CLAUDE.md content has no banned heading", (t) => {
+  const tempDir = makeTempDir(t);
   const filePath = path.join(tempDir, "CLAUDE.md");
   fs.writeFileSync(filePath, "# Preferências\n\n## Commits\n\nNão incluir assinatura.\n");
 
@@ -64,8 +69,8 @@ test("emits nothing when the touched CLAUDE.md content has no banned heading", (
   assert.strictEqual(stdout, "");
 });
 
-test("excludes client/CLAUDE.md from being flagged even when it contains a banned heading", () => {
-  const tempDir = makeTempDir();
+test("excludes client/CLAUDE.md from being flagged even when it contains a banned heading", (t) => {
+  const tempDir = makeTempDir(t);
   const clientDir = path.join(tempDir, "client");
   fs.mkdirSync(clientDir);
   const filePath = path.join(clientDir, "CLAUDE.md");
@@ -77,8 +82,8 @@ test("excludes client/CLAUDE.md from being flagged even when it contains a banne
   assert.strictEqual(stdout, "");
 });
 
-test("CR-01 regression: a Read-only tool_use on a CLAUDE.md with a banned heading does NOT block", () => {
-  const tempDir = makeTempDir();
+test("CR-01 regression: a Read-only tool_use on a CLAUDE.md with a banned heading does NOT block", (t) => {
+  const tempDir = makeTempDir(t);
   const filePath = path.join(tempDir, "CLAUDE.md");
   fs.writeFileSync(filePath, `# Preferências\n\n${BANNED_HEADING}\n\n| Comando | Uso |\n`);
 
@@ -88,8 +93,8 @@ test("CR-01 regression: a Read-only tool_use on a CLAUDE.md with a banned headin
   assert.strictEqual(stdout, "");
 });
 
-test("WR-02 regression: a CLAUDE.md nested under a directory merely containing '/client/' as a substring (e.g. api-client/) is NOT excluded and still blocks", () => {
-  const tempDir = makeTempDir();
+test("WR-02 regression: a CLAUDE.md nested under a directory merely containing '/client/' as a substring (e.g. api-client/) is NOT excluded and still blocks", (t) => {
+  const tempDir = makeTempDir(t);
   const nestedDir = path.join(tempDir, "api-client");
   fs.mkdirSync(nestedDir);
   const filePath = path.join(nestedDir, "CLAUDE.md");
@@ -104,8 +109,8 @@ test("WR-02 regression: a CLAUDE.md nested under a directory merely containing '
   assert.strictEqual(parsed.decision, "block");
 });
 
-test("emits nothing when no CLAUDE.md-named file was touched at all", () => {
-  const tempDir = makeTempDir();
+test("emits nothing when no CLAUDE.md-named file was touched at all", (t) => {
+  const tempDir = makeTempDir(t);
   const filePath = path.join(tempDir, "README.md");
   fs.writeFileSync(filePath, `# README\n\n${BANNED_HEADING}\n`);
 
