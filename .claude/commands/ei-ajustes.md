@@ -773,7 +773,32 @@ Mapeamento dos ícones:
 
 `N'` = quantidade total de fan-outs de reviewer executados (1 = só rodada inicial; 2 = 1 correção; 3 = 2 correções = cap).
 
-Após o resumo, encerre `/ei-ajustes`. NÃO há próximo passo automático nesta phase (Phase 5 introduzirá hook editor→reviewer; este Plan 02 mantém a transição manual via Claude principal igual ao fluxo atual).
+Após o resumo, emita a **mensagem de encerramento** (abaixo) conforme o estado geral do ajuste e então encerre `/ei-ajustes`. NÃO há próximo passo automático nesta phase (Phase 5 introduzirá hook editor→reviewer; este Plan 02 mantém a transição manual via Claude principal igual ao fluxo atual).
+
+##### Mensagem de encerramento (2 estados)
+
+Determine o estado pela composição dos ícones do resumo acima:
+
+- **Tudo aprovado** — TODOS os arquivos auditados terminaram com `✓` (nenhum `⊗`, `✗` ou `⊘`). Emita, logo após o resumo:
+
+  ```
+  ✅ Ajuste aplicado e aprovado na auditoria.
+  Resumo: <1–2 linhas do que mudou e em quais arquivos>.
+
+  Recomendo rodar `/clear` para limpar o contexto antes do próximo ajuste.
+  ```
+
+- **Com pendência** — pelo menos 1 arquivo terminou com `⊗`, `✗` ou `⊘`. Emita, logo após o resumo:
+
+  ```
+  ⚠️ O ajuste terminou com pendência(s):
+  <uma linha por arquivo pendente: `<path>` — <motivo curto>>
+
+  Para resolver, rode `/ei-ajustes` de novo focando em: <o que fazer de melhor por pendência — ex.: descrição mais específica da mudança, ou apontar a seção/arquivo certo>.
+  Recomendo rodar `/clear` antes para limpar o contexto.
+  ```
+
+O texto entre `<...>` é preenchido dinamicamente pelo Claude principal a partir do resumo — não é literal.
 
 ## Regras
 
