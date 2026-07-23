@@ -2,8 +2,6 @@
 
 CLI que instala o conjunto de agentes **EiPrompt** (Orquestrador, Qualifier, Scheduler, Protractor) no seu projeto, direto do repositório oficial no GitHub.
 
-Open source, criado por **Eric Luciano** na **Mentoria Automações Inteligentes** (Expert Integrado).
-
 ## Uso
 
 Um único comando — baixa tudo e sempre sobrescreve arquivos existentes (funciona tanto para primeira instalação quanto para atualização):
