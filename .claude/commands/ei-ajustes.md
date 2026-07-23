@@ -709,7 +709,8 @@ Reaproveite o bloco pós-Tasks do Passo 5 (mesma máquina de parsing dos N marca
 - **(a) Exceção do Agent** → `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` com `feedback="Exceção do Agent no re-edit: <texto>"`; sai da próxima rodada de reviewers.
 - **(b) Marcador `<resultado>` ausente** → `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` com `feedback="Marcador <resultado> ausente no re-edit (fail-closed)"`; sai da próxima rodada.
 - **(c) `<resultado>OK</resultado>`** → re-edit aplicado com sucesso; arquivo segue para a próxima rodada de reviewers (re-fan-out COMPLETO).
-- **(d) `<resultado>ERRO: motivo</resultado>`**: aplicar a lógica do Gate de retry parcial do Passo 5 (Plan 02 da Phase 3). Especificamente:
+- **(d-escopo) `<resultado>ERRO: ... fora do escopo declarado ...</resultado>`** (o motivo do ERRO contém o padrão `fora do escopo declarado` ou `fora de escopo declarado` — sinal de que o `<feedback>` do reviewer pede mudança em seção(ões) FORA do `secao_tag` do analyzer): **NÃO trate como falha de editor.** Este é o deadlock estrutural (reviewer tem autoridade para pedir a correção cross-section; o editor não tem para aplicá-la). Vá para a subseção **"Escalonamento de escopo (REVW-05)"** logo abaixo com este arquivo. **NÃO incremente `retries_por_arquivo` nem `correcoes_por_arquivo`** — a correção não foi aplicada nem falhou por erro de edição; foi recusada por falta de escopo, e a válvula REVW-05 vai (com consentimento humano) re-despachar a MESMA correção com escopo correto.
+- **(d) qualquer OUTRO `<resultado>ERRO: motivo</resultado>`** (motivo NÃO é "fora do escopo declarado"): aplicar a lógica do Gate de retry parcial do Passo 5 (Plan 02 da Phase 3). Especificamente:
   - O contador `retries_por_arquivo[path]` do Passo 5 incrementa (esta é uma rodada nova de Edit, conta como retry de editor — independente do cap de correção de reviewer);
   - Se `retries_por_arquivo[path] >= 2` (cap do editor estourou — Phase 3 D-11): arquivo cai para `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` com mensagem literal do Passo 5 (`"Edição de <path> falhou após 3 tentativas. Re-rode /ei-ajustes manualmente."`); sai da próxima rodada de reviewers.
   - Se `retries_por_arquivo[path] < 2`: o Gate de retry parcial do Passo 5 abre normalmente com K=1 (apenas este arquivo) — usuário pode escolher "Tentar de novo apenas os falhos" (re-edit), "Pular falhos e seguir" (cai para FALHO_EDITOR_NA_CORRECAO), ou "Cancelar tudo" (encerra `/ei-ajustes`).
@@ -723,6 +724,30 @@ Reaproveite o bloco pós-Tasks do Passo 5 (mesma máquina de parsing dos N marca
 - Se TODOS os re-edits viraram `ERRO/FALHO_EDITOR_NA_CORRECAO` → loop termina sem novo fan-out (não há arquivo re-editado para auditar) → ir para Apresentação final estendida.
 
 11. **Loop natural termina quando:** K_correcao=0 (todos OK ou BLOQUEADO ou CAP_CORRECAO) OU todos os K_correcao da rodada estouraram cap=2 OU re-edits falharam para todos os K_reedit. Em qualquer caso, ir para Apresentação final estendida.
+
+#### Subseção "Escalonamento de escopo" (REVW-05 — válvula para CORRECAO cross-section)
+
+**Pré-condição:** acionada SOMENTE pelo ramo **(d-escopo)** do parsing acima — um re-edit de correção retornou `<resultado>ERRO: ... fora do escopo declarado ...</resultado>` porque o `<feedback>` do reviewer pede mudança em seção(ões) FORA do `secao_tag` que o `docs-analyzer` declarou no Passo 3. Sem esta válvula, a correção cross-section é um **deadlock**: o reviewer audita cross-context e pode pedir mudança em qualquer seção, mas o editor está clampado (D-06) ao `secao_tag` original e recusa corretamente. Esta subseção automatiza o que antes só era possível re-rodando `/ei-ajustes` manualmente com escopo ampliado.
+
+**Por que um NOVO gate humano (única exceção ao A11):** o retry de correção normal NÃO reabre aprovação (A11 — mesma seção, mesmo blast radius). Ampliar o escopo para novas seções **aumenta o blast radius** que o humano aprovou no Passo 3.5 — isso exige consentimento humano explícito (cultura de gate do projeto). Este é o ÚNICO ponto do loop de correção que reabre um gate.
+
+**Procedimento (por arquivo que caiu no ramo d-escopo):**
+
+1. **Derive as seções-alvo da ampliação** a partir do `<feedback>` do veredito CORRECAO que originou esta correção: as tags XML que o reviewer citou explicitamente como precisando de mudança e que estão FORA do `secao_tag` atual. Chame esse conjunto de `secoes_novas` (uma ou mais tags, ex: `<objetivo>`, `<response_format>`). Use o **vocabulário fixo de tags** (não invente tags novas — `docs/regras-edicao.md`).
+
+2. **Abra UM AskUserQuestion** (D-04 tudo-ou-nada por arquivo) confirmando a ampliação:
+   - `question`: ``O reviewer pediu uma correção em `<path>` que exige mexer fora do escopo aprovado.\n\n- Escopo aprovado: `<secao_tag_atual>`\n- Reviewer também precisa alterar: `<secoes_novas>`\n- Motivo: <feedback do reviewer>\n\nAmpliar o escopo para incluir essas seções e aplicar a correção?``
+   - Opções (exatamente duas, labels literais): `"Ampliar escopo e corrigir"` / `"Manter escopo (bloquear arquivo)"`.
+
+3. **Resposta = `"Ampliar escopo e corrigir"`:**
+   - Atualize o escopo desse arquivo para `secao_tag_ampliado = secao_tag_atual ∪ secoes_novas` (guarde na variável mental do arquivo — vale para TODAS as rodadas de correção subsequentes deste arquivo nesta execução; não volta a estreitar).
+   - Re-despache o `docs-editor-conciso` para este arquivo com o MESMO template de re-edit (path, justificativa, descricao, objetivo, campo `FEEDBACK DO REVIEWER`), porém com o campo **ESCOPO reescrito** para listar TODAS as seções de `secao_tag_ampliado` (ex: ``Este ajuste PODE incidir dentro de `<contexto_transferencia_agente>` E `<objetivo>` E `<response_format>` — e SOMENTE dessas seções. NUNCA editar fora delas.``). Emita NOVO sentinela (`phase="correcao-revw04-r<n>"`, NOVO `id`, `expected_editors=<qtd re-despachada nesta resposta>`) na MESMA resposta das Tasks, per HOOK-02.
+   - **NÃO incremente `correcoes_por_arquivo` por causa da ampliação** — o incremento já ocorreu no passo 5 da rodada de correção que gerou o ERRO de escopo; a ampliação é a MESMA correção agora com escopo correto, não uma correção nova. (Cap de correção permanece justo: mede round-trips de reviewer, não negociações de escopo.)
+   - Parseie o `<resultado>` do re-dispatch pela MESMA máquina (ramos a/b/c/d acima): `OK` → arquivo segue para o re-fan-out COMPLETO de reviewers; ERRO genérico → ramo (d); ERRO de escopo DE NOVO → aplique REVW-05 mais uma vez SOMENTE se `secoes_novas` trouxer alguma tag ainda não incluída em `secao_tag_ampliado`; se não houver seção nova a acrescentar, caia para `status_final_reviewer=FALHO_EDITOR_NA_CORRECAO` (guarda anti-loop de escalonamento).
+
+4. **Resposta = `"Manter escopo (bloquear arquivo)"`:** marque o arquivo como `status_final_reviewer=BLOQUEADO` com `feedback = "Correção cross-section recusada pelo usuário (escopo não ampliado): <feedback original do reviewer>"`. Terminal — NÃO re-entra em rodadas futuras, aparece com `⊗` na Apresentação final estendida. Os demais arquivos da rodada seguem normalmente.
+
+> **Escopo desta válvula:** REVW-05 cobre APENAS o ERRO de escopo vindo do **loop de correção** do Passo 6 (reviewer pediu cross-section). O ERRO "fora de escopo" no **dispatch inicial** do Passo 5 continua significando que o `docs-analyzer` mirou a seção errada — esse caso segue o Gate de retry parcial existente (não re-invoca analyzer, D-12) e NÃO aciona REVW-05.
 
 #### Apresentação final estendida (D-16 estilo, 6 estados)
 

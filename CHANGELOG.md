@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.2.0] - 2026-07-23
+
+**A auditoria do `/ei-ajustes` não trava mais quando o revisor pede uma correção fora da seção que estava sendo editada.**
+
+- **Antes, uma correção legítima do revisor podia deixar o ajuste sem auditoria limpa.** Quando o revisor (que analisa o arquivo inteiro) apontava um problema numa seção diferente da que estava sendo ajustada, o editor — que só tem permissão para mexer na seção aprovada — recusava a correção, e o ciclo encerrava sem conseguir aplicá-la. A única saída era re-rodar o `/ei-ajustes` manualmente aprovando um escopo maior. Agora isso é automático: nesse caso, o comando pergunta se você quer ampliar o escopo para incluir as seções que o revisor apontou; se você confirmar, a mesma correção é reaplicada já com o escopo certo; se recusar, o arquivo é marcado como bloqueado e os demais seguem normalmente.
+- **A trava de escopo continua valendo** — o editor nunca sai por conta própria da seção aprovada. A ampliação só acontece com a sua confirmação explícita, porque ela aumenta o alcance do que foi aprovado no início.
+- **`.claude/commands/ei-ajustes.md`**: novo gate de escalonamento REVW-05 no loop de correção do Passo 6. O ERRO "fora do escopo declarado" vindo de um re-edit de correção deixa de ser tratado como falha de editor (que estourava o cap de retry e derrubava o arquivo para `FALHO_EDITOR_NA_CORRECAO`) e passa a abrir um `AskUserQuestion` de ampliação de escopo; ao aprovar, re-despacha a MESMA correção com `secao_tag` ampliado (sem re-incrementar os contadores de retry/correção). Inclui guarda anti-loop de escalonamento. O ERRO de escopo do dispatch inicial (Passo 5 — analyzer mirou a seção errada) mantém o comportamento atual.
+- **`package.json`**: version `2.1.1` → `2.2.0`.
+
 ## [2.1.1] - 2026-07-16
 
 **Hotfix: o `/ei-ajustes` podia re-bloquear uma rodada de ajustes que já tinha sido concluída.**
