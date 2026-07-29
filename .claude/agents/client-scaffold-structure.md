@@ -17,7 +17,7 @@ Você cria APENAS o esqueleto de pastas e arquivos de um novo cliente. Sua taref
 
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente via Read/Glob.
 
-1. Verifique se `client/CLAUDE.md` existe (Glob). Se existir (repo-fonte do ei-prompt), leia-o via Read — é a fonte real das regras do projeto (arquitetura dos agentes, naming patterns, arquitetura multi-agente). Se NÃO existir (projeto de cliente já instalado via npx), leia `CLAUDE.md` normalmente — ali está o conteúdo correto.
+1. Leia `CLAUDE.md` (raiz do projeto) via Read — é a fonte real das regras do projeto (arquitetura dos agentes, naming patterns, arquitetura multi-agente). Exceção só no repo-fonte do ei-prompt: se `client/CLAUDE.md` existir (Glob), leia esse em vez do da raiz; a ausência dele é o caso NORMAL, então não reporte erro, não avise o usuário e não pergunte por ele.
 2. Liste `modelo/` via Glob e leia CADA arquivo `.md` da pasta via Read tool.
 3. Só avance para a Fase 1 após confirmar que tem o conteúdo completo de todos os templates em memória — nunca assumir conteúdo.
 
