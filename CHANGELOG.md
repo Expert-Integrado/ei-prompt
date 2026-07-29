@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.1] - 2026-07-29
+
+**Os agentes não citam mais um arquivo que nunca existe no seu projeto.**
+
+- **As instruções internas dos agentes apontavam para o caminho errado primeiro.** O arquivo de regras que o instalador grava no seu projeto é sempre o `CLAUDE.md` na raiz — mas as instruções dos agentes citavam antes um caminho que só existe no repositório interno do ei-prompt. Isso fazia esse caminho inexistente vazar para dentro dos prompts dos subagentes e, às vezes, para as mensagens mostradas a você. Agora `CLAUDE.md` é a referência canônica em todos os pontos, e o caminho interno só aparece como exceção explícita do repositório-fonte, com instrução clara de que a ausência dele é o caso normal — nenhum agente reporta erro, avisa ou pergunta pelo arquivo quando não o encontra.
+- **`.claude/agents/client-scaffold-collect.md`, `.claude/agents/client-scaffold-fill.md`, `.claude/agents/docs-analyzer.md`, `.claude/agents/docs-editor-conciso.md`, `.claude/agents/docs-reviewer.md`, `.claude/commands/ei-ajustes.md`**: a linha de carregamento de contexto do Passo 0 (Passo 4 no `/ei-ajustes`) passa a usar uma redação canônica única e idêntica nos 6 arquivos, com `CLAUDE.md` primeiro.
+- **`.claude/agents/client-scaffold-structure.md`, `.claude/agents/recepcionista-scaffolder.md`, `.claude/commands/ei-cria-cliente.md`**: mesma inversão de precedência na instrução numerada da Fase/Passo 0, preservando os glosses de seção que cada uma já trazia.
+- **`.claude/agents/docs-editor-conciso.md`**: a referência cruzada da "VERIFICAÇÃO DE ESCOPO" ao arquivo carregado no PASSO 0 também cita `CLAUDE.md` primeiro.
+- **`.claude/commands/ei-ajustes.md`**: no template de prompt colado no `docs-reviewer` durante o fan-out do Passo 6, a checklist de regras agora cita só `CLAUDE.md` — o caminho interno deixa de ser injetado no prompt de um subagente que roda dentro do projeto do cliente. A resolução dual-contexto continua acontecendo no Passo 0 do próprio `docs-reviewer`.
+- **Sem mudança de comportamento no repositório-fonte** e sem mudança em `manifest.json`: quando o arquivo interno existe, ele mantém a precedência de leitura.
+- **`package.json`**: version `2.2.0` → `2.2.1`.
+
 ## [2.2.0] - 2026-07-23
 
 **A auditoria do `/ei-ajustes` não trava mais quando o revisor pede uma correção fora da seção que estava sendo editada.**
