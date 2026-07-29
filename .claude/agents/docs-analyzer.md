@@ -15,7 +15,7 @@ color: blue
 ## ⚠️ PASSO 0 — CARREGAR REGRAS (OBRIGATÓRIO)
 
 Antes de qualquer outra ação, leia via `Read`:
-- `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto: repo-fonte do ei-prompt vs. projeto de cliente instalado)
+- `CLAUDE.md` (raiz do projeto) — referência canônica. Exceção só no repo-fonte do ei-prompt: se `client/CLAUDE.md` existir (Glob), leia esse em vez do da raiz; a ausência dele é o caso NORMAL, então não reporte erro, não avise o usuário e não pergunte por ele.
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
 - SE `<modo>` (recebido na entrada — ver `<entrada_esperada>` abaixo) for `multi`: leia também `docs/multi-agente-recepcionista.md` (regra de personificação pós-transferência) — aplica-se apenas a clientes multi-agente com Recepcionista; em `<modo>=single`, pule este arquivo.

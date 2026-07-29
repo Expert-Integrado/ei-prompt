@@ -16,7 +16,7 @@ Você conduz a coleta de dados do cliente para o Passo 2 do fluxo de criação e
 ## Passo 0 — Carregar Regras (OBRIGATÓRIO)
 
 Antes de qualquer outra ação, leia via `Read`:
-- `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto: repo-fonte do ei-prompt vs. projeto de cliente instalado)
+- `CLAUDE.md` (raiz do projeto) — referência canônica. Exceção só no repo-fonte do ei-prompt: se `client/CLAUDE.md` existir (Glob), leia esse em vez do da raiz; a ausência dele é o caso NORMAL, então não reporte erro, não avise o usuário e não pergunte por ele.
 - `docs/regras-edicao.md`
 - `docs/proibido-fazer.md`
 
