@@ -262,7 +262,7 @@ NUNCA invocar o `docs-editor-conciso` (Passo 5) sem aprovação EXPLÍCITA via `
 > Injeção automática desativada em v1.8.9 (manutenção). Carregue manualmente.
 
 Leia via Read (se ainda não leu nesta sessão):
-- `client/CLAUDE.md` se existir (Glob) — senão `CLAUDE.md` (fallback dual-contexto)
+- `CLAUDE.md` (raiz do projeto) — referência canônica. Exceção só no repo-fonte do ei-prompt: se `client/CLAUDE.md` existir (Glob), leia esse em vez do da raiz; a ausência dele é o caso NORMAL, então não reporte erro, não avise o usuário e não pergunte por ele.
 - `docs/regras-edicao.md`, `docs/regras-validacao.md`, `docs/proibido-fazer.md`
 
 ### Passo 5: Despachar `docs-editor-conciso` em paralelo (fan-out)
@@ -550,7 +550,7 @@ INSTRUÇÃO ORIGINAL DO USUÁRIO (motivou a edição):
 FALLBACK DE TRUNCAMENTO: Se algum irmão exceder 30 KB, é apresentada apenas a SECAO_TAG alterada + lista de seções restantes; reviewer deve emitir `<veredito>CORRECAO</veredito>` se precisar do conteúdo completo para decidir.
 
 REGRAS A AUDITAR (mesma checklist do `docs-reviewer.md` original — Passo 0 do agente já carrega via Read):
-- `client/CLAUDE.md` (ou `CLAUDE.md`, conforme o Passo 4 determinou) + docs/regras-validacao.md + docs/proibido-fazer.md (re-ler se ainda não leu nesta sessão)
+- `CLAUDE.md` + docs/regras-validacao.md + docs/proibido-fazer.md (re-ler se ainda não leu nesta sessão)
 - `modelo/*.md` é read-only — flagar `<veredito>BLOQUEAR</veredito>` se o arquivo alvo estiver em `modelo/`
 - Campos novos no `<formato_resposta>` → `<veredito>BLOQUEAR</veredito>`
 - Duplicação de regras (entre o arquivo alvo e qualquer irmão de `<contexto_cruzado>`) → `<veredito>CORRECAO</veredito>` (proponha em `<feedback>` qual versão remover)
