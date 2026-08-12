@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Awaiting next milestone
-stopped_at: Completed quick task 260812-k2h
-last_updated: "2026-08-12T17:46:32.978Z"
+stopped_at: Completed quick task 260812-km7
+last_updated: "2026-08-12T17:58:00.000Z"
 last_activity: 2026-07-29
 last_activity_desc: "Completed quick task 260729-stk: CLAUDE.md da raiz virou referencia canonica nos 9 arquivos distribuidos, caminho interno removido do template de prompt do docs-reviewer, release prep v2.2.1"
 progress:
@@ -140,6 +140,7 @@ None yet.
 | 260716-on3 | UX ei-ajustes: removida nota interna "modo fallback" do resumo final ao usuario (ruido, nao acionavel); leitura de docs/multi-agente-recepcionista.md no docs-analyzer agora condicional a modo=multi | 2026-07-16 | fc66ec3 | [260716-on3-two-ei-ajustes-ux-fixes-1-remove-the-int](./quick/260716-on3-two-ei-ajustes-ux-fixes-1-remove-the-int/) |
 | 260729-stk | Corrigidas referencias a client/CLAUDE.md: raiz virou referencia canonica citada primeiro em 10 pontos dos 9 arquivos distribuidos, caminho interno removido do template de prompt colado no docs-reviewer (Passo 6 do /ei-ajustes); release prep v2.2.1 | 2026-07-29 | 73ca9ab, e366419, 6dacd45 | [260729-stk-corrigir-referencias-a-client-claude-md-](./quick/260729-stk-corrigir-referencias-a-client-claude-md-/) |
 | 260812-k2h | Seções obrigatórias por tipo de agente (formato de resposta + boas_praticas) codificadas em docs/regras-edicao.md e docs/regras-validacao.md; deteccao no docs-analyzer (secoes_faltantes), correcao autocontida no docs-editor-conciso, checklist novo no docs-reviewer | 2026-08-12 | 7ee80af, 4a3d91e | [260812-k2h-no-pipeline-ei-ajustes-docs-analyzer-md-](./quick/260812-k2h-no-pipeline-ei-ajustes-docs-analyzer-md-/) |
+| 260812-km7 | Corrigido escopo de boas_praticas introduzido em 260812-k2h: obrigatoria SOMENTE em Scheduler.md (unico tipo cujo modelo/ realmente tem essa secao), nao nos 5 tipos; docs/regras-edicao.md, docs/regras-validacao.md, docs-analyzer.md (incl. reversao do Exemplo 3), docs-editor-conciso.md e docs-reviewer.md corrigidos; mapa de tag de formato de resposta por tipo permanece intocado | 2026-08-12 | 960e455, dc3c68e | [260812-km7-corrigir-escopo-de-boas-praticas-introdu](./quick/260812-km7-corrigir-escopo-de-boas-praticas-introdu/) |
 
 ## Deferred Items
 
