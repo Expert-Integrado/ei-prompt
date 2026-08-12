@@ -12,7 +12,7 @@
 
 ## Validação de Seções Obrigatórias por Tipo de Agente
 - [ ] A tag de formato de resposta correta para o tipo do agente está presente? (Orquestrador/Protractor/Recepcionista=`<response_format>`, Qualifier=`<formato_resposta>`, Scheduler=`<contrato_resposta>`; Follow-Up fora desta checagem — mapa completo em `docs/regras-edicao.md`)
-- [ ] `<boas_praticas>` está presente no arquivo? (obrigatória em Orquestrador, Qualifier, Scheduler, Protractor, Recepcionista; Follow-Up fora desta checagem — ver `docs/regras-edicao.md`)
+- [ ] `<boas_praticas>` está presente no arquivo? (obrigatória SOMENTE em Scheduler.md — o único tipo cujo `modelo/` tem essa seção hoje; demais tipos fora desta checagem — ver `docs/regras-edicao.md`)
 
 ## Validação de Ações no Campo `resume`
 - [ ] Usa apenas palavras-chave do padrão (`IR_PARA_AGENDAMENTO`, `ACIONAR_PROTRACTOR:*`, `COLETAR:*`)?

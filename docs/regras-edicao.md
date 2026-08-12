@@ -116,9 +116,9 @@ Ao verificar a seção de formato de resposta de um arquivo, usar SEMPRE a tag c
 
 ### `<boas_praticas>` — seção obrigatória
 
-`<boas_praticas>` passa a ser OBRIGATÓRIA em Orquestrador, Qualifier, Scheduler, Protractor e Recepcionista (os mesmos 5 tipos da tabela acima). Hoje só existe de fato em `modelo/Scheduler.md`; para os demais é adicionada de forma preguiçosa (self-healing) no momento em que `/ei-ajustes` tocar o arquivo, nunca retroativa em `modelo/*.md`.
+`<boas_praticas>` é obrigatória SOMENTE em `Scheduler.md` — o único tipo cujo `modelo/` realmente tem essa seção hoje (`modelo/Scheduler.md`). Os demais 4 tipos (Orquestrador, Qualifier, Protractor, Recepcionista) NÃO são obrigados a ter `<boas_praticas>` — não aplicar self-healing/adição preguiçosa neles. Quando `/ei-ajustes` tocar um `Scheduler.md` de cliente que não tenha a seção, adicioná-la de forma preguiçosa (self-healing) no mesmo despacho, nunca retroativa em `modelo/*.md`.
 
-**Conteúdo mínimo ao adicionar:** 2 a 4 bullets diretos (sem justificativa, no mesmo estilo econômico do `<boas_praticas>` de `modelo/Scheduler.md`), SINTETIZADOS a partir de regras JÁ declaradas em outras seções do MESMO arquivo (`regras_gerais`, `regras_protractor`, `contrato_resposta` etc.) — nunca inventar regra nova, nunca copiar o conteúdo específico de agenda do Scheduler para outro tipo de agente.
+**Conteúdo mínimo ao adicionar:** 2 a 4 bullets diretos (sem justificativa, no mesmo estilo econômico do `<boas_praticas>` de `modelo/Scheduler.md`), SINTETIZADOS a partir de regras JÁ declaradas em outras seções do MESMO arquivo (`regras_gerais`, `regras_protractor`, `contrato_resposta` etc.) — nunca inventar regra nova, nunca copiar literalmente o `<boas_praticas>` de `modelo/Scheduler.md`: o conteúdo deve ser sintetizado a partir do `Scheduler.md` daquele cliente específico.
 
 ### Tag de formato de resposta totalmente ausente
 
