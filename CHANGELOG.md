@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.0] - 2026-08-12
+
+**O `/ei-ajustes` não deixa mais passar um arquivo de cliente sem a seção de formato de resposta.**
+
+- **Antes, se um arquivo de cliente perdesse a tag de formato de resposta, ninguém percebia automaticamente.** Cada tipo de agente usa um nome de tag diferente para essa seção (`<response_format>` no Orquestrador/Protractor/Recepcionista, `<formato_resposta>` no Qualifier, `<contrato_resposta>` no Scheduler), e a checagem dependia de um humano lembrar de olhar a checklist manual. Agora o `docs-analyzer` detecta a ausência da tag certa para aquele tipo de arquivo ao analisar o pedido de ajuste, e o `docs-editor-conciso` adiciona a seção mínima faltante no mesmo despacho do ajuste pedido — sem depender do analyzer, já que ele também verifica de forma independente ao ler o arquivo completo. O `docs-reviewer` ganhou um item de checklist novo e distinto para auditar essa presença.
+- **`<boas_praticas>` também passa a ser seção obrigatória, mas só onde ela já existia de fato: `Scheduler.md`.** Nenhum outro tipo de agente é obrigado a ter essa seção — evita inventar uma seção nova em tipos que nunca a tiveram.
+- **`docs/regras-edicao.md`**: nova seção "Seções Obrigatórias por Tipo de Agente" com o mapa de tag por tipo e a regra de `<boas_praticas>` (Scheduler-only).
+- **`docs/regras-validacao.md`**: novo checklist "Validação de Seções Obrigatórias por Tipo de Agente".
+- **`.claude/agents/docs-analyzer.md`**: novo campo `<secoes_faltantes>` na saída estruturada, preenchido por tipo de agente.
+- **`.claude/agents/docs-editor-conciso.md`**: nova seção "SEÇÕES OBRIGATÓRIAS POR TIPO" no fluxo de edição; a REGRA INVIOLÁVEL do `<response_format>` continua intocada.
+- **`.claude/agents/docs-reviewer.md`**: novo item de checklist "Seções Obrigatórias por Tipo de Agente", distinto do checklist existente de "sem campos novos".
+- **`package.json`**: version `2.2.1` → `2.3.0`.
+
 ## [2.2.1] - 2026-07-29
 
 **Os agentes não citam mais um arquivo que nunca existe no seu projeto.**
