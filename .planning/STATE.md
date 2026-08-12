@@ -3,16 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Awaiting next milestone
-stopped_at: Completed quick task 260729-stk
-last_updated: "2026-07-29T23:57:34.595Z"
+stopped_at: Completed quick task 260812-k2h
+last_updated: "2026-08-12T17:46:32.978Z"
 last_activity: 2026-07-29
-last_activity_desc: "Completed quick task 260729-stk: CLAUDE.md da raiz virou referencia canonica nos 9 arquivos distribuidos; caminho interno removido do template de prompt do docs-reviewer; release prep v2.2.1"
+last_activity_desc: "Completed quick task 260729-stk: CLAUDE.md da raiz virou referencia canonica nos 9 arquivos distribuidos, caminho interno removido do template de prompt do docs-reviewer, release prep v2.2.1"
 progress:
   total_phases: 4
   completed_phases: 4
   total_plans: 17
   completed_plans: 17
-  percent: 100
 current_phase: 0
 current_phase_name: corrigir-refer-ncias-obsoletas-a-client-project-scaffolder-e
 ---
@@ -75,6 +74,11 @@ Last activity: 2026-07-29 - Completed quick task 260729-stk: CLAUDE.md da raiz v
 | Phase 03.1 P03 | 6min | 2 tasks | 7 files |
 | Phase quick-260716-mhh P01 | 20min | 4 tasks | 5 files |
 | Phase quick-260729-stk P01 | 12min | 3 tasks | 11 files |
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase quick-260812-k2h P01 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -104,6 +108,7 @@ Recent decisions affecting current work:
 - [Phase ?]: PR #15 (dev -> main) aberto e deixado OPEN de proposito -- merge dispara npm publish real e irreversivel; requer decisao humana deliberada.
 - [Phase ?]: Quick 260729-stk: CLAUDE.md da raiz virou a referencia canonica citada primeiro nos 9 arquivos distribuidos; o caminho client/-prefixado passou a ser excecao explicita do repo-fonte com clausula ausencia-e-normal (nao reportar erro / nao avisar / nao perguntar)
 - [Phase ?]: Quick 260729-stk: caminho interno removido do template de prompt que /ei-ajustes cola no docs-reviewer (Passo 6) — a resolucao dual-contexto ficou concentrada no Passo 0 do proprio docs-reviewer; manifest.json intocado (o mapeamento client/CLAUDE.md -> CLAUDE.md e correto)
+- [Phase ?]: Quick 260812-k2h: mapa tag-por-tipo de formato de resposta (5 tipos + Follow-Up fora) e regra de <boas_praticas> obrigatoria (self-healing, sintetizada) codificados em docs/regras-edicao.md e docs/regras-validacao.md; docs-analyzer.md sinaliza via <secoes_faltantes>, docs-editor-conciso.md corrige autocontido no mesmo despacho, docs-reviewer.md tem checklist novo e distinto
 
 ### Roadmap Evolution
 
@@ -134,6 +139,7 @@ None yet.
 | 260716-mhh | Release prep: corrigido RELEASE.md (push-to-main dispara publish, nao tag), bump v2.1.1 + CHANGELOG do hotfix post-ajustes-fanout, cross-ref RELEASE.md em ambos CLAUDE.md, PR #15 aberto (dev->main, NAO mergeado) | 2026-07-16 | 0ebd682 | [260716-mhh-release-prep-fix-stale-release-md-says-t](./quick/260716-mhh-release-prep-fix-stale-release-md-says-t/) |
 | 260716-on3 | UX ei-ajustes: removida nota interna "modo fallback" do resumo final ao usuario (ruido, nao acionavel); leitura de docs/multi-agente-recepcionista.md no docs-analyzer agora condicional a modo=multi | 2026-07-16 | fc66ec3 | [260716-on3-two-ei-ajustes-ux-fixes-1-remove-the-int](./quick/260716-on3-two-ei-ajustes-ux-fixes-1-remove-the-int/) |
 | 260729-stk | Corrigidas referencias a client/CLAUDE.md: raiz virou referencia canonica citada primeiro em 10 pontos dos 9 arquivos distribuidos, caminho interno removido do template de prompt colado no docs-reviewer (Passo 6 do /ei-ajustes); release prep v2.2.1 | 2026-07-29 | 73ca9ab, e366419, 6dacd45 | [260729-stk-corrigir-referencias-a-client-claude-md-](./quick/260729-stk-corrigir-referencias-a-client-claude-md-/) |
+| 260812-k2h | Seções obrigatórias por tipo de agente (formato de resposta + boas_praticas) codificadas em docs/regras-edicao.md e docs/regras-validacao.md; deteccao no docs-analyzer (secoes_faltantes), correcao autocontida no docs-editor-conciso, checklist novo no docs-reviewer | 2026-08-12 | 7ee80af, 4a3d91e | [260812-k2h-no-pipeline-ei-ajustes-docs-analyzer-md-](./quick/260812-k2h-no-pipeline-ei-ajustes-docs-analyzer-md-/) |
 
 ## Deferred Items
 
@@ -145,8 +151,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-29T23:57:22.032Z
-Stopped at: Completed quick task 260729-stk
+Last session: 2026-08-12T17:45:53.281Z
+Stopped at: Completed quick task 260812-k2h
 Resume file: None
 
 Last activity: 2026-07-06 - Phase 02 UAT passed (1/1), security threat-secure (02-SECURITY.md, threats_open: 0), transitioned to Phase 03
