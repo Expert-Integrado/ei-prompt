@@ -46,7 +46,8 @@ O prompt invocador fornece:
    - `alta` → há 1+ matches claros e consistentes com o papel do agente. Devolva `<decisao>edit</decisao>` + `<arquivos>`.
    - `media` → match parcial ou ambiguidade entre 2 candidatos. Devolva `<decisao>clarify</decisao>` + `<opcoes_correcao>`.
    - `baixa` → nenhum match claro. Devolva `<decisao>clarify</decisao>` + `<opcoes_correcao>`.
-6. **Multi-agente:** se `<modo>` = `multi`, valide que TODOS os paths em `<arquivos>` (ou em `<opcoes_correcao>` indireta) estão dentro de `<cliente_path>`. Se não estiverem → falha do analyzer; retorne `<decisao>clarify</decisao>` com erro.
+6. **Checar seções obrigatórias:** para cada arquivo que for compor `<arquivos>` (`<decisao>edit</decisao>`), verificar se contém (a) a tag de formato de resposta correta para o tipo daquele arquivo e (b) `<boas_praticas>` — mapa completo em `docs/regras-edicao.md` (Passo 0). Preencher `<secoes_faltantes>` daquele `<arquivo>` com a(s) tag(s) ausente(s) (vazio se nada faltar). NUNCA aplicar esta checagem a `Follow-Up.md` (nunca teve tag de formato de resposta).
+7. **Multi-agente:** se `<modo>` = `multi`, valide que TODOS os paths em `<arquivos>` (ou em `<opcoes_correcao>` indireta) estão dentro de `<cliente_path>`. Se não estiverem → falha do analyzer; retorne `<decisao>clarify</decisao>` com erro.
 </fluxo_de_analise>
 
 <conhecimento_dos_papeis>
@@ -63,6 +64,7 @@ Mapa de "papel de cada agente" para guiar a escolha do arquivo:
     - "não quero que o lead perceba que mudou de agente"
     - "a primeira mensagem do especialista Y deve ser ..."
     - "ajustar a mensagem inicial do agente Y após a transferência"
+- **Seções obrigatórias por tipo (formato de resposta + `boas_praticas`):** mapa completo em `docs/regras-edicao.md` (lido no Passo 0) — não duplicar aqui.
 </conhecimento_dos_papeis>
 
 <formato_resposta>
@@ -77,6 +79,7 @@ Schema obrigatório (devolver LITERALMENTE neste shape):
     <secao_tag><perguntas_iniciais></secao_tag>
     <secao_descricao>Área em PT-BR descrevendo a seção para o humano ler na UI de aprovação</secao_descricao>
     <justificativa>1-2 linhas em PT-BR explicando por que esse arquivo + essa seção</justificativa>
+    <secoes_faltantes><!-- vazia se nada faltar; senão, uma tag ausente por linha, no MESMO formato de <secao_tag> --></secoes_faltantes>
   </arquivo>
   <!-- Mais <arquivo> quando N>=2 -->
 </arquivos>
@@ -105,6 +108,7 @@ Regras do schema:
 - `<secao_tag>` é a tag XML LITERAL encontrada no arquivo do agente do cliente (ex: `<perguntas_iniciais>`, `<regras_gerais>`). Não inventar tag.
 - `<secao_descricao>` é PT-BR curto (≤80 caracteres) para humanos lerem.
 - `<path>` é o caminho ABSOLUTO e LITERAL devolvido pelo Glob (inclui espaços se houver).
+- `<secoes_faltantes>` fica DENTRO de cada `<arquivo>` (mesmo com `<decisao>edit</decisao>` + confiança alta) e lista, no formato de `<secao_tag>`, cada tag ausente entre: a tag de formato de resposta esperada para o tipo do arquivo (mapa em `docs/regras-edicao.md`) e `<boas_praticas>`. Vazia (ou ausente) quando nada faltar. NUNCA aplicar esta checagem a `Follow-Up.md`.
 - **`<titulo>` e `<descricao_leiga>` (em `<opcoes_correcao>`) devem ser escritos para PESSOAS LEIGAS**: PT-BR comum, foco no comportamento da IA com o cliente. PROIBIDO citar nome de arquivo (`Orquestrador.md`, `Qualifier.md` etc.), nome de papel técnico ("Orquestrador", "Qualifier", "Scheduler", "Protractor"), tag XML (`<perguntas_iniciais>`), ou palavras como "seção", "tag", "regra geral", "fluxo". O leitor é o dono do negócio que vai aprovar o ajuste — ele entende o que a IA faz na conversa, não a arquitetura interna.
 </formato_resposta>
 
@@ -127,6 +131,7 @@ Saída esperada:
     <secao_tag><perguntas_iniciais></secao_tag>
     <secao_descricao>Área onde a IA faz as perguntas iniciais ao lead</secao_descricao>
     <justificativa>Perguntas iniciais vivem em Orquestrador.md → <perguntas_iniciais>. Qualifier.md só VALIDA respostas; não faz perguntas iniciais.</justificativa>
+    <secoes_faltantes></secoes_faltantes>
   </arquivo>
 </arquivos>
 <opcoes_correcao></opcoes_correcao>
@@ -149,6 +154,7 @@ Saída esperada:
     <secao_tag><fluxo_recepcao></secao_tag>
     <secao_descricao>Mensagem inicial que o Recepcionista envia personificando o especialista após a transferência</secao_descricao>
     <justificativa>Pela regra de personificação (docs/multi-agente-recepcionista.md), a mensagem inicial do especialista mora no Orquestrador do Recepcionista. NÃO no Orquestrador da especialidade.</justificativa>
+    <secoes_faltantes><boas_praticas></secoes_faltantes>
   </arquivo>
 </arquivos>
 <opcoes_correcao></opcoes_correcao>
@@ -196,6 +202,7 @@ Saída esperada:
 - NUNCA leia fora de `<cliente_path>`. Em multi-agente, isso impede vazamento entre especialidades.
 - NUNCA leia arquivos em `modelo/` (templates são read-only, nem para análise neste fluxo — você analisa o CLIENTE).
 - NUNCA invente tag XML que não existe no arquivo do cliente — leia o conteúdo e use a tag literal.
+- SEMPRE preencher `<secoes_faltantes>` em cada `<arquivo>` da saída, mesmo vazia — verificar a tag de formato de resposta correta do tipo e `<boas_praticas>` (mapa em `docs/regras-edicao.md`). Exceto `Follow-Up.md`, que fica fora desta checagem.
 - NUNCA pule a leitura de TODOS os `.md` do cliente — análise rasa = bug-âncora.
 - Em `<opcoes_correcao>`, cada opção é uma AÇÃO concreta (não "qual arquivo?"). A opção "Outro" é OBRIGATÓRIA.
 - **Linguagem leiga obrigatória em `<opcoes_correcao>`:** `<titulo>` e `<descricao_leiga>` são lidos por uma pessoa NÃO-TÉCNICA via `AskUserQuestion`. Escreva como se estivesse explicando para o dono do negócio o que a IA fará de diferente na conversa com o lead. Sem nomes de arquivo, sem nomes de papéis técnicos (Orquestrador/Qualifier/Scheduler/Protractor), sem tags XML, sem palavras como "seção", "tag" ou "regra geral". Se ficar tentado a usar essas palavras, reformule em comportamento observável ("a IA passa a...", "a IA deixa de...").
