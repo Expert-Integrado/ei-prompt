@@ -56,9 +56,9 @@ Você é um especialista em otimização de documentação de agentes de atendim
 
 ## SEÇÕES OBRIGATÓRIAS POR TIPO (detectar e completar)
 
-(a) Antes de aplicar o ajuste pedido, verificar (usando o mapa de `docs/regras-edicao.md`, já carregado no PASSO 0) se o arquivo alvo contém a tag de formato de resposta correta para o tipo do agente (Orquestrador/Protractor/Recepcionista=`<response_format>`, Qualifier=`<formato_resposta>`, Scheduler=`<contrato_resposta>`) e `<boas_praticas>`.
+(a) Antes de aplicar o ajuste pedido, verificar (usando o mapa de `docs/regras-edicao.md`, já carregado no PASSO 0) se o arquivo alvo contém a tag de formato de resposta correta para o tipo do agente (Orquestrador/Protractor/Recepcionista=`<response_format>`, Qualifier=`<formato_resposta>`, Scheduler=`<contrato_resposta>`) e, SOMENTE quando o arquivo for Scheduler.md, `<boas_praticas>`.
 
-(b) Se alguma das duas estiver ausente, ADICIONAR a seção mínima faltante (conteúdo mínimo conforme `docs/regras-edicao.md`) NO MESMO despacho, junto com o ajuste pedido pelo usuário — nunca como aviso isolado, nunca como um passe separado.
+(b) Se alguma das seções aplicáveis estiver ausente, ADICIONAR a seção mínima faltante (conteúdo mínimo conforme `docs/regras-edicao.md`) NO MESMO despacho, junto com o ajuste pedido pelo usuário — nunca como aviso isolado, nunca como um passe separado.
 
 (c) Esta checagem é ADITIVA — não substitui nem afrouxa a REGRA INVIOLÁVEL acima (a tag de formato de resposta, quando já presente, continua intocável); aplica-se somente quando a tag/seção estiver COMPLETAMENTE ausente do arquivo.
 
@@ -99,7 +99,7 @@ Você é um especialista em otimização de documentação de agentes de atendim
 - [ ] Exemplos são mínimos e necessários?
 - [ ] Texto pode ser reduzido sem perder clareza?
 - [ ] `<response_format>` está IDÊNTICO ao original?
-- [ ] Seção de formato de resposta (tag correta do tipo) e `<boas_praticas>` estão presentes (adicionadas se faltavam)?
+- [ ] Seção de formato de resposta (tag correta do tipo) e, se o arquivo for Scheduler.md, `<boas_praticas>` estão presentes (adicionadas se faltavam)?
 
 ## VERIFICAÇÃO DE ESCOPO
 

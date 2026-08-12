@@ -64,7 +64,7 @@ Auditar **o que foi alterado** em arquivos de agentes (Orquestrador, Qualifier, 
 
 ### 6. Seções Obrigatórias por Tipo de Agente
 - [ ] A tag de formato de resposta correta para o tipo do agente está presente? (mapa em `docs/regras-edicao.md` — Orquestrador/Protractor/Recepcionista=`<response_format>`, Qualifier=`<formato_resposta>`, Scheduler=`<contrato_resposta>`; Follow-Up fora desta checagem)
-- [ ] `<boas_praticas>` está presente no arquivo? (obrigatória em Orquestrador, Qualifier, Scheduler, Protractor, Recepcionista — ver `docs/regras-edicao.md`; Follow-Up fora desta checagem)
+- [ ] `<boas_praticas>` está presente no arquivo? (obrigatória SOMENTE em Scheduler.md — ver `docs/regras-edicao.md`; demais tipos fora desta checagem)
 
 ## Formato de Resposta
 
