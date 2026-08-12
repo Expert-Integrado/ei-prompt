@@ -10,6 +10,10 @@
 - [ ] `<formato_resposta>` mantém apenas os campos originais (nenhum campo novo)?
 - [ ] `<exemplos_resposta>` cobre todos os cenários possíveis do `result`?
 
+## Validação de Seções Obrigatórias por Tipo de Agente
+- [ ] A tag de formato de resposta correta para o tipo do agente está presente? (Orquestrador/Protractor/Recepcionista=`<response_format>`, Qualifier=`<formato_resposta>`, Scheduler=`<contrato_resposta>`; Follow-Up fora desta checagem — mapa completo em `docs/regras-edicao.md`)
+- [ ] `<boas_praticas>` está presente no arquivo? (obrigatória SOMENTE em Scheduler.md — o único tipo cujo `modelo/` tem essa seção hoje; demais tipos fora desta checagem — ver `docs/regras-edicao.md`)
+
 ## Validação de Ações no Campo `resume`
 - [ ] Usa apenas palavras-chave do padrão (`IR_PARA_AGENDAMENTO`, `ACIONAR_PROTRACTOR:*`, `COLETAR:*`)?
 - [ ] Ações de encerramento/transferência delegam ao Protractor (não fazem direto)?
@@ -53,3 +57,4 @@ Após edição via `docs-editor-conciso`, o `docs-reviewer` valida automaticamen
 - Respeito aos princípios de otimização (`docs/regras-edicao.md`)
 - Não-violação das regras de proibição (`docs/proibido-fazer.md`)
 - Conformidade com esta checklist
+- Presença das seções obrigatórias por tipo de agente (formato de resposta + `<boas_praticas>`) — ver "## Validação de Seções Obrigatórias por Tipo de Agente"

@@ -95,6 +95,35 @@ O fluxo do Orquestrador segue ETAPAS numeradas, no MESMO formato gerado pelo Pro
 - **Usar palavras-chave** no início de campos existentes para indicar ações
 - **Sempre incluir `<exemplos_resposta>`** com exemplos para cada cenário possível
 
+## Seções Obrigatórias por Tipo de Agente (formato de resposta + `boas_praticas`)
+
+Aplica-se aos arquivos de **cliente** ajustados via `/ei-ajustes` — não retroage sobre `modelo/*.md` (templates já nascem certos; esta é a política aplicada no momento do ajuste, não uma edição retroativa).
+
+### Mapa de tag de formato de resposta por tipo de agente
+
+Cada tipo de agente usa um NOME DIFERENTE de tag para a seção de formato de resposta — não existe "o" nome universal correto.
+
+| Arquivo do cliente | Tag XML da seção de formato de resposta |
+|---------------------|------------------------------------------|
+| `Orquestrador.md` | `<response_format>` |
+| `Qualifier.md` | `<formato_resposta>` |
+| `Scheduler.md` | `<contrato_resposta>` |
+| `Protractor.md` | `<response_format>` |
+| `Recepcionista/Orquestrador.md` (multi-agente) | `<response_format>` |
+| `Follow-Up.md` | Fora desta checagem — nunca teve tag de formato de resposta; não inventar uma |
+
+Ao verificar a seção de formato de resposta de um arquivo, usar SEMPRE a tag correta desta tabela para o tipo daquele arquivo — nunca uma lista genérica de "qualquer um destes 3 nomes".
+
+### `<boas_praticas>` — seção obrigatória
+
+`<boas_praticas>` é obrigatória SOMENTE em `Scheduler.md` — o único tipo cujo `modelo/` realmente tem essa seção hoje (`modelo/Scheduler.md`). Os demais 4 tipos (Orquestrador, Qualifier, Protractor, Recepcionista) NÃO são obrigados a ter `<boas_praticas>` — não aplicar self-healing/adição preguiçosa neles. Quando `/ei-ajustes` tocar um `Scheduler.md` de cliente que não tenha a seção, adicioná-la de forma preguiçosa (self-healing) no mesmo despacho, nunca retroativa em `modelo/*.md`.
+
+**Conteúdo mínimo ao adicionar:** 2 a 4 bullets diretos (sem justificativa, no mesmo estilo econômico do `<boas_praticas>` de `modelo/Scheduler.md`), SINTETIZADOS a partir de regras JÁ declaradas em outras seções do MESMO arquivo (`regras_gerais`, `regras_protractor`, `contrato_resposta` etc.) — nunca inventar regra nova, nunca copiar literalmente o `<boas_praticas>` de `modelo/Scheduler.md`: o conteúdo deve ser sintetizado a partir do `Scheduler.md` daquele cliente específico.
+
+### Tag de formato de resposta totalmente ausente
+
+Se a tag esperada (mapa acima) estiver de fato ausente do arquivo do cliente — não com nome diferente, mas ausente por completo — restaurar o bloco inteiro copiando o conteúdo correspondente de `modelo/<Tipo>.md` (leitura apenas; `modelo/` continua read-only, nunca editado).
+
 ## Padrão de Ações no Campo `resume`
 Palavras-chave que indicam ao Orquestrador **qual agente acionar e o que fazer**:
 

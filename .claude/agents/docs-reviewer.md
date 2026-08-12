@@ -62,6 +62,10 @@ Auditar **o que foi alterado** em arquivos de agentes (Orquestrador, Qualifier, 
 - [ ] Não contradiz outras regras existentes?
 - [ ] Fluxo permanece coerente?
 
+### 6. Seções Obrigatórias por Tipo de Agente
+- [ ] A tag de formato de resposta correta para o tipo do agente está presente? (mapa em `docs/regras-edicao.md` — Orquestrador/Protractor/Recepcionista=`<response_format>`, Qualifier=`<formato_resposta>`, Scheduler=`<contrato_resposta>`; Follow-Up fora desta checagem)
+- [ ] `<boas_praticas>` está presente no arquivo? (obrigatória SOMENTE em Scheduler.md — ver `docs/regras-edicao.md`; demais tipos fora desta checagem)
+
 ## Formato de Resposta
 
 ### Se APROVADO:
@@ -91,7 +95,7 @@ O que o docs-editor-conciso ainda precisa fazer:
 - SEMPRE reler `CLAUDE.md` antes de auditar (Passo 0) — regras mudam.
 - FOCAR primeiro no que foi alterado, depois validar coerência com o resto do arquivo.
 - SER específico nos problemas encontrados (linha/seção).
-- PRIORIZAR: (a) alteração indevida em `modelo/`, (b) campos novos no `<formato_resposta>`, (c) duplicação de regras, (d) base de conhecimento inteira dentro do prompt.
+- PRIORIZAR: (a) alteração indevida em `modelo/`, (b) campos novos no `<formato_resposta>`, (c) duplicação de regras, (d) base de conhecimento inteira dentro do prompt, (e) ausência da tag de formato de resposta do tipo ou de `<boas_praticas>` (ver `docs/regras-validacao.md`).
 - NÃO fazer as correções você mesmo — apenas revisar e delegar.
 
 ## FLUXO DE CORREÇÃO AUTOMÁTICA (Anti-Loop)
